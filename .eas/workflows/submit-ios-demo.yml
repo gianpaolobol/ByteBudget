@@ -1,0 +1,7 @@
+name: ByteBudget submit iOS demo 1
+jobs:
+  submit_ios:
+    type: submit
+    params:
+      build_id: 0fe76313-ed6d-46af-8aa4-fd0a41684c35
+      profile: demo
