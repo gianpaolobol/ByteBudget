@@ -10,11 +10,14 @@
         "BYTEBUDGET_MODE": "demo"
       },
       "ios": {
-        "scheme": "App"
+        "scheme": "App",
+        "image": "latest"
       },
       "android": {
-        "buildType": "app-bundle"
-      }
+        "buildType": "app-bundle",
+        "image": "latest"
+      },
+      "node": "24.11.0"
     },
     "demo-apk": {
       "extends": "demo",
