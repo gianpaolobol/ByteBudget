@@ -54,5 +54,6 @@
   "language": "언어",
   "luxury": "럭셔리",
   "priceTier": "가격대",
-  "noLimit": "지출 한도 없음"
+  "noLimit": "지출 한도 없음",
+  "upTo": "최대"
 }

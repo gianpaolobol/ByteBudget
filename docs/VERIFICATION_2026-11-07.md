@@ -18,3 +18,6 @@ Browser regression found and fixed: the UI helper named `location()` shadowed th
 
 ## v0.4.0 tier verification
 50 automated tests pass. Added exact 20/50/120 boundaries without overlaps, Luxury prices above the former numeric cap, configured city/meal thresholds, missing threshold behavior, tier-only API requests, same-city saved record merge and immutable searched criteria. Browser verified default Mid, four clickable buttons, no numeric input, Bologna illustration thresholds and Luxury results from 144 to 304 EUR with no budget ceiling in the summary. Build and native sync pass; native physical-device QA remains pending.
+
+## v0.5.0 spending slider
+55 automated tests pass. Added all tier segments, High625=>85 EUR, local JPY scaling, observed Luxury tail prices, invalid positions, unlimited1000 and exclusion of cheaper tiers/higher amounts. Browser QA reproduced an actual drag to625 and the Alta85 EUR output, then results only59/79 EUR. Arabic page remains RTL but spending input and labels are LTR; physical-right drag reaches1000 and unlimited Luxury. Native sync passes; physical-device QA remains pending.

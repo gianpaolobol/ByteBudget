@@ -1,12 +1,12 @@
-# Verified-menu provider contract — v0.4
+# Verified-menu provider contract — v0.5
 
 ## User-facing search
-Four choices: low, mid, high, luxury. There is no numeric budget input or numeric spending cap. Mid is initially selected. Radius 100–1000 m; lunch/dinner; local currency derives from city data, not interface language. Classification uses the upper verified meal-price estimate:
+Four choices: low, mid, high, luxury. There is no numeric input. A single slider sets a numeric cap within the chosen tier; its far-right endpoint has no cap. Mid is initially selected. Radius 100–1000 m; lunch/dinner; local currency derives from city data, not interface language. Classification uses the upper verified meal-price estimate:
 
 - Low: max < lowMax
 - Mid: lowMax <= max < midMax
 - High: midMax <= max < highMax
-- Luxury: max >= highMax, without an upper ceiling
+- Luxury: max >= highMax; a finite ceiling at slider positions750..999, no ceiling at1000
 
 `priceBands` may be configured per city and meal: `{lunch:{lowMax,midMax,highMax},dinner:{...}}`. Values must be positive, finite, strictly increasing and expressed in the city currency. Bologna's demo uses 20/50/120 EUR; London/Tokyo examples are fictional too. Do not treat these examples as verified real-world price indices.
 
@@ -14,7 +14,7 @@ If no calibrated configuration exists, at least ten fresh independent menu recor
 
 ## API
 `GET /api/status` returns `{configured:boolean}` without secrets.
-`POST /api/search` accepts `{lat,lng,radius,tier,meal,language}`. `tier` must be one of the four values. No budget field is required or sent. Invalid input cannot trigger provider calls. Unknown city, unknown bands or missing menus produce explicit errors. All API responses are no-store.
+`POST /api/search` accepts `{lat,lng,radius,spendingPosition,meal,language}`. spendingPosition is an integer0..1000. Server derives the selected tier and cap using src/spending-slider.js and its own city data. No typed budget or client-trusted amount is required or sent. Invalid input cannot trigger provider calls. Unknown city, unknown bands or missing menus produce explicit errors. All API responses are no-store.
 
 Response: `{city,currency,timeZone,lat,lng,venues,citySample,priceBands?,coverage,attribution}`. Currency ISO 4217; timezone IANA. Venues contain `{id,name,lat,lng,currency,rating,reviewCount,isOpen,prices:{lunch:{min,max,updatedAt,source,validDays?,validFrom?,validUntil?},dinner:{...}},cuisine,menu:[{name,price}]}`. Prices must be finite, nonnegative, ordered and sourced; date freshness max 90 days. Days 0=Sunday…6=Saturday use local city time. Valid date ranges are inclusive YYYY-MM-DD.
 
@@ -37,3 +37,6 @@ References checked 2026-11-07:
 - https://developers.google.com/maps/documentation/places/web-service/place-details
 - https://developers.google.com/maps/documentation/places/web-service/policies
 - https://capacitorjs.com/docs/apis/geolocation
+
+## Spending scale
+Four equal visual segments are piecewise linear in local prices. Low begins at one quarter of lowMax; subsequent segments begin at lowMax/midMax/highMax. Finite Luxury ends at max(5*highMax, highest fresh city menu estimate), reached at999. Position1000 means null maxPrice, never Infinity or an arbitrary high numeric cap. Amounts are rounded/clamped according to currency precision. Only venues within the selected tier and under the shown cap qualify. Data and thresholds must remain verified or explicitly estimated; the exact chosen cap is not a guarantee of the final bill.

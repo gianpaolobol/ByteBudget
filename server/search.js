@@ -1,5 +1,6 @@
+import {spendingSelection} from '../src/spending-slider.js';
 import {validateDataset} from '../src/provider.js';
-import {validPrice,distanceMeters,cityBands,matchesTier,PRICE_TIERS} from '../src/domain.js';
+import {validPrice,distanceMeters,cityBands,matchesTier} from '../src/domain.js';
 
 const FIELD_MASK='id,rating,userRatingCount,currentOpeningHours,businessStatus,googleMapsUri';
 const answer=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
@@ -26,14 +27,15 @@ export function createSearchHandler({fetch:fetcher=globalThis.fetch,now=Date.now
   if(origin&&origin!==url.origin&&!(env.NATIVE_API_ENABLED==='true'&&['capacitor://localhost','https://localhost'].includes(origin)))return error('origin_not_allowed',403);
   if(!request.headers.get('Content-Type')?.startsWith('application/json'))return error('json_required',415);
   let input;try{const text=await request.text();if(text.length>2048)return error('request_too_large',413);input=JSON.parse(text)}catch{return error('invalid_json',400)}
-  if(!input||typeof input!=='object'||!Number.isFinite(input.lat)||Math.abs(input.lat)>90||!Number.isFinite(input.lng)||Math.abs(input.lng)>180||!Number.isFinite(input.radius)||input.radius<100||input.radius>1000||!PRICE_TIERS.includes(input.tier)||!['lunch','dinner'].includes(input.meal))return error('invalid_search',400);
+  if(!input||typeof input!=='object'||!Number.isFinite(input.lat)||Math.abs(input.lat)>90||!Number.isFinite(input.lng)||Math.abs(input.lng)>180||!Number.isFinite(input.radius)||input.radius<100||input.radius>1000||!Number.isInteger(input.spendingPosition)||input.spendingPosition<0||input.spendingPosition>1000||!['lunch','dinner'].includes(input.meal))return error('invalid_search',400);
   if(env.LIVE_SEARCH_ENABLED!=='true'||!env.GOOGLE_PLACES_API_KEY||!env.VERIFIED_CATALOG)return error('provider_not_configured',503);
   let cities;try{cities=parseCatalog(env.VERIFIED_CATALOG)}catch{return error('invalid_provider_configuration',503)}
   const matches=cities.filter(({bounds:b})=>input.lat>=b.south&&input.lat<=b.north&&input.lng>=b.west&&input.lng<=b.east);
   if(matches.length!==1)return error('city_not_supported',422);
   const city=matches[0];const current=now();
   const bands=cityBands(city.venues,input.meal,city.currency,current,city.priceBands?.[input.meal]);if(!bands)return error('price_bands_unavailable',422);
-  const candidates=city.venues.filter(v=>validPrice(v,input.meal,city.currency,current)&&matchesTier(v.prices[input.meal],input.tier,bands)&&distanceMeters(input.lat,input.lng,v.lat,v.lng)<=input.radius);
+  const selection=spendingSelection(input.spendingPosition,bands,city.venues,input.meal,city.currency,current);
+  const candidates=city.venues.filter(v=>validPrice(v,input.meal,city.currency,current)&&matchesTier(v.prices[input.meal],selection.tier,bands)&&(selection.maxPrice===null||v.prices[input.meal].max<=selection.maxPrice)&&distanceMeters(input.lat,input.lng,v.lat,v.lng)<=input.radius);
   if(!candidates.length)return error('no_verified_menus',422);
   const identity=request.headers.get('CF-Connecting-IP')||'local';const minute=Math.floor(current/60000);
   if(buckets.size>1000)for(const [key,value]of buckets)if(value.minute!==minute)buckets.delete(key);

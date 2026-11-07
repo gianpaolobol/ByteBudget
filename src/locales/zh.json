@@ -54,5 +54,6 @@
   "language": "语言",
   "luxury": "奢华",
   "priceTier": "价格档位",
-  "noLimit": "消费无上限"
+  "noLimit": "消费无上限",
+  "upTo": "不超过"
 }

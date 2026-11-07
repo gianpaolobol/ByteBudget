@@ -54,5 +54,6 @@
   "language": "Sprache",
   "luxury": "Luxury",
   "priceTier": "Preisklasse",
-  "noLimit": "Ohne Ausgabenlimit"
+  "noLimit": "Ohne Ausgabenlimit",
+  "upTo": "Bis zu"
 }

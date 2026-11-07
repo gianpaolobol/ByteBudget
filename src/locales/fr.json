@@ -54,5 +54,6 @@
   "language": "Langue",
   "luxury": "Luxe",
   "priceTier": "Gamme de prix",
-  "noLimit": "Sans plafond de dépenses"
+  "noLimit": "Sans plafond de dépenses",
+  "upTo": "Jusqu’à"
 }

@@ -54,5 +54,6 @@
   "language": "言語",
   "luxury": "ラグジュアリー",
   "priceTier": "価格帯",
-  "noLimit": "予算の上限なし"
+  "noLimit": "予算の上限なし",
+  "upTo": "上限"
 }

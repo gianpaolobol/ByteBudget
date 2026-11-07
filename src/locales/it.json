@@ -54,5 +54,6 @@
   "language": "Lingua",
   "luxury": "Luxury",
   "priceTier": "Fascia di prezzo",
-  "noLimit": "Senza tetto massimo"
+  "noLimit": "Senza tetto massimo",
+  "upTo": "Fino a"
 }
