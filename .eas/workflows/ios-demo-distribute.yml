@@ -1,0 +1,27 @@
+name: ByteBudget distribute existing iOS demo 2
+
+defaults:
+  tools:
+    node: 24.11.0
+    fastlane: 2.240.1
+
+jobs:
+  resolve_build:
+    runs_on: linux-medium
+    outputs:
+      asc_build_id: ${{ steps.lookup.outputs.asc_build_id }}
+    steps:
+      - uses: eas/checkout
+      - uses: eas/install_node_modules
+      - name: Install supported Expo CLI
+        run: npm install --no-save --package-lock=false eas-cli@27.5.0
+      - id: lookup
+        name: Resolve validated Apple build without exporting credentials
+        run: node scripts/expo-asc-build.cjs
+  distribute:
+    type: testflight
+    needs: [resolve_build]
+    params:
+      asc_build_id: ${{ needs.resolve_build.outputs.asc_build_id }}
+      internal_groups: [ByteBudget Demo]
+      changelog: Demo with fictional Bologna, London and Tokyo venues, 12 languages and a local-currency spending slider.
