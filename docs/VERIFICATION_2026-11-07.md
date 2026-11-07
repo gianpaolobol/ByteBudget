@@ -10,3 +10,5 @@
 
 ## v0.2.0 validation
 Added menu schedule/timezone tests, server adapter tests, native origin policy, Worker asset/status tests and foreground geolocation/client error tests. Native Geolocation plugin synchronized on both platforms. Google integration tested with synthetic responses, not real credentials. Production activation and physical-device QA remain pending. Independent review identified and corrected stale live snapshots, missing native CORS policy and unrelated Nearby Search truncation (replaced with direct details by verified ID).
+
+Browser regression found and fixed: the UI helper named `location()` shadowed the browser Location object, causing the readiness check to fail before calling the API. Renamed it `locationMarkup()`. Reproduced generic failure before the fix; after the fix, browser QA shows the correct provider-not-configured message without requesting GPS. This is a manual browser regression check, in addition to 36 automated tests.
