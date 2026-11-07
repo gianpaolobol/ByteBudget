@@ -15,3 +15,6 @@ Browser regression found and fixed: the UI helper named `location()` shadowed th
 
 ## v0.3.0 localization and automatic position
 41 automated tests pass. Complete language-key parity checked for 12 packs; phone language variants map to the supported base locale. Arabic RTL verified. Browser QA verified Russian and Chinese interfaces, live status translation after language changes, Arabic direction and no headline overflow at the preview width. No Use location button remains; the location label is informational unless an explicit demo city is selected. On startup, foreground permission is requested once through the OS; permission refusal stops network processing and leaves the demo accessible. Physical-device permission prompts remain to validate on iOS and Android.
+
+## v0.4.0 tier verification
+50 automated tests pass. Added exact 20/50/120 boundaries without overlaps, Luxury prices above the former numeric cap, configured city/meal thresholds, missing threshold behavior, tier-only API requests, same-city saved record merge and immutable searched criteria. Browser verified default Mid, four clickable buttons, no numeric input, Bologna illustration thresholds and Luxury results from 144 to 304 EUR with no budget ceiling in the summary. Build and native sync pass; native physical-device QA remains pending.

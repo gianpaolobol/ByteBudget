@@ -5,7 +5,6 @@
   "location": "Localização automática",
   "lunch": "Almoço",
   "dinner": "Jantar",
-  "budget": "Seu orçamento",
   "person": "por pessoa",
   "radius": "Raio de busca",
   "find": "Encontrar meu lugar",
@@ -19,8 +18,8 @@
   "saved": "Salvos",
   "demo": "Demo · Os locais, preços e avaliações são fictícios.",
   "try": "Explorar a demo",
-  "empty": "Nenhuma opção dentro do seu orçamento",
-  "emptyText": "Tente um orçamento maior ou um raio mais amplo, até 1 km.",
+  "empty": "Nenhum local nesta faixa",
+  "emptyText": "Escolha outra faixa ou aumente a distância, até 1 km.",
   "open": "Aberto",
   "walk": "Distância em linha reta",
   "directions": "Ir a pé",
@@ -34,7 +33,7 @@
   "priceNote": "Faixa para a refeição escolhida. Extras podem custar mais.",
   "noSaved": "Seus próximos favoritos estarão aqui",
   "noSavedText": "Salve um local na página de detalhes.",
-  "privacy": "A localização é solicitada automaticamente ao abrir o app, com a permissão do sistema. Sem rastreamento em segundo plano. O orçamento e os favoritos ficam neste dispositivo. Ao abrir a navegação, você compartilha o destino com o serviço de mapas escolhido.",
+  "privacy": "A localização é solicitada automaticamente ao abrir o app, com permissão do sistema. Sem rastreamento em segundo plano. Preferências e favoritos ficam neste dispositivo. A navegação compartilha o destino com o serviço de mapas escolhido.",
   "about": "Como funciona",
   "rank": "Ordenados pela nota ponderada pelo número de avaliações. Os resultados permanecem até uma nova busca.",
   "imprecise": "Localização muito aproximada. Ative a localização precisa e tente novamente.",
@@ -52,5 +51,8 @@
   "demoRoute": "Local fictício: navegação indisponível.",
   "error": "Não foi possível carregar dados verificados. Tente mais tarde.",
   "route": "O tempo a pé é mostrado no seu app de navegação.",
-  "language": "Idioma"
+  "language": "Idioma",
+  "luxury": "Luxo",
+  "priceTier": "Faixa de preço",
+  "noLimit": "Sem limite de gasto"
 }

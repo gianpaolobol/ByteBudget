@@ -5,3 +5,4 @@
 .shell .tagline{font-size:clamp(18px,5.7vw,27px);letter-spacing:-.7px;white-space:nowrap;line-height:1.2}
 .language{max-width:145px;font-size:13px}.shell .tagline{font-size:clamp(16px,5.2vw,25px)}
 [dir=rtl] .card{text-align:right}[dir=rtl] .detail-price,[dir=rtl] .budget input{unicode-bidi:plaintext}[dir=rtl] .nav{direction:rtl}
+.bands{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}.band{border:2px solid transparent;min-height:76px;color:inherit;cursor:pointer}.band b{font-size:16px}.band span{display:block;font-size:12px}.band:nth-child(4){background:#e9e1ee}.band.active{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}.band.active b{color:var(--teal)}

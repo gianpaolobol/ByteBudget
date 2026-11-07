@@ -1,5 +1,5 @@
 import {validateDataset} from '../src/provider.js';
-import {validPrice,distanceMeters} from '../src/domain.js';
+import {validPrice,distanceMeters,cityBands,matchesTier,PRICE_TIERS} from '../src/domain.js';
 
 const FIELD_MASK='id,rating,userRatingCount,currentOpeningHours,businessStatus,googleMapsUri';
 const answer=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
@@ -10,7 +10,7 @@ function parseCatalog(value){
  if(!Array.isArray(catalog.cities)||catalog.cities.length>1000)throw Error();
  return catalog.cities.map(city=>{
   const b=city.bounds;if(!b||![b.south,b.north,b.west,b.east].every(Number.isFinite)||b.south< -90||b.north>90||b.south>=b.north||b.west< -180||b.east>180||b.west>=b.east)throw Error();
-  const dataset=validateDataset({city:city.name,currency:city.currency,timeZone:city.timeZone,lat:(b.south+b.north)/2,lng:(b.west+b.east)/2,venues:city.venues.map(v=>({...v,id:v.placeId,rating:0,reviewCount:0,isOpen:false}))});
+  const dataset=validateDataset({city:city.name,currency:city.currency,timeZone:city.timeZone,priceBands:city.priceBands,lat:(b.south+b.north)/2,lng:(b.west+b.east)/2,venues:city.venues.map(v=>({...v,id:v.placeId,rating:0,reviewCount:0,isOpen:false}))});
   return {...city,venues:dataset.venues};
  });
 }
@@ -26,13 +26,14 @@ export function createSearchHandler({fetch:fetcher=globalThis.fetch,now=Date.now
   if(origin&&origin!==url.origin&&!(env.NATIVE_API_ENABLED==='true'&&['capacitor://localhost','https://localhost'].includes(origin)))return error('origin_not_allowed',403);
   if(!request.headers.get('Content-Type')?.startsWith('application/json'))return error('json_required',415);
   let input;try{const text=await request.text();if(text.length>2048)return error('request_too_large',413);input=JSON.parse(text)}catch{return error('invalid_json',400)}
-  if(!input||typeof input!=='object'||!Number.isFinite(input.lat)||Math.abs(input.lat)>90||!Number.isFinite(input.lng)||Math.abs(input.lng)>180||!Number.isFinite(input.radius)||input.radius<100||input.radius>1000||!Number.isFinite(input.budget)||input.budget<=0||input.budget>1000000||!['lunch','dinner'].includes(input.meal))return error('invalid_search',400);
+  if(!input||typeof input!=='object'||!Number.isFinite(input.lat)||Math.abs(input.lat)>90||!Number.isFinite(input.lng)||Math.abs(input.lng)>180||!Number.isFinite(input.radius)||input.radius<100||input.radius>1000||!PRICE_TIERS.includes(input.tier)||!['lunch','dinner'].includes(input.meal))return error('invalid_search',400);
   if(env.LIVE_SEARCH_ENABLED!=='true'||!env.GOOGLE_PLACES_API_KEY||!env.VERIFIED_CATALOG)return error('provider_not_configured',503);
   let cities;try{cities=parseCatalog(env.VERIFIED_CATALOG)}catch{return error('invalid_provider_configuration',503)}
   const matches=cities.filter(({bounds:b})=>input.lat>=b.south&&input.lat<=b.north&&input.lng>=b.west&&input.lng<=b.east);
   if(matches.length!==1)return error('city_not_supported',422);
   const city=matches[0];const current=now();
-  const candidates=city.venues.filter(v=>validPrice(v,input.meal,city.currency,current)&&distanceMeters(input.lat,input.lng,v.lat,v.lng)<=input.radius);
+  const bands=cityBands(city.venues,input.meal,city.currency,current,city.priceBands?.[input.meal]);if(!bands)return error('price_bands_unavailable',422);
+  const candidates=city.venues.filter(v=>validPrice(v,input.meal,city.currency,current)&&matchesTier(v.prices[input.meal],input.tier,bands)&&distanceMeters(input.lat,input.lng,v.lat,v.lng)<=input.radius);
   if(!candidates.length)return error('no_verified_menus',422);
   const identity=request.headers.get('CF-Connecting-IP')||'local';const minute=Math.floor(current/60000);
   if(buckets.size>1000)for(const [key,value]of buckets)if(value.minute!==minute)buckets.delete(key);
@@ -55,7 +56,7 @@ export function createSearchHandler({fetch:fetcher=globalThis.fetch,now=Date.now
    const venues=candidates.flatMap(v=>{const p=live.get(v.id);if(!p||!Number.isFinite(p.rating)||!Number.isInteger(p.userRatingCount)||p.businessStatus!=='OPERATIONAL'||p.currentOpeningHours?.openNow!==true)return [];
     let mapsUrl;try{const link=new URL(p.googleMapsUri);if(link.protocol==='https:'&&['maps.google.com','www.google.com','google.com','maps.app.goo.gl'].includes(link.hostname))mapsUrl=link.href}catch{}
     return [{...v,rating:p.rating,reviewCount:p.userRatingCount,isOpen:true,mapsUrl,ratingSource:'Google Maps',ratingFetchedAt:new Date(current).toISOString()}];});
-   const dataset=validateDataset({city:city.name,currency:city.currency,timeZone:city.timeZone,lat:input.lat,lng:input.lng,demo:false,venues});
+   const dataset=validateDataset({city:city.name,currency:city.currency,timeZone:city.timeZone,priceBands:city.priceBands,lat:input.lat,lng:input.lng,demo:false,venues});
    return answer({...dataset,citySample:city.venues,coverage:'verified-catalog-subset',attribution:{provider:'Google Maps',url:'https://maps.google.com'},fetchedAt:new Date(current).toISOString()});
   }catch{return error('provider_unavailable',502)}
  };

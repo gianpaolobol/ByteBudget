@@ -5,7 +5,6 @@
   "location": "Posizione automatica",
   "lunch": "Pranzo",
   "dinner": "Cena",
-  "budget": "Il tuo budget",
   "person": "a persona",
   "radius": "Raggio di ricerca",
   "find": "Trova il mio posto",
@@ -19,8 +18,8 @@
   "saved": "Salvati",
   "demo": "Demo · Locali, prezzi e recensioni sono inventati.",
   "try": "Esplora la demo",
-  "empty": "Nessun locale compatibile",
-  "emptyText": "Prova ad aumentare il budget o il raggio, fino a 1 km.",
+  "empty": "Nessun locale in questa fascia",
+  "emptyText": "Scegli un’altra fascia o aumenta la distanza, fino a 1 km.",
   "open": "Aperto",
   "walk": "Distanza in linea d’aria",
   "directions": "Portami qui",
@@ -34,7 +33,7 @@
   "priceNote": "Fascia per il pasto selezionato. Gli extra possono costare di più.",
   "noSaved": "Qui troverai i tuoi preferiti",
   "noSavedText": "Salva un locale dalla sua scheda.",
-  "privacy": "La posizione viene richiesta automaticamente all’apertura, con il consenso del sistema. Nessun tracciamento in background. Budget e locali salvati restano sul dispositivo. Aprendo la navigazione condividi la destinazione con il servizio mappe scelto.",
+  "privacy": "La posizione viene richiesta automaticamente all’apertura, con il consenso del sistema. Nessun tracciamento in background. Preferenze e locali salvati restano sul dispositivo. La navigazione condivide la destinazione con il servizio mappe scelto.",
   "about": "Come funziona",
   "rank": "Classifica basata sul voto ponderato per numero di recensioni. I risultati restano fermi fino alla prossima ricerca.",
   "imprecise": "Posizione troppo approssimativa per questo raggio. Abilita la posizione precisa e riprova.",
@@ -52,5 +51,8 @@
   "demoRoute": "Locale dimostrativo: navigazione non disponibile.",
   "error": "Impossibile caricare dati verificati. Riprova più tardi.",
   "route": "Il tempo a piedi viene mostrato dall’app di navigazione.",
-  "language": "Lingua"
+  "language": "Lingua",
+  "luxury": "Luxury",
+  "priceTier": "Fascia di prezzo",
+  "noLimit": "Senza tetto massimo"
 }

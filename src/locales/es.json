@@ -5,7 +5,6 @@
   "location": "Ubicación automática",
   "lunch": "Almuerzo",
   "dinner": "Cena",
-  "budget": "Tu presupuesto",
   "person": "por persona",
   "radius": "Radio de búsqueda",
   "find": "Encuentra mi sitio",
@@ -19,8 +18,8 @@
   "saved": "Guardados",
   "demo": "Demo · Los locales, precios y reseñas son ficticios.",
   "try": "Explorar la demo",
-  "empty": "Sin opciones dentro de tu presupuesto",
-  "emptyText": "Prueba un presupuesto mayor o un radio más amplio, hasta 1 km.",
+  "empty": "No hay locales en este rango",
+  "emptyText": "Elige otro rango de precios o amplía la distancia, hasta 1 km.",
   "open": "Abierto",
   "walk": "Distancia en línea recta",
   "directions": "Cómo llegar a pie",
@@ -34,7 +33,7 @@
   "priceNote": "Precio para la comida elegida. Los extras pueden costar más.",
   "noSaved": "Tus próximos favoritos estarán aquí",
   "noSavedText": "Guarda un local desde su ficha.",
-  "privacy": "La ubicación se solicita automáticamente al abrir la app, con permiso del sistema. Sin seguimiento en segundo plano. El presupuesto y los favoritos se guardan en este dispositivo. Al abrir la navegación, compartes el destino con el servicio de mapas elegido.",
+  "privacy": "La ubicación se solicita automáticamente al abrir la app, con permiso del sistema. Sin seguimiento en segundo plano. Las preferencias y los favoritos quedan en este dispositivo. La navegación comparte el destino con el servicio de mapas elegido.",
   "about": "Cómo funciona",
   "rank": "Ordenados por valoración ponderada según el número de reseñas. Los resultados se mantienen hasta una nueva búsqueda.",
   "imprecise": "Ubicación demasiado aproximada. Activa la ubicación precisa e inténtalo de nuevo.",
@@ -52,5 +51,8 @@
   "demoRoute": "Local ficticio: navegación no disponible.",
   "error": "No se pudieron cargar datos verificados. Inténtalo más tarde.",
   "route": "El tiempo a pie se muestra en tu app de navegación.",
-  "language": "Idioma"
+  "language": "Idioma",
+  "luxury": "Luxury",
+  "priceTier": "Rango de precios",
+  "noLimit": "Sin límite de gasto"
 }

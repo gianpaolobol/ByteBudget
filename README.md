@@ -1,10 +1,10 @@
 # ByteBudget
 
-**Eat well. Your way.** International dining discovery, personal meal budget and walking-radius search.
+**Eat well. Your way.** International dining discovery, four city-adjusted price tiers and walking-radius search.
 
 ## Current status
 
-Version 0.3.0: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic budget/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+Version 0.4.0: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
 
 ## Run
 
@@ -30,7 +30,7 @@ iOS requires macOS/Xcode and Apple Developer signing. Android requires Android S
 
 ## Data model
 
-See `docs/DATA_PROVIDER.md`. Demo is opt-in and explicitly labelled. No hardcoded worldwide price bands; city sample quantiles are descriptive, not official economic statistics. Prices expire after 90 days. A venue's upper meal-price estimate must fit the budget; this cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
+See `docs/DATA_PROVIDER.md`. Demo is opt-in and explicitly labelled. No hardcoded worldwide price bands; city sample quantiles are descriptive, not official economic statistics. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
 
 ## Release blockers
 
@@ -46,3 +46,5 @@ No secret keys belong in client code, git, screenshots or documentation.
 Build outputs: `dist/client` (web/native assets), `dist/server/index.js` (Worker including assets). `npm start` runs the local Worker adapter. Production runtime variables must be configured as server secrets, never inside client code. See `.env.example` for names only.
 
 Location permission is requested automatically at application startup, through the platform system dialog. There is no separate Use location control. Denial leaves the demo usable; location is not transmitted to the data provider while the service is unconfigured. Language follows the phone preferences until manually changed; Arabic uses RTL. Translation packs are complete but native-speaker editorial review remains recommended before store release.
+
+The user removed numeric budget entry. Mid is initially selected. City/meal thresholds can be configured as lowMax/midMax/highMax. With sufficient own menu samples, the fallback estimates the low/mid boundaries and sets the Luxury threshold above both the 95th percentile and 2.4 times the Mid boundary. These are descriptive estimates, not a luxury quality certification. Demo thresholds and prices are fictional; Bologna illustrates 20/50/120 EUR.

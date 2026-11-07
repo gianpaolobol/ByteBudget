@@ -5,7 +5,6 @@
   "location": "Automatic location",
   "lunch": "Lunch",
   "dinner": "Dinner",
-  "budget": "Your budget",
   "person": "per person",
   "radius": "Walking radius",
   "find": "Find my table",
@@ -19,8 +18,8 @@
   "saved": "Saved",
   "demo": "Demo · All places, prices and reviews are fictional.",
   "try": "Explore the demo",
-  "empty": "No matches within your budget",
-  "emptyText": "Try a higher budget or a wider radius, up to 1 km.",
+  "empty": "No places in this price range",
+  "emptyText": "Choose another price range or increase the distance, up to 1 km.",
   "open": "Open",
   "walk": "Straight-line distance",
   "directions": "Walk there",
@@ -34,7 +33,7 @@
   "priceNote": "Price range for the selected meal. Extras may cost more.",
   "noSaved": "Your next favourites live here",
   "noSavedText": "Save a place from its detail page.",
-  "privacy": "Location is requested automatically when the app opens, subject to system permission. No background tracking. Budget and saved places stay on this device. Opening navigation shares the destination with your chosen map service.",
+  "privacy": "Location is requested automatically when the app opens, subject to system permission. No background tracking. Preferences and saved places stay on this device. Navigation shares the destination with your chosen map service.",
   "about": "How it works",
   "rank": "Ranked by rating weighted by review count. Search results stay fixed until you search again.",
   "imprecise": "Your location is too approximate for this walking radius. Enable precise location and try again.",
@@ -52,5 +51,8 @@
   "demoRoute": "Demo place: navigation unavailable.",
   "error": "Could not load verified restaurant data. Try again later.",
   "route": "Walking time is shown by your navigation app.",
-  "language": "Language"
+  "language": "Language",
+  "luxury": "Luxury",
+  "priceTier": "Price range",
+  "noLimit": "No spending limit"
 }

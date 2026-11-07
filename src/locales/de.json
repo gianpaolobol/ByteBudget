@@ -5,7 +5,6 @@
   "location": "Automatischer Standort",
   "lunch": "Mittagessen",
   "dinner": "Abendessen",
-  "budget": "Dein Budget",
   "person": "pro Person",
   "radius": "Suchradius",
   "find": "Finde meinen Platz",
@@ -19,8 +18,8 @@
   "saved": "Gespeichert",
   "demo": "Demo · Orte, Preise und Bewertungen sind frei erfunden.",
   "try": "Demo entdecken",
-  "empty": "Keine Treffer innerhalb deines Budgets",
-  "emptyText": "Versuche ein höheres Budget oder einen größeren Radius bis 1 km.",
+  "empty": "Keine Orte in dieser Preisklasse",
+  "emptyText": "Wähle eine andere Preisklasse oder erhöhe den Radius bis 1 km.",
   "open": "Geöffnet",
   "walk": "Entfernung in Luftlinie",
   "directions": "Zu Fuß hin",
@@ -34,7 +33,7 @@
   "priceNote": "Preisspanne für die gewählte Mahlzeit. Extras können mehr kosten.",
   "noSaved": "Hier findest du bald deine Favoriten",
   "noSavedText": "Speichere einen Ort auf seiner Detailseite.",
-  "privacy": "Beim Öffnen der App wird der Standort mit Zustimmung des Systems automatisch angefragt. Keine Ortung im Hintergrund. Budget und Favoriten bleiben auf diesem Gerät. Beim Start der Navigation wird das Ziel an den gewählten Kartendienst übermittelt.",
+  "privacy": "Beim Öffnen wird der Standort mit Zustimmung des Systems automatisch angefragt. Keine Ortung im Hintergrund. Einstellungen und Favoriten bleiben auf dem Gerät. Die Navigation teilt das Ziel mit dem gewählten Kartendienst.",
   "about": "So funktioniert es",
   "rank": "Sortierung nach Bewertung, gewichtet nach Anzahl der Rezensionen. Die Ergebnisse bleiben bis zur nächsten Suche unverändert.",
   "imprecise": "Dein Standort ist zu ungenau. Aktiviere den genauen Standort und versuche es erneut.",
@@ -52,5 +51,8 @@
   "demoRoute": "Demo-Ort: Navigation nicht verfügbar.",
   "error": "Geprüfte Daten konnten nicht geladen werden. Versuche es später erneut.",
   "route": "Die Gehzeit wird in deiner Navigations-App angezeigt.",
-  "language": "Sprache"
+  "language": "Sprache",
+  "luxury": "Luxury",
+  "priceTier": "Preisklasse",
+  "noLimit": "Ohne Ausgabenlimit"
 }
