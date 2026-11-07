@@ -4,7 +4,7 @@
 
 ## Current status
 
-Version 0.5.0: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+Version 0.5.1: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
 
 ## Run
 
@@ -30,7 +30,7 @@ iOS requires macOS/Xcode and Apple Developer signing. Android requires Android S
 
 ## Data model
 
-See `docs/DATA_PROVIDER.md`. Demo is opt-in and explicitly labelled. No hardcoded worldwide price bands; city sample quantiles are descriptive, not official economic statistics. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
+See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically loads an explicitly labelled demo city; configured live mode and native static startup do not receive fictional data automatically. No hardcoded worldwide price bands; city sample quantiles are descriptive, not official economic statistics. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
 
 ## Release blockers
 

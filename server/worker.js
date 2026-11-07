@@ -17,7 +17,10 @@ export function createWorker(assets){
   if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405});
   const name=url.pathname==='/'?'/index.html':url.pathname;
   if(!Object.hasOwn(assets,name))return new Response('Not found',{status:404});
-  const item=assets[name];const body=item.base64?Uint8Array.from(atob(item.content),c=>c.charCodeAt(0)):item.content;
+  const item=assets[name];
+  const configured=env.LIVE_SEARCH_ENABLED==='true'&&!!env.GOOGLE_PLACES_API_KEY&&!!env.VERIFIED_CATALOG;
+  const content=name==='/index.html'&&!configured?item.content.replace(/<html(?=\s|>)/i,'<html data-demo-preview="true"'):item.content;
+  const body=item.base64?Uint8Array.from(atob(content),c=>c.charCodeAt(0)):content;
   return new Response(request.method==='HEAD'?null:body,{headers:{'Content-Type':item.type,'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','Cache-Control':'no-cache'}});
  }};
 }

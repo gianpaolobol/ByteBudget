@@ -24,3 +24,6 @@ Browser regression found and fixed: the UI helper named `location()` shadowed th
 
 ## Separate right-hand price readout
 58 automated tests pass. New checks cover blank unknown amount, EUR/GBP/USD formatting independent of interface language, and infinity for unlimited. Browser verified tier High at x446 and GBP105 price at x858 after a real drag to625 in London demo; no middle dot or dash in the visible selected tier row. Build/native sync pass. Real-data activation remains pending; sample cities are demonstrations.
+
+## First-open finite-price regression
+63 automated tests pass. New tests reproduce missing first-open dataset and check server preview injection, all finite sample positions, remembered city/currency, invalid preference safety and live-mode exclusion. Browser verified opening the root URL directly with no city-selection action: High85 EUR was present. Actual drag to375 changed it to Mid35 EUR; reload preserved Mid35 EUR and the labelled demo city. This replaces the insufficient prior QA that started only after Explore. Native sync/build pass; real provider activation and physical-device QA still pending.

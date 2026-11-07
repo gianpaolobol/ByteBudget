@@ -1,3 +1,4 @@
+import {initialDemoDataset} from './bootstrap.js';
 import {spendingSelection,spendingPriceText} from './spending-slider.js';
 import {mergeCityDataset,makeSearchSnapshot} from './search-state.js';
 import {strings,languages,resolveLanguage,direction} from './i18n.js';
@@ -9,6 +10,7 @@ import {selectVenues,cityBands,PRICE_TIERS} from './domain.js';
 import {validateDataset} from './provider.js';
 import {demoCity} from './demo.js';
 const app=document.querySelector('#app');
+const demoPreview=document.documentElement.dataset.demoPreview==='true';
 
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
@@ -19,7 +21,7 @@ if(!Number.isInteger(spendingPosition)||spendingPosition<0||spendingPosition>100
 let saved=read('bb-saved',[]);if(!Array.isArray(saved))saved=[];
 const t=k=>strings[lang][k];const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>new Intl.NumberFormat(lang,{style:'currency',currency:data?.currency||'EUR',minimumFractionDigits:0}).format(v);
-function setData(next){next=validateDataset(next);data=next;knownDataset=mergeCityDataset(knownDataset,data);lastSearch=null;const hour=Number(new Intl.DateTimeFormat('en',{hour:'numeric',hourCycle:'h23',timeZone:data.timeZone}).format(new Date()));meal=hour<16?'lunch':'dinner';results=[];selected=null;view='discover';message='';render()}
+function setData(next){next=validateDataset(next);data=next;if(data.demo)write('bb-demo-city',data.city);knownDataset=mergeCityDataset(knownDataset,data);lastSearch=null;const hour=Number(new Intl.DateTimeFormat('en',{hour:'numeric',hourCycle:'h23',timeZone:data.timeZone}).format(new Date()));meal=hour<16?'lunch':'dinner';results=[];selected=null;view='discover';message='';render()}
 const plate=(v=0)=>`<div class="thumb v${[0,1,2].includes(v)?v:0}"><div class="plate" aria-hidden="true"></div></div>`;
 function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></header>${data?.demo?`<div class="notice">${t('demo')}</div>`:data?`<p class="subtle">★ Google Maps</p>`:''}`}
 function locationMarkup(){return `<div class="location">⌖ ${data?.demo?`<button id="location">${esc(data.city)}</button>`:`<span>${esc(data?.city||t('location'))}</span>`}${data?.currency?`<span class="badge">${esc(data.currency)}</span>`:''}</div>`}
@@ -54,7 +56,7 @@ async function locate(refresh=false,automatic=false){
  try{
   const next=await loadLiveRestaurants({origin:location.origin,automatic,native:Capacitor.isNativePlatform(),apiBase:window.BYTEBUDGET_CONFIG?.apiBase,radius,spendingPosition,meal,language:lang,locate:()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),radius)});
   setData(next);meal=previousMeal;if(refresh&&previousCurrency===data.currency)search();
- }catch(e){const key={provider_not_configured:'noProvider',price_bands_unavailable:'unknown',city_not_supported:'coverage',no_verified_menus:'noMenus',search_too_broad:'broad',rate_limited:'limited',location_denied:'permission',location_unavailable:'permission',location_imprecise:'imprecise'}[e.code]||'error';message=key}finally{busy=false;render()}
+ }catch(e){const key={provider_not_configured:'noProvider',price_bands_unavailable:'unknown',city_not_supported:'coverage',no_verified_menus:'noMenus',search_too_broad:'broad',rate_limited:'limited',location_denied:'permission',location_unavailable:'permission',location_imprecise:'imprecise'}[e.code]||'error';message=demoPreview&&data?.demo?'':key}finally{busy=false;render()}
 }
 
-render();locate(false,true);if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+const initialDemo=initialDemoDataset(demoPreview,read('bb-demo-city',null));if(initialDemo)setData(initialDemo);else render();locate(false,true);if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
