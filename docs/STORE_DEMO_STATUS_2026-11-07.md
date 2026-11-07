@@ -23,6 +23,6 @@
 
 User requested build and submission directly from GitHub. New workflowStore demo (direct GitHub), Xcode/SPM + Gradle/JDK21 + Fastlane2.240.1; internal releases only. No new EAS run initiated. No production store publication claimed.
 
-Latest GitHub Checks42424214585 blocked before start by payments/spending-limit issue. ByteBudget GitHub repository/environment secrets absent. Direct workflow cannot execute until billing and authorized signing/upload secrets are configured. See GITHUB_STORE_DELIVERY.md for exact names. No private keys copied, account access broadened or billing changed.
+Latest GitHub Checks42424214585 blocked before start by payments/spending-limit issue. ByteBudget GitHub repository/environment secrets absent. Direct workflow run42425160090 (source6279294a85aaf785c9e4a15f8401bd4eecfd8127) was dispatched and both jobs were rejected before startup for the same billing/spending-limit reason. It cannot execute until billing and authorized signing/upload secrets are configured. See GITHUB_STORE_DELIVERY.md for exact names. No private keys copied, account access broadened or billing changed.
 
 74 Node tests pass. Explicit demo build and Capacitor sync pass. New workflow not yet compiled or uploaded on native runners. Physical-device QA pending. Venues, prices and reviews are fictional, explicitly labelled; real-data provider unconfigured.

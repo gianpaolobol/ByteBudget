@@ -13,7 +13,7 @@ Build numbers are allocated above the current store maximum: the current1.0.0 Te
 
 1. Latest Checks run42424214585 (sourcecf5d361ec7fd6fc1cbbda68dff042ba464cdc81b) failed before a runner started: “recent account payments have failed or your spending limit needs to be increased.” Owner must resolve account billing/spending limits or provide a separately configured runner. No billing change made.
 2. ByteBudget repository and environments show no Actions secrets. Secret values cannot be recovered from GitHub by reading other repositories. They must be provisioned securely from authorized originals. No signing credentials transferred or replacement keys created in this change.
-3. Cloud/native execution of the new workflow is pending. Local verification covers Node suite, explicit demo packaging, Capacitor sync and workflow structure; Linux workspace lacks Xcode/Android SDK/Ruby. Fastlane dependency resolution and native runner validation remain pending.
+3. Direct workflow run42425160090 on source6279294a85aaf785c9e4a15f8401bd4eecfd8127 was dispatched for both platforms; both jobs were rejected before startup by that same billing/spending-limit block. Cloud/native execution is pending. Local verification covers Node suite, explicit demo packaging, Capacitor sync and workflow structure, shell syntax and Ruby parsing with tree-sitter; Linux workspace lacks Xcode/Android SDK/Ruby. Fastlane dependency resolution and native runner validation remain pending.
 
 ## Required GitHub Actions secrets
 
