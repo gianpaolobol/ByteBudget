@@ -27,3 +27,5 @@ Browser regression found and fixed: the UI helper named `location()` shadowed th
 
 ## First-open finite-price regression
 63 automated tests pass. New tests reproduce missing first-open dataset and check server preview injection, all finite sample positions, remembered city/currency, invalid preference safety and live-mode exclusion. Browser verified opening the root URL directly with no city-selection action: High85 EUR was present. Actual drag to375 changed it to Mid35 EUR; reload preserved Mid35 EUR and the labelled demo city. This replaces the insufficient prior QA that started only after Explore. Native sync/build pass; real provider activation and physical-device QA still pending.
+
+Hosted-path follow-up: public root lacked the Worker-injected HTML marker because index.html can be served as a static asset. Added runtime /api/status discovery fallback with no-store and timeout. Configured/unknown/native status does not seed demos. Automated suite:66 passing.

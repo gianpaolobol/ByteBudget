@@ -1,4 +1,4 @@
-import {initialDemoDataset} from './bootstrap.js';
+import {initialDemoDataset,discoverDemoPreview} from './bootstrap.js';
 import {spendingSelection,spendingPriceText} from './spending-slider.js';
 import {mergeCityDataset,makeSearchSnapshot} from './search-state.js';
 import {strings,languages,resolveLanguage,direction} from './i18n.js';
@@ -10,7 +10,7 @@ import {selectVenues,cityBands,PRICE_TIERS} from './domain.js';
 import {validateDataset} from './provider.js';
 import {demoCity} from './demo.js';
 const app=document.querySelector('#app');
-const demoPreview=document.documentElement.dataset.demoPreview==='true';
+let demoPreview=document.documentElement.dataset.demoPreview==='true';
 
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
@@ -59,4 +59,5 @@ async function locate(refresh=false,automatic=false){
  }catch(e){const key={provider_not_configured:'noProvider',price_bands_unavailable:'unknown',city_not_supported:'coverage',no_verified_menus:'noMenus',search_too_broad:'broad',rate_limited:'limited',location_denied:'permission',location_unavailable:'permission',location_imprecise:'imprecise'}[e.code]||'error';message=demoPreview&&data?.demo?'':key}finally{busy=false;render()}
 }
 
-const initialDemo=initialDemoDataset(demoPreview,read('bb-demo-city',null));if(initialDemo)setData(initialDemo);else render();locate(false,true);if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+async function start(){busy=true;render();demoPreview=await discoverDemoPreview({marker:demoPreview,native:Capacitor.isNativePlatform()});busy=false;const initialDemo=initialDemoDataset(demoPreview,read('bb-demo-city',null));if(initialDemo)setData(initialDemo);else render();await locate(false,true)}
+start();if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
