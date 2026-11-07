@@ -2,6 +2,6 @@
 # this adapter supplies the workspace without migrating or duplicating them.
 platform :ios, '15.0'
 use_frameworks!
-project 'App/App.xcodeproj'
+project 'App.xcodeproj'
 target 'App' do
 end

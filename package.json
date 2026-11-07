@@ -10,7 +10,8 @@
     "native:sync": "npx cap sync",
     "dev": "node scripts/serve.mjs",
     "build:demo": "BYTEBUDGET_MODE=demo node scripts/build.mjs",
-    "eas-build-post-install": "npm test && npm run build && npx cap sync"
+    "eas-build-post-install": "npm test && npm run build && npx cap sync && node scripts/prepare-eas-ios.mjs",
+    "eas-build-pre-install": "bash scripts/eas-pre-install.sh"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
