@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {getForegroundPosition} from '../src/location.js';
+test('asks precise foreground location once with no tracking',async()=>{let options;const result=await getForegroundPosition(async o=>{options=o;return {timestamp:Date.now(),coords:{latitude:44.49,longitude:11.34,accuracy:20}}},800);assert.equal(options.enableHighAccuracy,true);assert.equal(options.maximumAge,30000);assert.equal(result.coords.latitude,44.49)});
+test('rejects coarse position instead of pretending 100m precision',async()=>{await assert.rejects(getForegroundPosition(async()=>({coords:{latitude:44.49,longitude:11.34,accuracy:2000}}),100),e=>e.code==='location_imprecise')});
+test('permission denial remains actionable',async()=>{await assert.rejects(getForegroundPosition(async()=>{throw {code:'OS-PLUG-GLOC-0003'}},800),e=>e.code==='location_denied')});

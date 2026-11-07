@@ -1,3 +1,15 @@
-import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';
-const root=path.resolve('dist');const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
-http.createServer(async(req,res)=>{try{const p=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!p.startsWith(root+path.sep)&&p!==root)throw Error();const data=await readFile(p===root||p.endsWith('/')?path.join(p,'index.html'):p);res.writeHead(200,{'Content-Type':types[path.extname(p)]||'text/html'});res.end(data);}catch{res.writeHead(404);res.end('Not found');}}).listen(4173,'0.0.0.0',()=>console.log('ByteBudget: http://localhost:4173'));
+// Development server only. Do not log request URLs, bodies or coordinates.
+import http from 'node:http';
+import {Readable} from 'node:stream';
+const {default:worker}=await import('../dist/server/index.js');
+const env={LIVE_SEARCH_ENABLED:process.env.LIVE_SEARCH_ENABLED,GOOGLE_PLACES_API_KEY:process.env.GOOGLE_PLACES_API_KEY,VERIFIED_CATALOG:process.env.VERIFIED_CATALOG};
+const port=Number(process.env.PORT)||4173;
+http.createServer(async(req,res)=>{
+ try{
+  const method=req.method||'GET';
+  const request=new Request(`http://${req.headers.host||'localhost'}${req.url}`,{method,headers:req.headers,...(['GET','HEAD'].includes(method)?{}:{body:Readable.toWeb(req),duplex:'half'})});
+  const response=await worker.fetch(request,env);
+  res.writeHead(response.status,Object.fromEntries(response.headers));
+  if(response.body)Readable.fromWeb(response.body).pipe(res);else res.end();
+ }catch{res.writeHead(500);res.end('Service unavailable')}
+}).listen(port,'0.0.0.0',()=>console.log(`ByteBudget development server on port ${port}`));

@@ -7,3 +7,6 @@
 - Independent read-only code review: fixed globally colliding saved IDs, hidden refresh errors, unsafe visual/currency interpolation and provider payload validation before state assignment.
 - Original design uses photography; first executable demo uses original CSS food illustrations. Real restaurant photography awaits licensed provider data.
 - Real provider, sponsored offer commercial flow, precise pedestrian time, native device QA and store publication remain pending. No claim of end-to-end live launch.
+
+## v0.2.0 validation
+Added menu schedule/timezone tests, server adapter tests, native origin policy, Worker asset/status tests and foreground geolocation/client error tests. Native Geolocation plugin synchronized on both platforms. Google integration tested with synthetic responses, not real credentials. Production activation and physical-device QA remain pending. Independent review identified and corrected stale live snapshots, missing native CORS policy and unrelated Nearby Search truncation (replaced with direct details by verified ID).

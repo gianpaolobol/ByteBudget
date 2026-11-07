@@ -24,6 +24,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ByteBudget uses your location to find places to eat within your chosen distance. No background tracking.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ByteBudget uses your location to find places to eat within your chosen distance. No background tracking.</string>
 	<key>UIApplicationSceneManifest</key>

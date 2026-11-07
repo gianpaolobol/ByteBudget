@@ -4,7 +4,7 @@
 
 ## Current status
 
-Version 0.1.0: working responsive demo, English/Italian, fictional London/Bologna/Tokyo datasets; deterministic budget/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+Version 0.2.0: working responsive demo, English/Italian, fictional London/Bologna/Tokyo datasets; deterministic budget/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
 
 ## Run
 
@@ -35,10 +35,12 @@ See `docs/DATA_PROVIDER.md`. Demo is opt-in and explicitly labelled. No hardcode
 ## Release blockers
 
 - Licensed production POI/review provider and verified per-meal price source, coverage, provenance and update pipeline.
-- Backend provider, city/timezone/currency resolution, verified opening hours and restaurant menus.
+- Configure and validate production coverage for the implemented backend provider, city catalog, opening hours and restaurant menus.
 - Real pedestrian routing if walking minutes must appear in result cards.
 - Real restaurant offer portal, campaign payments, moderation, redemption tracking. No fake advertising flow.
-- Native device QA, real app icons/splash artwork, signing, store listings/screenshots, support contact, reviewed privacy and terms.
+- Native device QA, final brand artwork, signing, store listings/screenshots, support contact, reviewed privacy and terms.
 - Name/trademark availability has not been cleared. GitHub repository availability is not trademark clearance.
 
 No secret keys belong in client code, git, screenshots or documentation.
+
+Build outputs: `dist/client` (web/native assets), `dist/server/index.js` (Worker including assets). `npm start` runs the local Worker adapter. Production runtime variables must be configured as server secrets, never inside client code. See `.env.example` for names only.
