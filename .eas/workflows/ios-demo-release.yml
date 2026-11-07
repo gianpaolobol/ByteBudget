@@ -1,0 +1,15 @@
+name: ByteBudget iOS demo build and TestFlight
+jobs:
+  build_ios:
+    type: build
+    params:
+      platform: ios
+      profile: demo
+  testflight:
+    type: testflight
+    needs: [build_ios]
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: demo
+      internal_groups: [ByteBudget Demo]
+      changelog: Demo with fictional Bologna, London and Tokyo venues, 12 languages and local-currency spending slider. Opaque App Store icon correction.
