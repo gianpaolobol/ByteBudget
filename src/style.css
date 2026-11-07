@@ -3,3 +3,5 @@
 .hero{min-height:110px;margin:16px 0;padding:18px}.hero .plate{width:88px;height:88px}.hero strong{font-size:25px}.top{margin-bottom:18px}.control{padding:16px 0}h1{font-size:36px;margin-top:16px}.segmented{margin:14px 0}.shell{padding-top:18px}@media(min-width:700px){.shell h1{font-size:38px}}
 
 .shell .tagline{font-size:clamp(18px,5.7vw,27px);letter-spacing:-.7px;white-space:nowrap;line-height:1.2}
+.language{max-width:145px;font-size:13px}.shell .tagline{font-size:clamp(16px,5.2vw,25px)}
+[dir=rtl] .card{text-align:right}[dir=rtl] .detail-price,[dir=rtl] .budget input{unicode-bidi:plaintext}[dir=rtl] .nav{direction:rtl}

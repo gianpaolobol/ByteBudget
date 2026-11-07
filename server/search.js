@@ -45,7 +45,7 @@ export function createSearchHandler({fetch:fetcher=globalThis.fetch,now=Date.now
    const records=[];
    for(let index=0;index<candidates.length;index+=4){
     const batch=await Promise.all(candidates.slice(index,index+4).map(async venue=>{
-     const url=new URL(`https://places.googleapis.com/v1/places/${encodeURIComponent(venue.id)}`);url.searchParams.set('languageCode',input.language==='it'?'it':'en');
+     const url=new URL(`https://places.googleapis.com/v1/places/${encodeURIComponent(venue.id)}`);url.searchParams.set('languageCode',({zh:'zh-CN'}[input.language]||(['en','it','es','de','fr','pt','ru','ja','ko','ar','hi'].includes(input.language)?input.language:'en')));
      const response=await fetcher(url.href,{method:'GET',headers:{'X-Goog-Api-Key':env.GOOGLE_PLACES_API_KEY,'X-Goog-FieldMask':FIELD_MASK},signal:AbortSignal.timeout(10000)});
      if(!response.ok)throw Error('Provider unavailable');
      const place=await response.json();if(!place||place.id!==venue.id)throw Error('Unexpected provider result');return place;

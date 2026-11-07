@@ -4,7 +4,7 @@
 
 ## Current status
 
-Version 0.2.0: working responsive demo, English/Italian, fictional London/Bologna/Tokyo datasets; deterministic budget/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+Version 0.3.0: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic budget/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
 
 ## Run
 
@@ -44,3 +44,5 @@ See `docs/DATA_PROVIDER.md`. Demo is opt-in and explicitly labelled. No hardcode
 No secret keys belong in client code, git, screenshots or documentation.
 
 Build outputs: `dist/client` (web/native assets), `dist/server/index.js` (Worker including assets). `npm start` runs the local Worker adapter. Production runtime variables must be configured as server secrets, never inside client code. See `.env.example` for names only.
+
+Location permission is requested automatically at application startup, through the platform system dialog. There is no separate Use location control. Denial leaves the demo usable; location is not transmitted to the data provider while the service is unconfigured. Language follows the phone preferences until manually changed; Arabic uses RTL. Translation packs are complete but native-speaker editorial review remains recommended before store release.
