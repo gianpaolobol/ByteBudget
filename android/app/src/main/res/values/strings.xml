@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ByteBudget</string>
+    <string name="title_activity_main">ByteBudget</string>
+    <string name="package_name">com.bytebudget.app</string>
+    <string name="custom_url_scheme">com.bytebudget.app</string>
+</resources>

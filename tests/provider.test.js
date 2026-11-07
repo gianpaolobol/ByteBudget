@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {validateDataset} from '../src/provider.js';import {demoCity} from '../src/demo.js';
+test('demo IDs are globally unique across cities',()=>{const london=demoCity('London'),tokyo=demoCity('Tokyo');assert.equal(london.venues.some(a=>tokyo.venues.some(b=>a.id===b.id)),false)});
+test('reject malformed provider before state assignment',()=>{for(const patch of [{timeZone:'broken-zone'},{currency:'<img onerror=x>'},{venues:[null]},{venues:[{id:'x'}]}])assert.throws(()=>validateDataset({...demoCity('London'),...patch}));});
+test('accept full dataset and normalize visual variants',()=>{const d=demoCity('London');d.venues[0].visual='" onmouseover="x';const result=validateDataset(d);assert.equal(result.venues[0].visual,0);assert.equal(result.currency,'GBP')});

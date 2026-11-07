@@ -1,0 +1,2 @@
+# ByteBudget
+Read CONTINUITA.md and README.md before editing. Preserve the approved visual direction. Never present fictional venues, reviews or prices as real. No provider credentials in git or client. Budget excludes unknown/stale/wrong-currency prices. Keep sponsored results separate from organic quality ranking. Use Node test runner for domain logic and verify build before committing. Preserve Site project ID.
