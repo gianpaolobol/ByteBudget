@@ -1,0 +1,12 @@
+name: ByteBudget native demo
+jobs:
+  android:
+    type: build
+    params:
+      platform: android
+      profile: demo
+  ios:
+    type: build
+    params:
+      platform: ios
+      profile: demo

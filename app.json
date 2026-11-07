@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "ByteBudget",
+    "slug": "bytebudget",
+    "owner": "gianpaolobol",
+    "version": "1.0.0",
+    "ios": {
+      "bundleIdentifier": "com.bytebudget.app"
+    },
+    "android": {
+      "package": "com.bytebudget.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "31af7833-38c6-4b74-8002-57222b1b03e8"
+      }
+    }
+  }
+}
