@@ -1,0 +1,7 @@
+name: ByteBudget iOS demo
+jobs:
+  ios:
+    type: build
+    params:
+      platform: ios
+      profile: demo
