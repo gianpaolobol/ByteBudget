@@ -1,0 +1,78 @@
+require 'base64'
+require 'fileutils'
+require 'securerandom'
+require 'tmpdir'
+require 'shellwords'
+
+ROOT = File.expand_path('..', __dir__)
+APP_ID = 'com.bytebudget.app'
+TEAM_ID = 'BX9MDXAHKG'
+
+def secret_file(dir, name, env_name)
+  path = File.join(dir, name)
+  File.write(path, Base64.strict_decode64(ENV.fetch(env_name).delete("\r\n")), mode: 'wb', perm: 0600)
+  path
+end
+
+platform :ios do
+  desc 'Build with Xcode and distribute to the existing owner-only TestFlight group'
+  lane :demo do
+    api_key = app_store_connect_api_key(key_id: 'Q867WLD8JD', issuer_id: '8f57d241-76f9-4226-a912-f2ef24ac1a92', key_content: ENV.fetch('ASC_KEY_P8_BASE64'), is_key_content_base64: true)
+    build_number = [2, latest_testflight_build_number(api_key: api_key, app_identifier: APP_ID, version: '1.0.0', initial_build_number: 2)].max + 1
+    Dir.mktmpdir('bytebudget-signing-') do |dir|
+      keychain = File.join(dir, 'signing.keychain-db')
+      password = SecureRandom.hex(32)
+      profile_path = nil
+      begin
+        certificate = secret_file(dir, 'distribution.p12', 'IOS_DISTRIBUTION_P12_BASE64')
+        profile = secret_file(dir, 'app.mobileprovision', 'IOS_PROFILE_BASE64')
+        parsed = FastlaneCore::ProvisioningProfile.parse(profile)
+        UI.user_error!('Profile is not for ByteBudget and the expected Apple team') unless parsed.dig('Entitlements', 'application-identifier') == "#{TEAM_ID}.#{APP_ID}" && parsed['TeamIdentifier'] == [TEAM_ID]
+        UI.user_error!('App Store profile required') if parsed['ProvisionedDevices'] || parsed['ProvisionsAllDevices'] || parsed.dig('Entitlements', 'get-task-allow')
+        UI.user_error!('Signing profile expired') if parsed.fetch('ExpirationDate').to_time <= Time.now
+        profile_path = FastlaneCore::ProvisioningProfile.install(profile)
+        create_keychain(path: keychain, password: password, default_keychain: false, unlock: true, timeout: 3600, add_to_search_list: true)
+        import_certificate(certificate_path: certificate, certificate_password: ENV.fetch('IOS_DISTRIBUTION_P12_PASSWORD'), keychain_name: keychain, keychain_path: keychain, keychain_password: password)
+        project = File.join(ROOT, 'ios/App/App.xcodeproj')
+        update_code_signing_settings(path: project, use_automatic_signing: false, team_id: TEAM_ID, code_sign_identity: 'Apple Distribution', profile_uuid: parsed.fetch('UUID'), targets: ['App'], build_configurations: ['Release'])
+        build_app(project: project, scheme: 'App', configuration: 'Release', clean: true,
+          output_directory: File.join(ROOT, 'build/ios'), output_name: 'ByteBudget.ipa',
+          export_method: 'app-store', export_team_id: TEAM_ID, skip_profile_detection: true,
+          xcargs: "CURRENT_PROJECT_VERSION=#{build_number} OTHER_CODE_SIGN_FLAGS=#{Shellwords.escape("--keychain #{keychain}")}",
+          export_options: { signingStyle: 'manual', provisioningProfiles: { APP_ID => parsed.fetch('UUID') } })
+        upload_to_testflight(api_key: api_key, app_identifier: APP_ID, apple_id: '6832104168',
+          ipa: File.join(ROOT, 'build/ios/ByteBudget.ipa'), groups: ['ByteBudget Demo'],
+          distribute_external: false, notify_external_testers: false, submit_beta_review: false,
+          uses_non_exempt_encryption: false, wait_processing_timeout_duration: 1800,
+          changelog: 'ByteBudget demo: fictional Bologna, London and Tokyo venues; 12 languages and local currency spending slider.')
+      ensure
+        FileUtils.rm_f(profile_path) if profile_path
+        delete_keychain(keychain_path: keychain) if File.exist?(keychain)
+      end
+    end
+  end
+end
+
+platform :android do
+  desc 'Build with Gradle and publish to the existing internal test track'
+  lane :demo do
+    codes = %w[internal alpha beta production].flat_map do |track|
+      google_play_track_version_codes(package_name: APP_ID, track: track, json_key_data: ENV.fetch('PLAY_SERVICE_ACCOUNT_JSON'))
+    end
+    build_number = [1, *codes].max + 1
+    Dir.mktmpdir('bytebudget-signing-') do |dir|
+      begin
+        ENV['BYTEBUDGET_KEYSTORE_FILE'] = secret_file(dir, 'upload.keystore', 'ANDROID_KEYSTORE_BASE64')
+        gradle(task: 'bundle', build_type: 'Release', project_dir: File.join(ROOT, 'android'),
+          properties: { 'bytebudgetVersionCode' => build_number }, print_command: false)
+        upload_to_play_store(package_name: APP_ID, json_key_data: ENV.fetch('PLAY_SERVICE_ACCOUNT_JSON'),
+          aab: File.join(ROOT, 'android/app/build/outputs/bundle/release/app-release.aab'),
+          track: 'internal', release_status: 'completed',
+          skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true,
+          skip_upload_changelogs: true)
+      ensure
+        ENV.delete('BYTEBUDGET_KEYSTORE_FILE')
+      end
+    end
+  end
+end

@@ -4,7 +4,7 @@
 
 ## Current status
 
-Version 0.5.1: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. This is NOT a published store app and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+Version 0.5.1: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. Android 1.0(1) is available to the owner on Google Play internal testing. iOS 1.0.0(2) was uploaded and processed VALID; TestFlight group distribution is not yet confirmed. This is a demo and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
 
 ## Run
 
@@ -26,7 +26,7 @@ npx cap open ios
 npx cap open android
 ```
 
-iOS requires macOS/Xcode and Apple Developer signing. Android requires Android Studio/JDK/SDK. No signing credentials are committed. `com.bytebudget.app` is a provisional bundle identifier; verify ownership before store registration.
+iOS requires macOS/Xcode and Apple Developer signing. Android requires Android Studio/JDK/SDK. No signing credentials are committed. `com.bytebudget.app` is registered for ByteBudget on both stores.
 
 ## Data model
 
@@ -50,3 +50,9 @@ Location permission is requested automatically at application startup, through t
 The user removed numeric budget entry. Mid is initially selected. City/meal thresholds can be configured as lowMax/midMax/highMax. With sufficient own menu samples, the fallback estimates the low/mid boundaries and sets the Luxury threshold above both the 95th percentile and 2.4 times the Mid boundary. These are descriptive estimates, not a luxury quality certification. Demo thresholds and prices are fictional; Bologna illustrates 20/50/120 EUR.
 
 Latest interaction: one spending slider replaces the four buttons. Four local price tiers remain as labels. Within a tier, the slider sets a concrete per-person ceiling without typing; only the far-right endpoint is Luxury without a spending ceiling. Midpoint High is 85 EUR for the fictional Bologna 20/50/120 example. The spending control always increases left-to-right, including Arabic.
+
+## Direct GitHub delivery
+
+User selected GitHub Actions for both compilation and store upload, without Expo. Run **Store demo (direct GitHub)** on main, choosing iOS, Android or both. This uses the canonical Capacitor iOS SPM project with Xcode and the Android project with Gradle/JDK21, then Fastlane to deliver internally. No Expo login/token/build/download is used.
+
+See [setup and exact prerequisites](docs/GITHUB_STORE_DELIVERY.md). Actions is currently blocked by account billing/spending limits and this repository has no signing/upload secrets; this new pipeline has not run on native runners. The existing Android demo remains available. Historical EAS workflows are retained but are not part of this delivery path.

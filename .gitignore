@@ -7,3 +7,7 @@ android/.gradle/
 ios/App/Pods/
 
 .build/
+
+build/
+fastlane/report.xml
+fastlane/README.md
