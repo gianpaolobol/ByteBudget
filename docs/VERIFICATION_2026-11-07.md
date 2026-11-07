@@ -21,3 +21,6 @@ Browser regression found and fixed: the UI helper named `location()` shadowed th
 
 ## v0.5.0 spending slider
 55 automated tests pass. Added all tier segments, High625=>85 EUR, local JPY scaling, observed Luxury tail prices, invalid positions, unlimited1000 and exclusion of cheaper tiers/higher amounts. Browser QA reproduced an actual drag to625 and the Alta85 EUR output, then results only59/79 EUR. Arabic page remains RTL but spending input and labels are LTR; physical-right drag reaches1000 and unlimited Luxury. Native sync passes; physical-device QA remains pending.
+
+## Separate right-hand price readout
+58 automated tests pass. New checks cover blank unknown amount, EUR/GBP/USD formatting independent of interface language, and infinity for unlimited. Browser verified tier High at x446 and GBP105 price at x858 after a real drag to625 in London demo; no middle dot or dash in the visible selected tier row. Build/native sync pass. Real-data activation remains pending; sample cities are demonstrations.

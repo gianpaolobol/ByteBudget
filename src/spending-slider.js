@@ -16,3 +16,9 @@ export function spendingSelection(position,bands,venues=[],meal='dinner',currenc
  const value=offset===0?starts[index]:Math.min(upper,Math.max(starts[index],Math.round(raw)));
  return {position,tier,maxPrice:Number(value.toFixed(digits)),unlimited:false};
 }
+
+export function spendingPriceText(selection,locale,currency){
+ if(selection.unlimited)return '∞';
+ if(!Number.isFinite(selection.maxPrice))return '';
+ return new Intl.NumberFormat(locale,{style:'currency',currency,minimumFractionDigits:0}).format(selection.maxPrice);
+}
