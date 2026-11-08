@@ -4,11 +4,11 @@
 
 ## Current status
 
-Live-location betas are delivered internally on both platforms: **iOS1.0.0(3)** on TestFlight and **Android1.0(2)** on Google Play Test interni. Both are compiled directly on GitHub; Android's signed AAB was uploaded through the existing Play Console session. No new Expo/EAS build is involved.
+Live-location betas are delivered internally on both platforms: **iOS1.0.0(4)** on TestFlight and **Android1.0(3)** on Google Play Test interni. Both are compiled directly on GitHub; Android's signed AAB was uploaded through the existing Play Console session. No new Expo/EAS build is involved.
 
-114 Node tests and the build pass. Actual signed IPA/AAB inspections confirm the live API origin and foreground location configuration. Live API smoke tests at four public landmarks passed: Bologna/EUR, Ferrara/EUR, London/GBP and Tokyo's Shibuya/JPY, with all returned venues within the requested600m radius and both native origins supported. These are backend tests with supplied public coordinates, not physical-device GPS tests. See docs/QA_LIVE_BETA_2026-11-08.md.
+125 Node tests and the build pass. Actual signed IPA/AAB inspections confirm the live API origin and foreground location configuration. Live API smoke tests at four public landmarks passed: Bologna/EUR, Ferrara/EUR, London/GBP and Tokyo's Shibuya/JPY, with all returned venues within the requested600m radius and both native origins supported. These are backend tests with supplied public coordinates, not physical-device GPS tests. See docs/QA_LIVE_BETA_2026-11-08.md.
 
-The restricted Google runtime key stays server-only. A durable shared lifetime cap stops after500searches total, with no automatic reset. Current prices are sourced general venue estimates, not verified lunch/dinner menu prices. Insufficient pricing coverage disables price calibration rather than inventing figures. Physical iPhone/Android permission and GPS QA remains pending.
+The restricted Google runtime key stays server-only. A durable shared lifetime cap stops after500searches total, with no automatic reset. Current prices are sourced general venue estimates, not verified lunch/dinner menu prices. The spending slider stays enabled with sparse samples. Live tiers use Google's qualitative priceLevel; concrete within-tier limits use actual sourced ranges only. Unclassified venues appear separately, never silently in Mid. The installed-beta budget/photo regression is corrected in iOS4/Android3. Physical-device confirmation of these replacement builds remains pending. See docs/LOCAL_DISCOVERY_FIX_2026-11-08.md.
 
 ## Run
 
@@ -34,7 +34,7 @@ iOS requires macOS/Xcode and Apple Developer signing. Android requires Android S
 
 ## Data model
 
-See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically loads an explicitly labelled demo city; configured live mode and native static startup do not receive fictional data automatically. No hardcoded worldwide price bands; city sample quantiles are descriptive, not official economic statistics. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
+See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically loads an explicitly labelled demo city; configured live mode and native static startup do not receive fictional data automatically. No hardcoded worldwide price bands. Live venues use Google's sourced local priceLevel; numeric catalog/demo calibration remains separate. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
 
 ## Release blockers
 

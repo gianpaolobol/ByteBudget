@@ -32,7 +32,7 @@ test('small towns keep closed and unknown-hour operational places and source the
  const h=createNearbyHandler({fetch:async(url,opts)=>{
   if(String(url).includes('geocode'))return Response.json(geocode('Valsamoggia','IT'));
   query=JSON.parse(opts.body);mask=opts.headers['X-Goog-FieldMask'];
-  return Response.json({places:[place({id:'closed',priceLevel:'PRICE_LEVEL_INEXPENSIVE',currentOpeningHours:{openNow:false},googleMapsUri:'https://maps.google.com/?cid=123',websiteUri:'https://example.com',photos:[{name:'places/closed/photos/realPhoto',authorAttributions:[{displayName:'Photographer',uri:'https://maps.google.com/maps/contrib/123'}]}]}),place({id:'hours-unknown',priceLevel:'PRICE_LEVEL_MODERATE',currentOpeningHours:undefined}),place({id:'permanently-closed',businessStatus:'CLOSED_PERMANENTLY'})]});
+  return Response.json({places:[place({id:'closed',priceLevel:'PRICE_LEVEL_INEXPENSIVE',currentOpeningHours:{openNow:false},googleMapsUri:'https://maps.google.com/?cid=123',websiteUri:'https://example.com',photos:[{name:'places/closed/photos/realPhoto',authorAttributions:[{displayName:'Photographer',uri:'https://maps.google.com/maps/contrib/123'}]}]}),place({id:'hours-unknown',priceLevel:'PRICE_LEVEL_MODERATE',currentOpeningHours:undefined}),place({id:'store',primaryType:'supermarket'}),place({id:'permanently-closed',businessStatus:'CLOSED_PERMANENTLY'})]});
  }});
  const d=await(await h(request(),env)).json();assert.equal(d.venues.length,2);
  assert.equal(d.venues[0].isOpen,false);assert.equal(d.venues[0].openingStatus,'closed');assert.equal(d.venues[1].openingStatus,'unknown');

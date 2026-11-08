@@ -3,7 +3,7 @@ import currencies from 'country-to-currency';
 import timeZoneAt from 'tz-lookup';
 import {distanceMeters} from '../src/domain.js';
 import {validateDataset} from '../src/provider.js';
-const MASK='places.id,places.displayName,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.businessStatus,places.priceRange,places.googleMapsUri,places.attributions,places.priceLevel,places.photos,places.websiteUri';
+const MASK='places.id,places.displayName,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.businessStatus,places.priceRange,places.googleMapsUri,places.attributions,places.priceLevel,places.photos,places.websiteUri,places.primaryType';
 const answer=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const failure=(error,status)=>answer({error},status);
 const language=value=>({zh:'zh-CN'}[value]||(['en','it','es','de','fr','pt','ru','ja','ko','ar','hi'].includes(value)?value:'en'));
@@ -45,7 +45,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    if(!response.ok)throw Error();const result=await response.json();if(result.places!==undefined&&!Array.isArray(result.places))throw Error();
    const ids=new Set(),venues=(result.places||[]).slice(0,20).flatMap(p=>{
     const lat=p.location?.latitude,lng=p.location?.longitude;
-    if(typeof p.id!=='string'||!p.id||ids.has(p.id)||typeof p.displayName?.text!=='string'||!Number.isFinite(lat)||Math.abs(lat)>90||!Number.isFinite(lng)||Math.abs(lng)>180||distanceMeters(input.lat,input.lng,lat,lng)>input.radius||!Number.isFinite(p.rating)||p.rating<0||p.rating>5||!Number.isInteger(p.userRatingCount)||p.userRatingCount<1||p.businessStatus!=='OPERATIONAL')return [];
+    if(typeof p.id!=='string'||!p.id||ids.has(p.id)||typeof p.displayName?.text!=='string'||!Number.isFinite(lat)||Math.abs(lat)>90||!Number.isFinite(lng)||Math.abs(lng)>180||distanceMeters(input.lat,input.lng,lat,lng)>input.radius||!Number.isFinite(p.rating)||p.rating<0||p.rating>5||!Number.isInteger(p.userRatingCount)||p.userRatingCount<1||p.businessStatus!=='OPERATIONAL'||['supermarket','grocery_store','convenience_store','gas_station','tobacco_shop','liquor_store'].includes(p.primaryType))return [];
     ids.add(p.id);
     return [{id:p.id,name:p.displayName.text,lat,lng,currency,rating:p.rating,reviewCount:p.userRatingCount,isOpen:p.currentOpeningHours?.openNow===true,openingStatus:typeof p.currentOpeningHours?.openNow==='boolean'?(p.currentOpeningHours.openNow?'open':'closed'):'unknown',sourceTier:({PRICE_LEVEL_FREE:'low',PRICE_LEVEL_INEXPENSIVE:'low',PRICE_LEVEL_MODERATE:'mid',PRICE_LEVEL_EXPENSIVE:'high',PRICE_LEVEL_VERY_EXPENSIVE:'luxury'})[p.priceLevel],googleMapsUri:p.googleMapsUri,websiteUri:p.websiteUri,photo:Array.isArray(p.photos)?p.photos[0]:undefined,prices:{},venuePrice:venuePrice(p.priceRange,currency,current),menu:[],attributions:Array.isArray(p.attributions)?p.attributions:[],ratingSource:'Google Maps'}];
    });
