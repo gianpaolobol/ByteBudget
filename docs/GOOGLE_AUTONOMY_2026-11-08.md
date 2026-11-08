@@ -106,3 +106,22 @@ User explicitly authorized accepting Firebase Terms and creating the project. Te
 Attempted to associate private Apps Script186Uiz3wiE2yd3bb_cISS3F-M4Dfjwzpp01jyMBl-0m4gqEdOYbnd-vfv with project137839521041. Apps Script explicitly rejected association because the standard project's OAuth consent screen must first be configured. The script therefore remains on its default Cloud project; do not claim the original API SERVICE_DISABLED error is resolved or WIF is connected.
 
 Firebase service-account settings expose firebase-adminsdk-fbsvc@bytebudget-f8aaa.iam.gserviceaccount.com and the Generate new private key action. No key generated/downloaded and no IAM role assigned. Firebase Users and Permissions was inspected read-only; owner remains GianPaolo.Franceschini@gmail.com. Do not silently use a broad Owner/Editor service-account key as a substitute for the scoped WIF bootstrap. Next prerequisite is configuring standard-project OAuth consent through an authenticated supported administrative route, then retrying script association and read-only API verification. Existing TestFlight remains the old demo.
+
+
+## Working authenticated API route — supersedes OAuth blocker, 2026-11-08
+
+Official Google quota-project mechanism works: set x-goog-user-project: bytebudget-f8aaa on Apps Script UrlFetch REST requests while retaining the already-authorized default Apps Script project. No new OAuth branding/client or service-account private key is needed for this read-only route. Verified Cloud Resource Manager projects.list HTTP200, ByteBudget ACTIVE and complete response hasMore=false. Avoid reattempting standard-project association: its OAuth-branding prerequisite is unnecessary for this route.
+
+Then ran inspectByteBudget with the same read-only OAuth scopes. Real Service Usage results:
+- ENABLED: cloudresourcemanager.googleapis.com, serviceusage.googleapis.com.
+- DISABLED: iam.googleapis.com, iamcredentials.googleapis.com, sts.googleapis.com, places.googleapis.com, geocoding-backend.googleapis.com.
+
+Reusable preferred pattern for current/future apps: existing private Apps Script user consent + an explicit authorized quota project for management REST calls; repository-scoped keyless WIF for subsequent unattended GitHub checks. The successful read does not grant write scopes or connect GitHub by itself.
+
+Prepared scripts/cloud/apps-script-bootstrap.gs in the private editor and this repository. Its first function inspectByteBudget only reads status. bootstrapByteBudgetIdentity is blocked by absent BYTEBUDGET_BOOTSTRAP_APPROVED=yes script property; current manifest still has cloud-platform.read-only and script.external_request. It has NOT run. To apply it requires explicit owner approval of full cloud-platform OAuth consent for the private script plus the exact ByteBudget trust/role changes below. Although OAuth names Cloud-wide access, script mutations are fixed to verified ByteBudget ID/number; no changes to other projects are planned.
+
+Reviewed bootstrap: enable only Cloud Resource Manager, IAM, IAM Credentials, STS and Service Usage; create bytebudget-github-ops SA and dedicated bytebudget-github/github WIF pool/provider; restrict repository1449678627, owner100540571, main branch, exact google-cloud-ops.yml workflow; initial project role Service Usage Viewer only and workloadIdentityUser impersonation binding on that SA. Reject unexpected pool providers and existing privileged SA grants. Preserve policy etags/conditional bindings and refuse concurrent-policy replacements. Never creates keys, enables Maps, links billing or grants Owner/Editor. Successful bootstrap removes its approval property. Later API/key changes still need separately scoped roles; do not describe read-only GitHub access as full administration.
+
+Validation: 95 Node tests passed and build succeeded; six bootstrap tests cover approval gate, immutable project identity, least-privilege changes/token non-export, unexpected providers, preexisting elevated account grants and repeat-run idempotence. Independent bounded code review found no remaining Important/Critical issues. These are source/mock tests; IAM writes and GitHub authentication are not yet verified live.
+
+Source: https://docs.cloud.google.com/docs/quotas/set-quota-project and https://docs.cloud.google.com/docs/authentication/rest .
