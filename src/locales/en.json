@@ -60,5 +60,15 @@
   "pricesUnavailable": "Price unavailable",
   "menusUnknown": "No verified meal menu available.",
   "budgetUnavailable": "Price filter unavailable: insufficient local prices.",
-  "livePrivacy": "Your coordinates are sent to ByteBudget and Google Maps to identify the city and find nearby restaurants. No background tracking."
+  "livePrivacy": "Your coordinates are sent to ByteBudget and Google Maps to identify the city and find nearby restaurants. No background tracking.",
+  "closedNow": "Closed now",
+  "hoursUnknown": "Hours unavailable",
+  "photoUnavailable": "Photo unavailable",
+  "photoCredit": "Photo:",
+  "sourceTierNote": "Local price band from Google. Amounts shown only when available.",
+  "unclassified": "Price band unavailable",
+  "unclassifiedNote": "These places are separate from your selected budget.",
+  "nearbyCount": "places found nearby",
+  "viewPlace": "View place on Google Maps",
+  "website": "Website"
 }

@@ -60,5 +60,15 @@
   "pricesUnavailable": "Preço indisponível",
   "menusUnknown": "Menu da refeição não verificado.",
   "budgetUnavailable": "Filtro de preço indisponível: poucos preços locais.",
-  "livePrivacy": "As coordenadas são enviadas ao ByteBudget e Google Maps para identificar a cidade e encontrar restaurantes próximos. Sem rastreamento em segundo plano."
+  "livePrivacy": "As coordenadas são enviadas ao ByteBudget e Google Maps para identificar a cidade e encontrar restaurantes próximos. Sem rastreamento em segundo plano.",
+  "closedNow": "Fechado agora",
+  "hoursUnknown": "Horário indisponível",
+  "photoUnavailable": "Foto indisponível",
+  "photoCredit": "Foto:",
+  "sourceTierNote": "Faixa local do Google. Valores exibidos quando disponíveis.",
+  "unclassified": "Faixa de preço indisponível",
+  "unclassifiedNote": "Estes locais estão separados do orçamento escolhido.",
+  "nearbyCount": "locais encontrados nas proximidades",
+  "viewPlace": "Ver no Google Maps",
+  "website": "Site"
 }

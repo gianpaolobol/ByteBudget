@@ -5,7 +5,9 @@ const LIMIT=500;
 export function providerBudgetConfigured(env){
  return env.GOOGLE_FREE_ALLOWANCE_CONFIRMED==='true'&&typeof env.PROVIDER_BUDGET_DB?.prepare==='function';
 }
-export async function reserveProviderSearch(env){
+export const reserveProviderSearch=env=>reserve(env,SCOPE);
+export const reserveProviderPhoto=env=>reserve(env,'google-photos-v1');
+async function reserve(env,scope){
  if(!providerBudgetConfigured(env))return 'unavailable';
  try{
   const row=await env.PROVIDER_BUDGET_DB.prepare(`
@@ -13,7 +15,7 @@ export async function reserveProviderSearch(env){
    ON CONFLICT(scope) DO UPDATE SET searches=provider_budget.searches+1
    WHERE provider_budget.searches < ?
    RETURNING searches
-  `).bind(SCOPE,LIMIT).first();
+  `).bind(scope,LIMIT).first();
   if(row===null)return 'exhausted';
   return Number.isInteger(row?.searches)&&row.searches>=1&&row.searches<=LIMIT?'reserved':'unavailable';
  }catch{return 'unavailable'}

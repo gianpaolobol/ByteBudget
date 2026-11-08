@@ -1,7 +1,8 @@
+import {createPhotoHandler} from './photos.js';
 import {createNearbyHandler,nearbyConfigured} from './nearby.js';
 import {createSearchHandler} from './search.js';
 export function createWorker(assets){
- const search=createSearchHandler(),nearby=createNearbyHandler();
+ const search=createSearchHandler(),nearby=createNearbyHandler(),photo=createPhotoHandler();
  const isConfigured=env=>env.DISCOVERY_MODE==='nearby'?nearbyConfigured(env):(env.LIVE_SEARCH_ENABLED==='true'&&!!env.GOOGLE_PLACES_API_KEY&&!!env.VERIFIED_CATALOG);
  return {async fetch(request,env={}){
   const url=new URL(request.url),origin=request.headers.get('Origin');
@@ -12,6 +13,7 @@ export function createWorker(assets){
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{...cors,'Cache-Control':'no-store'}});
    let response;
    if(url.pathname==='/api/status')response=Response.json({configured:isConfigured(env),...(nearbyConfigured(env)?{mode:'nearby'}:{}),...(env.DEMO_PREVIEW_ENABLED==='true'?{demoPreview:true}:{})},{headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+   else if(url.pathname==='/api/photo')response=await photo(request,env);
    else if(url.pathname==='/api/nearby')response=await nearby(request,env);
    else if(env.DISCOVERY_MODE==='nearby')response=Response.json({error:'not_found'},{status:404});
    else response=await search(request,env);

@@ -60,5 +60,15 @@
   "pricesUnavailable": "가격 정보 없음",
   "menusUnknown": "식사 메뉴가 확인되지 않았습니다.",
   "budgetUnavailable": "현지 가격 정보가 부족하여 가격 필터를 사용할 수 없습니다.",
-  "livePrivacy": "도시와 주변 음식점을 찾기 위해 좌표를 ByteBudget과 Google Maps로 전송합니다. 백그라운드에서 추적하지 않습니다."
+  "livePrivacy": "도시와 주변 음식점을 찾기 위해 좌표를 ByteBudget과 Google Maps로 전송합니다. 백그라운드에서 추적하지 않습니다.",
+  "closedNow": "현재 영업 종료",
+  "hoursUnknown": "영업시간 정보 없음",
+  "photoUnavailable": "사진 없음",
+  "photoCredit": "사진:",
+  "sourceTierNote": "Google의 현지 가격대입니다. 제공된 금액만 표시합니다.",
+  "unclassified": "가격대 정보 없음",
+  "unclassifiedNote": "선택한 예산과 별도로 표시됩니다.",
+  "nearbyCount": "개의 주변 장소",
+  "viewPlace": "Google 지도에서 보기",
+  "website": "웹사이트"
 }

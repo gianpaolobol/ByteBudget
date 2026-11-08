@@ -1,9 +1,18 @@
-import {PRICE_TIERS,validBands,validPrice} from './domain.js';
+import {PRICE_TIERS,validBands,validPrice,sourceVenueTier} from './domain.js';
 // Four equal UI segments, each calibrated to that city's meal-price boundaries.
-export function spendingSelection(position,bands,venues=[],meal='dinner',currency='EUR',now=Date.now()){
+export function spendingSelection(position,bands,venues=[],meal='dinner',currency='EUR',now=Date.now(),options={}){
  if(!Number.isInteger(position)||position<0||position>1000)throw new RangeError('Invalid spending position');
  const tier=PRICE_TIERS[Math.min(3,Math.floor(position/250))];
  if(position===1000)return {position,tier,maxPrice:null,unlimited:true};
+ if(options.sourceTiers){
+  const amounts=venues.filter(v=>sourceVenueTier(v,meal,currency,now,bands)===tier).map(v=>validPrice(v,meal,currency,now)?.max).filter(Number.isFinite);
+  if(!amounts.length)return {position,tier,maxPrice:undefined,unlimited:false};
+  const lo=Math.min(...amounts),hi=Math.max(...amounts),index=PRICE_TIERS.indexOf(tier);
+  const progress=(position-index*250)/249;
+  const digits=new Intl.NumberFormat('en',{style:'currency',currency}).resolvedOptions().maximumFractionDigits;
+  const value=lo+(hi-lo)*progress;
+  return {position,tier,maxPrice:Math.ceil(value*10**digits-1e-8)/10**digits,unlimited:false};
+ }
  if(!validBands(bands))return {position,tier,maxPrice:undefined,unlimited:false};
  const digits=new Intl.NumberFormat('en',{style:'currency',currency}).resolvedOptions().maximumFractionDigits;
  const quantum=10**(-digits);const observed=venues.map(v=>validPrice(v,meal,currency,now)?.max).filter(Number.isFinite);

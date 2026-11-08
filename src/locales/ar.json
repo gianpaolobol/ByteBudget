@@ -60,5 +60,15 @@
   "pricesUnavailable": "السعر غير متاح",
   "menusUnknown": "قائمة الوجبة غير موثّقة.",
   "budgetUnavailable": "تصفية السعر غير متاحة: الأسعار المحلية غير كافية.",
-  "livePrivacy": "تُرسل الإحداثيات إلى ByteBudget وGoogle Maps لتحديد المدينة والعثور على المطاعم القريبة. لا يوجد تتبع في الخلفية."
+  "livePrivacy": "تُرسل الإحداثيات إلى ByteBudget وGoogle Maps لتحديد المدينة والعثور على المطاعم القريبة. لا يوجد تتبع في الخلفية.",
+  "closedNow": "مغلق الآن",
+  "hoursUnknown": "ساعات العمل غير متاحة",
+  "photoUnavailable": "الصورة غير متاحة",
+  "photoCredit": "الصورة:",
+  "sourceTierNote": "فئة السعر المحلية من Google. تظهر المبالغ عند توفرها فقط.",
+  "unclassified": "فئة السعر غير متاحة",
+  "unclassifiedNote": "هذه الأماكن منفصلة عن الميزانية المختارة.",
+  "nearbyCount": "أماكن قريبة",
+  "viewPlace": "عرض في خرائط Google",
+  "website": "الموقع الإلكتروني"
 }

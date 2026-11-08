@@ -60,5 +60,15 @@
   "pricesUnavailable": "価格情報なし",
   "menusUnknown": "食事メニューは未確認です。",
   "budgetUnavailable": "地域の価格情報が不足しているため価格で絞り込めません。",
-  "livePrivacy": "都市の特定と近くのレストラン検索のため、位置情報をByteBudgetとGoogle Mapsに送信します。バックグラウンド追跡は行いません。"
+  "livePrivacy": "都市の特定と近くのレストラン検索のため、位置情報をByteBudgetとGoogle Mapsに送信します。バックグラウンド追跡は行いません。",
+  "closedNow": "現在営業時間外",
+  "hoursUnknown": "営業時間不明",
+  "photoUnavailable": "写真はありません",
+  "photoCredit": "写真：",
+  "sourceTierNote": "Google の地域別価格帯。金額は提供されている場合のみ表示。",
+  "unclassified": "価格帯不明",
+  "unclassifiedNote": "選択した予算とは別に表示しています。",
+  "nearbyCount": "件の周辺スポット",
+  "viewPlace": "Google マップで見る",
+  "website": "ウェブサイト"
 }

@@ -16,10 +16,15 @@ export function matchesTier(price,tier,bands){
  if(!validBands(bands)||!PRICE_TIERS.includes(tier)||!price||!Number.isFinite(price.max))return false;
  const actual=price.max<bands.lowMax?'low':price.max<bands.midMax?'mid':price.max<bands.highMax?'high':'luxury';return actual===tier;
 }
+export function sourceVenueTier(v,meal,currency,now=Date.now(),bands=null){
+ if(v.currency!==currency)return null;
+ if(PRICE_TIERS.includes(v.sourceTier))return v.sourceTier;
+ return null;
+}
 export function selectVenues(venues,q){
  if(!Number.isFinite(q.radius)||q.radius<100||q.radius>1000||!Number.isFinite(q.lat)||!Number.isFinite(q.lng)||q.tier!==undefined&&!PRICE_TIERS.includes(q.tier))throw new RangeError('Invalid search');
  if(q.maxPrice!==undefined&&q.maxPrice!==null&&(!Number.isFinite(q.maxPrice)||q.maxPrice<0))throw new RangeError('Invalid spending limit');
- return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price&&!q.unpricedFallback||q.maxPrice!==undefined&&q.maxPrice!==null&&(!price||price.max>q.maxPrice)||q.tier&&!matchesTier(price,q.tier,q.bands)||v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
+ return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price&&!q.unpricedFallback&&!q.sourceTiers||q.maxPrice!==undefined&&q.maxPrice!==null&&(!price||price.max>q.maxPrice)||q.tier&&(q.sourceTiers?sourceVenueTier(v,q.meal,q.currency,q.now,q.bands)!==q.tier:!matchesTier(price,q.tier,q.bands))||!q.includeClosed&&v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
  const distance=distanceMeters(q.lat,q.lng,v.lat,v.lng);if(distance>q.radius)return [];const score=(v.rating*v.reviewCount+4*50)/(v.reviewCount+50);return [{...v,price,distance,score}];}).sort((a,b)=>b.score-a.score||a.distance-b.distance||a.id.localeCompare(b.id));
 }
 export function cityBands(venues,meal,currency,now=Date.now(),configured=null){

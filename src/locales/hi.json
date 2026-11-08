@@ -60,5 +60,15 @@
   "pricesUnavailable": "कीमत उपलब्ध नहीं",
   "menusUnknown": "भोजन का मेनू सत्यापित नहीं है।",
   "budgetUnavailable": "स्थानीय कीमतें कम होने के कारण मूल्य फ़िल्टर उपलब्ध नहीं है।",
-  "livePrivacy": "शहर पहचानने और पास के रेस्तराँ खोजने के लिए निर्देशांक ByteBudget और Google Maps को भेजे जाते हैं। पृष्ठभूमि में ट्रैकिंग नहीं होती।"
+  "livePrivacy": "शहर पहचानने और पास के रेस्तराँ खोजने के लिए निर्देशांक ByteBudget और Google Maps को भेजे जाते हैं। पृष्ठभूमि में ट्रैकिंग नहीं होती।",
+  "closedNow": "अभी बंद है",
+  "hoursUnknown": "समय उपलब्ध नहीं",
+  "photoUnavailable": "फ़ोटो उपलब्ध नहीं",
+  "photoCredit": "फ़ोटो:",
+  "sourceTierNote": "Google की स्थानीय मूल्य श्रेणी। उपलब्ध होने पर ही राशि दिखाई जाती है।",
+  "unclassified": "मूल्य श्रेणी उपलब्ध नहीं",
+  "unclassifiedNote": "ये स्थान चुने गए बजट से अलग दिखाए गए हैं।",
+  "nearbyCount": "आसपास मिले स्थान",
+  "viewPlace": "Google Maps पर देखें",
+  "website": "वेबसाइट"
 }

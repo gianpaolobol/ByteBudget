@@ -60,5 +60,15 @@
   "pricesUnavailable": "暂无价格",
   "menusUnknown": "用餐菜单尚未核实。",
   "budgetUnavailable": "当地价格不足，暂时无法按价格筛选。",
-  "livePrivacy": "坐标会发送至 ByteBudget 和 Google Maps，以识别城市并查找附近餐厅。不在后台跟踪位置。"
+  "livePrivacy": "坐标会发送至 ByteBudget 和 Google Maps，以识别城市并查找附近餐厅。不在后台跟踪位置。",
+  "closedNow": "目前休息",
+  "hoursUnknown": "营业时间未知",
+  "photoUnavailable": "暂无照片",
+  "photoCredit": "照片：",
+  "sourceTierNote": "Google 当地价格档次。仅显示已提供的金额。",
+  "unclassified": "价格档次未知",
+  "unclassifiedNote": "这些地点与所选预算分开显示。",
+  "nearbyCount": "个附近地点",
+  "viewPlace": "在 Google 地图中查看",
+  "website": "网站"
 }

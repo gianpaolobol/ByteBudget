@@ -15,8 +15,8 @@ test('London GBP and Tokyo JPY derive from geocoded country independently of int
   const h=createNearbyHandler({fetch:async url=>String(url).includes('geocode')?Response.json(geocode(city,country)):Response.json({places:[]})});const d=await (await h(request({lat,lng,language:'it'}),env)).json();assert.equal(d.city,city);assert.equal(d.currency,currency);assert.equal(d.venues.length,0);assert.equal(d.demo,false);
  }
 });
-test('unknown prices never become invented per-meal prices; out-of-radius and closed venues are discarded',async()=>{
- const h=createNearbyHandler({fetch:async url=>String(url).includes('geocode')?Response.json(geocode('Bologna','IT')):Response.json({places:[place({priceRange:undefined}),place({id:'far',location:{latitude:45,longitude:12}}),place({id:'closed',currentOpeningHours:{openNow:false}})]})});const d=await (await h(request(),env)).json();assert.equal(d.venues.length,1);assert.equal(d.venues[0].venuePrice,undefined);assert.deepEqual(d.venues[0].prices,{});
+test('unknown prices never become invented per-meal prices; outside radius is discarded while closed remains labelled',async()=>{
+ const h=createNearbyHandler({fetch:async url=>String(url).includes('geocode')?Response.json(geocode('Bologna','IT')):Response.json({places:[place({priceRange:undefined}),place({id:'far',location:{latitude:45,longitude:12}}),place({id:'closed',currentOpeningHours:{openNow:false}})]})});const d=await (await h(request(),env)).json();assert.equal(d.venues.length,2);assert.equal(d.venues[1].openingStatus,'closed');assert.equal(d.venues[0].venuePrice,undefined);assert.deepEqual(d.venues[0].prices,{});
 });
 test('foreign-currency and unbounded source prices do not become numeric caps',async()=>{
  const h=createNearbyHandler({fetch:async url=>String(url).includes('geocode')?Response.json(geocode('Bologna','IT')):Response.json({places:[place({priceRange:{startPrice:{currencyCode:'USD',units:'10'},endPrice:{currencyCode:'USD',units:'20'}}}),place({id:'unbounded',priceRange:{startPrice:{currencyCode:'EUR',units:'50'}}})]})});const d=await (await h(request(),env)).json();assert.equal(d.venues.length,2);assert.equal(d.venues[0].venuePrice,undefined);assert.equal(d.venues[1].venuePrice,undefined);
@@ -26,4 +26,17 @@ test('invalid radius or disabled provider cannot trigger paid calls',async()=>{
 });
 test('Google request failure stays an error and never falls back to demo',async()=>{
  const h=createNearbyHandler({fetch:async()=>Response.json({status:'REQUEST_DENIED'})});const r=await h(request(),env);assert.equal(r.status,502);assert.deepEqual(await r.json(),{error:'provider_unavailable'});
+});
+test('small towns keep closed and unknown-hour operational places and source their budget/photo links',async()=>{
+ let query,mask;
+ const h=createNearbyHandler({fetch:async(url,opts)=>{
+  if(String(url).includes('geocode'))return Response.json(geocode('Valsamoggia','IT'));
+  query=JSON.parse(opts.body);mask=opts.headers['X-Goog-FieldMask'];
+  return Response.json({places:[place({id:'closed',priceLevel:'PRICE_LEVEL_INEXPENSIVE',currentOpeningHours:{openNow:false},googleMapsUri:'https://maps.google.com/?cid=123',websiteUri:'https://example.com',photos:[{name:'places/closed/photos/realPhoto',authorAttributions:[{displayName:'Photographer',uri:'https://maps.google.com/maps/contrib/123'}]}]}),place({id:'hours-unknown',priceLevel:'PRICE_LEVEL_MODERATE',currentOpeningHours:undefined}),place({id:'permanently-closed',businessStatus:'CLOSED_PERMANENTLY'})]});
+ }});
+ const d=await(await h(request(),env)).json();assert.equal(d.venues.length,2);
+ assert.equal(d.venues[0].isOpen,false);assert.equal(d.venues[0].openingStatus,'closed');assert.equal(d.venues[1].openingStatus,'unknown');
+ assert.equal(d.venues[0].sourceTier,'low');assert.equal(d.venues[1].sourceTier,'mid');
+ assert.equal(d.venues[0].photo.name,'places/closed/photos/realPhoto');assert.equal(d.venues[0].websiteUri,'https://example.com/');
+ assert.equal(query.rankPreference,'DISTANCE');assert.ok(query.includedTypes.includes('cafe'));assert.ok(query.includedTypes.includes('bar'));assert.ok(mask.includes('places.photos'));
 });

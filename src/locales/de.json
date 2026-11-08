@@ -60,5 +60,15 @@
   "pricesUnavailable": "Preis nicht verfügbar",
   "menusUnknown": "Kein geprüftes Menü verfügbar.",
   "budgetUnavailable": "Preisfilter nicht verfügbar: zu wenige lokale Preise.",
-  "livePrivacy": "Koordinaten werden an ByteBudget und Google Maps gesendet, um die Stadt und nahe Restaurants zu finden. Keine Ortung im Hintergrund."
+  "livePrivacy": "Koordinaten werden an ByteBudget und Google Maps gesendet, um die Stadt und nahe Restaurants zu finden. Keine Ortung im Hintergrund.",
+  "closedNow": "Jetzt geschlossen",
+  "hoursUnknown": "Öffnungszeiten unbekannt",
+  "photoUnavailable": "Kein Foto verfügbar",
+  "photoCredit": "Foto:",
+  "sourceTierNote": "Lokale Preisklasse von Google. Beträge nur wenn verfügbar.",
+  "unclassified": "Preisklasse unbekannt",
+  "unclassifiedNote": "Diese Orte sind vom gewählten Budget getrennt.",
+  "nearbyCount": "Orte in der Nähe gefunden",
+  "viewPlace": "Auf Google Maps ansehen",
+  "website": "Webseite"
 }

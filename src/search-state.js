@@ -7,5 +7,5 @@ export function mergeCityDataset(previous,next){
 export function makeSearchSnapshot(venues,criteria){return {venues:[...venues],criteria:{...criteria}}}
 
 export function selectSavedVenues(venues,savedIds,criteria){
- return selectVenues(venues.filter(v=>savedIds.includes(v.id)),{...criteria,unpricedFallback:criteria.pricingScope==='venue'});
+ return selectVenues(venues.filter(v=>savedIds.includes(v.id)),{...criteria,includeClosed:criteria.pricingScope==='venue',unpricedFallback:criteria.pricingScope==='venue'});
 }
