@@ -42,3 +42,42 @@ Direct unauthenticated request to https://cloudresourcemanager.googleapis.com/v1
 Read-only inspection of Fungo Italia store-build.yml/pipeline.yml and Pianta Libera store.yml/deploy-cloudflare.yml found no google-github-actions/auth or workload_identity_provider configuration to reuse. No credentials copied, secret values retrieved or other repositories modified. This is a bounded check of those workflows, not a claim to have inspected every repository or secret.
 
 Remaining zero-extra-cost path is one authenticated owner/admin bootstrap followed by scoped OIDC federation. Runtime access is not established yet. Explicit user authorization does not issue Google OAuth/IAM credentials by itself, and paid alternative automation was not started.
+
+## Preferred route for all current and future apps — user decision
+
+User explicitly selects this supported route as the preferred approach for other apps and future apps, subject to actual access and the no-additional-spending constraint. Reuse the setup pattern, with separate project/repository identities and narrowly scoped permissions; do not automatically reuse ByteBudget credentials or broaden access to unrelated projects. GitHub remains the preferred build and delivery path, without Expo.
+
+Apps Script is accessible and already signed in to the owner's Google account. Created a private standalone project named **Gian - Accesso tecnico Google Cloud**:
+https://script.google.com/home/projects/186Uiz3wiE2yd3bb_cISS3F-M4Dfjwzpp01jyMBl-0m4gqEdOYbnd-vfv/edit
+
+Saved a diagnostic function and an explicit manifest. No deployment or scheduled trigger created. The token stays inside Apps Script and is never logged, copied or returned. First execution reached Google's **Google non ha verificato questa app** warning, naming the owner's own developer account. Owner intervention is required to proceed past that warning and grant initial read-only Cloud consent. No project discovery result, IAM changes, Maps activation or billing changes have occurred. Accessible editor does not yet prove authenticated Cloud API access.
+
+Diagnostic source in Codice.gs:
+
+```js
+function inspectGoogleProjects() {
+  const response = UrlFetchApp.fetch("https://cloudresourcemanager.googleapis.com/v1/projects?pageSize=100", {
+    headers: {Authorization: "Bearer " + ScriptApp.getOAuthToken()},
+    muteHttpExceptions: true
+  });
+  const payload = JSON.parse(response.getContentText());
+  console.log(JSON.stringify({status: response.getResponseCode(), projects: (payload.projects || []).map(p => ({projectId: p.projectId, name: p.name, lifecycleState: p.lifecycleState})), error: payload.error || null, hasMore: Boolean(payload.nextPageToken)}));
+}
+```
+
+Manifest appsscript.json:
+
+```json
+{
+  "timeZone": "Europe/Rome",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/cloud-platform.read-only"
+  ]
+}
+```
+
+After consent, inspect the actual response. The default Apps Script Cloud project may require API configuration; no success is assumed. This diagnostic reads at most the first100projects and reports hasMore. If true, implement pagination before concluding that a project is absent. Only after the exact existing ByteBudget project is identified should a separately reviewed, scoped federation bootstrap run. Read-only consent does not authorize IAM writes by itself.
