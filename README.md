@@ -4,7 +4,9 @@
 
 ## Current status
 
-The source implements real foreground GPS, reverse-geocoded city/country/currency and Google Nearby Search in 12 interface languages. A durable shared request budget (500 searches total, no automatic reset) is deployed on the existing web service; 109 Node tests pass. The dedicated restricted server key is stored as a backend secret and private live Google search has been verified (Bologna/EUR, 14 venues). Anonymous native access remains blocked by the existing private hosting audience. Firebase Blaze and the project's billing link are verified. The existing TestFlight 1.0.0(2) and Android 1.0(1) are still the earlier fictional-city demo; no replacement native live binary has been delivered. See CONTINUITA.md for verified checkpoints.
+Real-location iOS beta **1.0.0 (3)** has been signed, uploaded, processed by Apple and distributed to the existing internal ByteBudget Demo TestFlight group directly from GitHub. Source discovers the real city/country/currency and nearby Google venues; live native bundles exclude fictional city datasets. The public backend has been smoke-tested with actual Bologna data, and the signed IPA's live API origin/location permission configuration checked. Physical iPhone GPS QA remains pending. Android1.0(1) is still the earlier demo; no replacement Android beta has been uploaded.
+
+109 Node tests pass. The restricted Google runtime key stays server-only. A durable shared lifetime cap stops after500searches total, with no automatic reset. Current pricing is sourced general venue estimates, not verified lunch/dinner menu prices. Insufficient pricing coverage is explicitly reported rather than fabricated. See CONTINUITA.md and docs/GITHUB_STORE_DELIVERY.md for verified release evidence.
 
 ## Run
 
