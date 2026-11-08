@@ -150,3 +150,17 @@ https://github.com/gianpaolobol/ByteBudget/actions/runs/42437565962
 Verified successful steps: config prerequisite, google-github-actions/auth@v3, setup-gcloud@v3, real gcloud services list for Places/Geocoding and credential cleanup. This proves unattended GitHub→Google authentication works. Query returned no enabled matching Maps/Geocoding services. The read-only connection does not enable Maps, provide venue data, confer full admin access to GitHub, or satisfy remaining live TestFlight release prerequisites.
 
 Preferred reusable route for current/future apps is now proven for ByteBudget: private authorized Apps Script + explicit quota-project header for initial setup, then narrow per-repository keyless WIF. Preserve user's zero-extra-spending constraint and GitHub-native builds. Do not bootstrap other projects with ByteBudget's fixed IDs; use verified per-project/repository identities and permissions. No new recurring triggers, billing links/upgrades, API keys, public endpoint or store binary created. Next live-app prerequisites remain Google Maps free-allowance/billing/enforceable spending controls, backend secret and native API hosting, then GitHub signing/upload credentials and device tests.
+
+
+## Places and Geocoding enabled — 2026-11-08 (current Maps checkpoint)
+
+Owner requested Maps/Geocoding configuration. Added reviewed enableByteBudgetMapsApis function: fixed project verification, ServiceUsage batchEnable only places.googleapis.com and geocoding-backend.googleapis.com; no billing, keys, IAM grants or provider queries.97tests/build passed, new test observed red→green. Function executed successfully in private Apps Script and reported operation complete with billingChanged=false, keysCreated=false, providerQueriesSent=false.
+
+Independent GitHub verification run42438128077, job128601305206 SUCCESS. Actual job log contains:
+- geocoding-backend.googleapis.com ENABLED
+- places.googleapis.com ENABLED
+Run URL: https://github.com/gianpaolobol/ByteBudget/actions/runs/42438128077
+
+Firebase still shows Spark,0USD/month. Opened pricing dialog read-only: Spark current; Blaze pay-as-you-go is offered, with charges after free allowances. Did not select Blaze, link/create billing, create API keys, submit billable queries or connect backend. Official Places setup requires billing enabled even for free-allowance use. This is the concrete remaining blocker under user's zero-additional-spending constraint; API enablement is complete but live Maps use is NOT. Free allowances and alerts are not hard spending caps. Owner must explicitly decide whether to authorize a Cloud Billing/Blaze financial setup; final financial steps require owner handoff. Before public/billable queries, implement/enforce permitted call budget and review billing-account shared usage. Don't promise zero billing from QPM or budget alerts.
+
+Sources: https://developers.google.com/maps/documentation/places/web-service/get-api-key ; https://developers.google.com/maps/documentation/places/web-service/usage-and-billing ; https://developers.google.com/maps/billing-and-pricing/overview .
