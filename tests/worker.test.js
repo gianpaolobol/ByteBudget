@@ -1,3 +1,4 @@
+import {budgetEnvironment} from '../test-support/provider-budget.js';
 import {test} from 'node:test';import assert from 'node:assert/strict';import {createWorker} from '../server/worker.js';
 const worker=createWorker({'/index.html':{content:'<h1>ByteBudget</h1>',type:'text/html'},'/public/icon.png':{content:'AQID',base64:true,type:'image/png'}});
 test('serves application shell without exposing configuration',async()=>{const res=await worker.fetch(new Request('https://bb.test/'),{GOOGLE_PLACES_API_KEY:'secret'});assert.equal(res.status,200);assert.equal(await res.text(),'<h1>ByteBudget</h1>')});
@@ -12,4 +13,4 @@ test('configured live service does not inject demo startup mode',async()=>{const
 
 test('inactive live shell never auto-seeds demo data',async()=>{const app=createWorker({'/index.html':{content:'<html lang="en"></html>',type:'text/html'}});assert.doesNotMatch(await (await app.fetch(new Request('https://bb.test/'),{})).text(),/data-demo-preview/)});
 
-test('nearby mode is configured without any precompiled city catalog',async()=>{const res=await worker.fetch(new Request('https://bb.test/api/status'),{LIVE_SEARCH_ENABLED:'true',DISCOVERY_MODE:'nearby',GOOGLE_PLACES_API_KEY:'test-only'});assert.deepEqual(await res.json(),{configured:true,mode:'nearby'})});
+test('nearby mode is configured without any precompiled city catalog',async()=>{const res=await worker.fetch(new Request('https://bb.test/api/status'),{...budgetEnvironment(),LIVE_SEARCH_ENABLED:'true',DISCOVERY_MODE:'nearby',GOOGLE_PLACES_API_KEY:'test-only'});assert.deepEqual(await res.json(),{configured:true,mode:'nearby'})});

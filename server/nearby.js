@@ -1,3 +1,4 @@
+import {providerBudgetConfigured,reserveProviderSearch} from './provider-budget.js';
 import currencies from 'country-to-currency';
 import timeZoneAt from 'tz-lookup';
 import {distanceMeters} from '../src/domain.js';
@@ -6,7 +7,7 @@ const MASK='places.id,places.displayName,places.location,places.rating,places.us
 const answer=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const failure=(error,status)=>answer({error},status);
 const language=value=>({zh:'zh-CN'}[value]||(['en','it','es','de','fr','pt','ru','ja','ko','ar','hi'].includes(value)?value:'en'));
-export function nearbyConfigured(env){return env.LIVE_SEARCH_ENABLED==='true'&&env.DISCOVERY_MODE==='nearby'&&!!env.GOOGLE_PLACES_API_KEY}
+export function nearbyConfigured(env){return env.LIVE_SEARCH_ENABLED==='true'&&env.DISCOVERY_MODE==='nearby'&&!!env.GOOGLE_PLACES_API_KEY&&providerBudgetConfigured(env)}
 function amount(money,currency){
  if(!money||money.currencyCode!==currency||!/^\d+$/.test(String(money.units??'0'))||!Number.isInteger(money.nanos??0)||(money.nanos??0)<0||(money.nanos??0)>999999999)return null;
  const n=Number(money.units??0)+(money.nanos??0)/1e9;return Number.isFinite(n)&&n>=0?n:null;
@@ -29,6 +30,8 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
   if(!buckets.has(identity)&&buckets.size>=2000)return failure('rate_limited',429);
   const count=(buckets.get(identity)?.count||0)+1;buckets.set(identity,{minute,count});
   if(count>requestsPerMinute)return failure('rate_limited',429);
+  const reservation=await reserveProviderSearch(env);
+  if(reservation!=='reserved')return failure(reservation==='exhausted'?'provider_budget_exhausted':'provider_budget_unavailable',reservation==='exhausted'?429:503);
   try{
    const geoUrl=new URL('https://maps.googleapis.com/maps/api/geocode/json');geoUrl.searchParams.set('latlng',`${input.lat},${input.lng}`);geoUrl.searchParams.set('language',language(input.language));geoUrl.searchParams.set('key',env.GOOGLE_PLACES_API_KEY);
    const geoResponse=await fetcher(geoUrl.href,{signal:AbortSignal.timeout(10000)});if(!geoResponse.ok)throw Error();

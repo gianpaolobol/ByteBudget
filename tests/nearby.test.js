@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createNearbyHandler} from '../server/nearby.js';
-const env={LIVE_SEARCH_ENABLED:'true',GOOGLE_PLACES_API_KEY:'test-only'};
+import {budgetEnvironment} from '../test-support/provider-budget.js';
+const env={...budgetEnvironment(),LIVE_SEARCH_ENABLED:'true',GOOGLE_PLACES_API_KEY:'test-only'};
 const request=(extra={})=>new Request('https://bb.test/api/nearby',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:44.49,lng:11.34,radius:600,language:'it',...extra})});
 const geocode=(city,country)=>({status:'OK',results:[{address_components:[{long_name:city,short_name:city,types:['locality']},{long_name:country,short_name:country,types:['country']}]}]});
 const place=(extra={})=>({id:'real-place-id',displayName:{text:'Source restaurant'},location:{latitude:44.491,longitude:11.34},rating:4.6,userRatingCount:123,businessStatus:'OPERATIONAL',currentOpeningHours:{openNow:true},priceRange:{startPrice:{currencyCode:'EUR',units:'20'},endPrice:{currencyCode:'EUR',units:'40'}},...extra});
