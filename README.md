@@ -34,7 +34,7 @@ iOS requires macOS/Xcode and Apple Developer signing. Android requires Android S
 
 ## Data model
 
-See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically loads an explicitly labelled demo city; configured live mode and native static startup do not receive fictional data automatically. No hardcoded worldwide price bands. Live venues use Google's sourced local priceLevel; numeric catalog/demo calibration remains separate. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. The four half-open bands are Low, Mid, High and Luxury; Luxury has no ceiling. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
+See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically loads an explicitly labelled demo city; configured live mode and native static startup do not receive fictional data automatically. No hardcoded worldwide price bands. Live venues use Google's sourced local priceLevel; numeric catalog/demo calibration remains separate. Prices expire after 90 days. Venues are classified using the upper meal-price estimate. Low is below the first boundary, Mid includes the second boundary, High includes the third boundary and Luxury is above it. A provider’s exclusive upper endpoint is handled at the currency’s minor unit. This cannot guarantee the final bill. Currency is not guessed from the phone language. Radius is straight-line distance; the navigation provider supplies the walking route/time. No background geolocation.
 
 ## Release blockers
 
@@ -53,7 +53,7 @@ Location permission is requested automatically at application startup, through t
 
 The user removed numeric budget entry. Mid is initially selected. City/meal thresholds can be configured as lowMax/midMax/highMax. With sufficient own menu samples, the fallback estimates the low/mid boundaries and sets the Luxury threshold above both the 95th percentile and 2.4 times the Mid boundary. These are descriptive estimates, not a luxury quality certification. Demo thresholds and prices are fictional; Bologna illustrates 20/50/120 EUR.
 
-Latest interaction: one spending slider replaces the four buttons. Four local price tiers remain as labels. Within a tier, the slider sets a concrete per-person ceiling without typing; only the far-right endpoint is Luxury without a spending ceiling. Midpoint High is 85 EUR for the fictional Bologna 20/50/120 example. The spending control always increases left-to-right, including Arabic.
+Latest interaction: one spending slider replaces the four buttons. Four local price tiers remain as labels. Within a tier, the slider sets a concrete per-person ceiling without typing; only the far-right endpoint is Luxury without a spending ceiling. Midpoint High is 85 EUR for the fictional Bologna 20/50/120 example. The spending control always increases left-to-right, including Arabic. Both sliders use an88px touch surface; readouts update during dragging and spending results update on release. Physical device gesture and status-bar checks remain pending.
 
 ## Direct GitHub delivery
 
@@ -63,8 +63,8 @@ See docs/GITHUB_STORE_DELIVERY.md for verified releases and exact prerequisites.
 
 ## Live location implementation — 2026-11-08
 
-User rejected the seeded native demo as insufficient. Source now includes foreground GPS → reverse geocoded city/country → local currency → Google Nearby Search, with no hardcoded city catalog. Google priceRange is a general venue estimate, stored separately from verified lunch/dinner menus. The live UI hides meal-specific controls for those estimates, displays actual sourced prices only and explicitly disables price filtering when calibration is insufficient. Unknown-priced venues can still appear in that clearly labelled fallback and remain in Saved.
+User rejected the seeded native demo as insufficient. Source now includes foreground GPS → reverse geocoded city/country → local currency → Google Nearby Search, with no hardcoded city catalog. Google priceRange is a general venue estimate, stored separately from verified lunch/dinner menus. The live UI hides meal-specific controls for those estimates, displays actual sourced prices only and never substitutes qualitative priceLevel for numeric amounts. Unknown-priced venues are excluded from budget results; existing Saved records remain available as session records with explicit unavailable prices.
 
 Live bundles exclude fictional venue datasets and demo city selection; API failures do not enable samples. Direct workflow is now **Store live beta (direct GitHub)** and refuses upload without configured nearby API/native CORS.
 
-This live configuration is included in TestFlight1.0.0(3) and Android internal1.0(2). Public backend, restricted server key, durable usage cap and signing setup are active. Installation and real GPS/permission behavior on physical devices remain to be checked. See docs/LIVE_LOCATION_STATUS_2026-11-08.md.
+This live configuration is included in TestFlight1.0.0(5) and Android internal1.0(2). Public backend, restricted server key, durable usage cap and signing setup are active. Installation and real GPS/permission behavior on physical devices remain to be checked. See docs/LIVE_LOCATION_STATUS_2026-11-08.md.
