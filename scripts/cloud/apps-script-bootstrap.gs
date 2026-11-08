@@ -25,6 +25,16 @@ function inspectByteBudget() {
   console.log(JSON.stringify({projectId: project.projectId, projectNumber: project.projectNumber, services: services}));
 }
 
+// Explicit owner-requested API activation only. Does not enable billing, create
+// credentials, change GitHub permissions or send billable Places/Geocoding calls.
+function enableByteBudgetMapsApis() {
+  bbProject_();
+  bbWait_('serviceusage', bbRequest_('serviceusage', 'projects/' + BB_NUMBER_ + '/services:batchEnable', 'post', {
+    serviceIds: ['places.googleapis.com', 'geocoding-backend.googleapis.com']
+  }));
+  console.log(JSON.stringify({projectId: BB_PROJECT_, apiEnableOperationCompleted: true, billingChanged: false, keysCreated: false, providerQueriesSent: false}));
+}
+
 function bootstrapByteBudgetIdentity() {
   const properties = PropertiesService.getScriptProperties();
   if (properties.getProperty('BYTEBUDGET_BOOTSTRAP_APPROVED') !== 'yes') {
