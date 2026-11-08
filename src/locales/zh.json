@@ -42,9 +42,9 @@
   "limited": "搜索过于频繁，请等待一分钟。",
   "broad": "附近餐厅较多，请缩小距离以便精确搜索。",
   "partial": "仅包含菜单价格已核实的餐厅，覆盖范围正在扩大。",
-  "permission": "无法获取位置，请检查权限或体验演示。",
+  "permission": "无法获取位置，请检查权限后重试。",
   "loading": "正在获取位置…",
-  "noProvider": "真实餐厅服务尚未连接。你的位置未发送给餐厅数据提供方。你可以体验明确标注的演示。",
+  "noProvider": "餐厅服务暂不可用，请稍后重试。",
   "browse": "附近推荐",
   "close": "关闭",
   "illustration": "示意图",
@@ -55,5 +55,10 @@
   "luxury": "奢华",
   "priceTier": "价格档位",
   "noLimit": "消费无上限",
-  "upTo": "不超过"
+  "upTo": "不超过",
+  "venueEstimate": "餐厅参考价格；午餐和晚餐菜单可能不同。",
+  "pricesUnavailable": "暂无价格",
+  "menusUnknown": "用餐菜单尚未核实。",
+  "budgetUnavailable": "当地价格不足，暂时无法按价格筛选。",
+  "livePrivacy": "坐标会发送至 ByteBudget 和 Google Maps，以识别城市并查找附近餐厅。不在后台跟踪位置。"
 }

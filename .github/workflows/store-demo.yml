@@ -1,9 +1,9 @@
-name: Store demo (direct GitHub)
+name: Store live beta (direct GitHub)
 on:
   workflow_dispatch:
     inputs:
       platform:
-        description: Demo platform to build and publish
+        description: Live beta platform to build and publish
         type: choice
         options: [both, ios, android]
         default: both
@@ -13,7 +13,8 @@ concurrency:
   group: bytebudget-store-demo
   cancel-in-progress: false
 env:
-  BYTEBUDGET_MODE: demo
+  BYTEBUDGET_MODE: live
+  BYTEBUDGET_API_BASE: ${{ vars.BYTEBUDGET_API_BASE }}
   FASTLANE_SKIP_UPDATE_CHECK: '1'
   FASTLANE_HIDE_CHANGELOG: '1'
   FASTLANE_OPT_OUT_USAGE: '1'
@@ -46,6 +47,8 @@ jobs:
         with:
           ruby-version: '3.3'
       - run: bundle install --jobs 4 --retry 3
+      - name: Verify real native restaurant service
+        run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
       - run: npm test && npm run build && npx cap sync ios
       - name: Build signed IPA and send to TestFlight
@@ -92,6 +95,8 @@ jobs:
         with:
           ruby-version: '3.3'
       - run: bundle install --jobs 4 --retry 3
+      - name: Verify real native restaurant service
+        run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
       - run: npm test && npm run build && npx cap sync android
       - name: Build signed AAB and send to Google Play internal testing

@@ -42,9 +42,9 @@
   "limited": "Too many searches. Please wait a minute.",
   "broad": "Many places nearby. Try a smaller distance for a more precise search.",
   "partial": "Results include places with verified menu prices. Coverage is still growing.",
-  "permission": "Location unavailable. Check your device permissions or explore the demo.",
+  "permission": "Location unavailable. Enable precise location in Settings and try again.",
   "loading": "Finding your location…",
-  "noProvider": "Live restaurant data is not connected yet. Your location has not been sent to a restaurant provider. You can explore the clearly labelled demo.",
+  "noProvider": "Restaurant service unavailable. Please try again later.",
   "browse": "Nearby picks",
   "close": "Close",
   "illustration": "Illustration",
@@ -55,5 +55,10 @@
   "luxury": "Luxury",
   "priceTier": "Price range",
   "noLimit": "No spending limit",
-  "upTo": "Up to"
+  "upTo": "Up to",
+  "venueEstimate": "Venue price estimate; lunch/dinner menus may differ.",
+  "pricesUnavailable": "Price unavailable",
+  "menusUnknown": "No verified meal menu available.",
+  "budgetUnavailable": "Price filter unavailable: insufficient local prices.",
+  "livePrivacy": "Your coordinates are sent to ByteBudget and Google Maps to identify the city and find nearby restaurants. No background tracking."
 }

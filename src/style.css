@@ -10,3 +10,5 @@
 /* Price increases left-to-right in every language; keep a 44px touch target. */
 #spending{direction:ltr;height:44px;min-height:44px;background:transparent;margin:10px 0 0;--spending-track:linear-gradient(to right,#cdddb5 0 25%,#eee0a9 25% 50%,#e9c5ac 50% 75%,#d1c0dc 75%)}#spending::-webkit-slider-runnable-track{height:9px;border-radius:20px;background:var(--spending-track)}#spending::-webkit-slider-thumb{margin-top:-8px}#spending::-moz-range-track{height:9px;border-radius:20px;background:var(--spending-track)}.tier-labels{direction:ltr}[dir=rtl] #spending{background:transparent}
 .spending-value{display:flex;justify-content:space-between;align-items:center;gap:16px;direction:ltr}#spending-price{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;min-height:28px}
+
+.maps-attribution{font:400 13px/1.5 system-ui,sans-serif;color:#5e5e5e;letter-spacing:normal;white-space:nowrap;margin:10px 0}

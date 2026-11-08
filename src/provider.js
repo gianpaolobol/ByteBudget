@@ -10,6 +10,7 @@ export function validateDataset(d){
  const dateOk=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&new Date(s).toISOString().slice(0,10)===s;
  if(p.validFrom&&!dateOk(p.validFrom)||p.validUntil&&!dateOk(p.validUntil)||p.validFrom&&p.validUntil&&p.validFrom>p.validUntil)fail();
  prices[meal]={...p};}}
+ if(v.venuePrice){const p=v.venuePrice;if(p.scope!=='venue-estimate'||!Number.isFinite(p.min)||!Number.isFinite(p.max)||p.min<0||p.max<p.min||!Number.isFinite(Date.parse(p.updatedAt))||typeof p.source!=='string'||!p.source)fail();}
  const menu=Array.isArray(v.menu)?v.menu.map(item=>{if(!item||typeof item.name!=='string'||!Number.isFinite(item.price)||item.price<0)fail();return {name:item.name,price:item.price}}):[];
  return {...v,timeZone:d.timeZone,cuisine:typeof v.cuisine==='string'?v.cuisine:'',visual:[0,1,2].includes(v.visual)?v.visual:0,prices,menu};});
  const citySample=d.citySample===undefined?undefined:validateDataset({...d,venues:d.citySample,citySample:undefined}).venues;

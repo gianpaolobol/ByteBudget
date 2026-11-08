@@ -1,6 +1,6 @@
 export function distanceMeters(a,b,c,d){const r=Math.PI/180;const x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.atan2(Math.sqrt(x),Math.sqrt(Math.max(0,1-x)));}
 export function validPrice(v,meal,currency,now=Date.now()){
- const p=v.prices?.[meal];const age=now-Date.parse(p?.updatedAt);
+ const p=v.prices?.[meal]||(v.venuePrice?.scope==='venue-estimate'?v.venuePrice:undefined);const age=now-Date.parse(p?.updatedAt);
  if(!(v.currency===currency&&p&&Number.isFinite(p.min)&&Number.isFinite(p.max)&&p.min>=0&&p.max>=p.min&&p.source&&Number.isFinite(age)&&age>=0&&age<=90*86400000))return null;
  if(p.validDays||p.validFrom||p.validUntil){
   if(!v.timeZone)return null;
@@ -19,7 +19,7 @@ export function matchesTier(price,tier,bands){
 export function selectVenues(venues,q){
  if(!Number.isFinite(q.radius)||q.radius<100||q.radius>1000||!Number.isFinite(q.lat)||!Number.isFinite(q.lng)||q.tier!==undefined&&!PRICE_TIERS.includes(q.tier))throw new RangeError('Invalid search');
  if(q.maxPrice!==undefined&&q.maxPrice!==null&&(!Number.isFinite(q.maxPrice)||q.maxPrice<0))throw new RangeError('Invalid spending limit');
- return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price||q.maxPrice!==undefined&&q.maxPrice!==null&&price.max>q.maxPrice||q.tier&&!matchesTier(price,q.tier,q.bands)||v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
+ return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price&&!q.unpricedFallback||q.maxPrice!==undefined&&q.maxPrice!==null&&(!price||price.max>q.maxPrice)||q.tier&&!matchesTier(price,q.tier,q.bands)||v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
  const distance=distanceMeters(q.lat,q.lng,v.lat,v.lng);if(distance>q.radius)return [];const score=(v.rating*v.reviewCount+4*50)/(v.reviewCount+50);return [{...v,price,distance,score}];}).sort((a,b)=>b.score-a.score||a.distance-b.distance||a.id.localeCompare(b.id));
 }
 export function cityBands(venues,meal,currency,now=Date.now(),configured=null){

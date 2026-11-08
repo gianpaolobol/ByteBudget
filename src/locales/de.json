@@ -42,9 +42,9 @@
   "limited": "Zu viele Suchanfragen. Bitte warte eine Minute.",
   "broad": "Viele Orte in der Nähe. Wähle einen kleineren Radius für eine genauere Suche.",
   "partial": "Enthalten sind Orte mit geprüften Menüpreisen. Die Abdeckung wächst noch.",
-  "permission": "Standort nicht verfügbar. Prüfe die Berechtigungen oder entdecke die Demo.",
+  "permission": "Standort nicht verfügbar. Prüfe die Berechtigungen und versuche es erneut.",
   "loading": "Standort wird ermittelt…",
-  "noProvider": "Der Restaurantdienst ist noch nicht verbunden. Dein Standort wurde nicht an einen Restaurantanbieter gesendet. Du kannst die gekennzeichnete Demo entdecken.",
+  "noProvider": "Restaurantdienst nicht verfügbar. Bitte später erneut versuchen.",
   "browse": "Empfehlungen in der Nähe",
   "close": "Schließen",
   "illustration": "Illustration",
@@ -55,5 +55,10 @@
   "luxury": "Luxury",
   "priceTier": "Preisklasse",
   "noLimit": "Ohne Ausgabenlimit",
-  "upTo": "Bis zu"
+  "upTo": "Bis zu",
+  "venueEstimate": "Geschätzte Preise des Lokals; Mittags- und Abendmenüs können abweichen.",
+  "pricesUnavailable": "Preis nicht verfügbar",
+  "menusUnknown": "Kein geprüftes Menü verfügbar.",
+  "budgetUnavailable": "Preisfilter nicht verfügbar: zu wenige lokale Preise.",
+  "livePrivacy": "Koordinaten werden an ByteBudget und Google Maps gesendet, um die Stadt und nahe Restaurants zu finden. Keine Ortung im Hintergrund."
 }

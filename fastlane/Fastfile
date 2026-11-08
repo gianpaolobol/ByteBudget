@@ -44,7 +44,7 @@ platform :ios do
           ipa: File.join(ROOT, 'build/ios/ByteBudget.ipa'), groups: ['ByteBudget Demo'],
           distribute_external: false, notify_external_testers: false, submit_beta_review: false,
           uses_non_exempt_encryption: false, wait_processing_timeout_duration: 1800,
-          changelog: 'ByteBudget demo: fictional Bologna, London and Tokyo venues; 12 languages and local currency spending slider.')
+          changelog: 'Foreground GPS, automatic city and currency, nearby restaurant search. Venue price estimates are not verified lunch or dinner menus.')
       ensure
         FileUtils.rm_f(profile_path) if profile_path
         delete_keychain(keychain_path: keychain) if File.exist?(keychain)

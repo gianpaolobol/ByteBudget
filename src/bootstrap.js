@@ -10,5 +10,5 @@ export function initialDemoDataset(isPreview,rememberedCity){
 export async function discoverDemoPreview({marker,native,fetch:fetcher=(...args)=>globalThis.fetch(...args)}){
  if(marker)return true;
  if(native)return false;
- try{const response=await fetcher('/api/status',{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!response.ok)return false;return (await response.json()).configured===false}catch{return false}
+ try{const response=await fetcher('/api/status',{cache:'no-store',signal:AbortSignal.timeout(8000)});if(!response.ok)return false;return (await response.json()).demoPreview===true}catch{return false}
 }

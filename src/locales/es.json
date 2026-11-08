@@ -42,9 +42,9 @@
   "limited": "Demasiadas búsquedas. Espera un minuto.",
   "broad": "Hay muchos locales cerca. Reduce la distancia para afinar la búsqueda.",
   "partial": "Se incluyen locales con precios de menú verificados. La cobertura sigue creciendo.",
-  "permission": "Ubicación no disponible. Revisa los permisos o explora la demo.",
+  "permission": "Ubicación no disponible. Comprueba los permisos e inténtalo de nuevo.",
   "loading": "Buscando tu ubicación…",
-  "noProvider": "El servicio de restaurantes todavía no está conectado. Tu ubicación no se ha enviado a un proveedor de locales. Puedes explorar la demo identificada.",
+  "noProvider": "Servicio de restaurantes no disponible. Inténtalo más tarde.",
   "browse": "Opciones cercanas",
   "close": "Cerrar",
   "illustration": "Ilustración",
@@ -55,5 +55,10 @@
   "luxury": "Luxury",
   "priceTier": "Rango de precios",
   "noLimit": "Sin límite de gasto",
-  "upTo": "Hasta"
+  "upTo": "Hasta",
+  "venueEstimate": "Precio estimado del local; los menús de almuerzo y cena pueden variar.",
+  "pricesUnavailable": "Precio no disponible",
+  "menusUnknown": "Menú de la comida sin verificar.",
+  "budgetUnavailable": "Filtro de precio no disponible: faltan precios locales.",
+  "livePrivacy": "Las coordenadas se envían a ByteBudget y Google Maps para identificar la ciudad y encontrar restaurantes cercanos. Sin seguimiento en segundo plano."
 }

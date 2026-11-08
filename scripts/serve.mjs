@@ -2,7 +2,7 @@
 import http from 'node:http';
 import {Readable} from 'node:stream';
 const {default:worker}=await import('../dist/server/index.js');
-const env={LIVE_SEARCH_ENABLED:process.env.LIVE_SEARCH_ENABLED,GOOGLE_PLACES_API_KEY:process.env.GOOGLE_PLACES_API_KEY,VERIFIED_CATALOG:process.env.VERIFIED_CATALOG};
+const env={LIVE_SEARCH_ENABLED:process.env.LIVE_SEARCH_ENABLED,DISCOVERY_MODE:process.env.DISCOVERY_MODE,NATIVE_API_ENABLED:process.env.NATIVE_API_ENABLED,DEMO_PREVIEW_ENABLED:process.env.DEMO_PREVIEW_ENABLED,GOOGLE_PLACES_API_KEY:process.env.GOOGLE_PLACES_API_KEY,VERIFIED_CATALOG:process.env.VERIFIED_CATALOG};
 const port=Number(process.env.PORT)||4173;
 http.createServer(async(req,res)=>{
  try{

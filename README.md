@@ -56,3 +56,11 @@ Latest interaction: one spending slider replaces the four buttons. Four local pr
 User selected GitHub Actions for both compilation and store upload, without Expo. Run **Store demo (direct GitHub)** on main, choosing iOS, Android or both. This uses the canonical Capacitor iOS SPM project with Xcode and the Android project with Gradle/JDK21, then Fastlane to deliver internally. No Expo login/token/build/download is used.
 
 See [setup and exact prerequisites](docs/GITHUB_STORE_DELIVERY.md). Actions is currently blocked by account billing/spending limits and this repository has no signing/upload secrets; this new pipeline has not run on native runners. The existing Android demo remains available. Historical EAS workflows are retained but are not part of this delivery path.
+
+## Live location implementation — 2026-11-08
+
+User rejected the seeded native demo as insufficient. Source now includes foreground GPS → reverse geocoded city/country → local currency → Google Nearby Search, with no hardcoded city catalog. Google priceRange is a general venue estimate, stored separately from verified lunch/dinner menus. The live UI hides meal-specific controls for those estimates, displays actual sourced prices only and explicitly disables price filtering when calibration is insufficient. Unknown-priced venues can still appear in that clearly labelled fallback and remain in Saved.
+
+Live bundles exclude fictional venue datasets and demo city selection; API failures do not enable samples. Direct workflow is now **Store live beta (direct GitHub)** and refuses upload without configured nearby API/native CORS.
+
+This source is NOT yet activated on the user's phone: existing TestFlight1.0.0(2) remains the demo. Real Google credentials, native-accessible API hosting/quotas and GitHub signing/upload secrets remain prerequisites. The repository is now public; runner startup was verified after the visibility change. See docs/LIVE_LOCATION_STATUS_2026-11-08.md.
