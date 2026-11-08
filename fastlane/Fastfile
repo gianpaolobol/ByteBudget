@@ -17,7 +17,7 @@ end
 platform :ios do
   desc 'Build with Xcode and distribute to the existing owner-only TestFlight group'
   lane :demo do
-    api_key = app_store_connect_api_key(key_id: 'Q867WLD8JD', issuer_id: '8f57d241-76f9-4226-a912-f2ef24ac1a92', key_content: ENV.fetch('ASC_KEY_P8_BASE64'), is_key_content_base64: true)
+    api_key = app_store_connect_api_key(key_id: 'Y58R2Y3BW9', issuer_id: '8f57d241-76f9-4226-a912-f2ef24ac1a92', key_content: ENV.fetch('ASC_KEY_P8_BASE64'), is_key_content_base64: true)
     build_number = [2, latest_testflight_build_number(api_key: api_key, app_identifier: APP_ID, version: '1.0.0', initial_build_number: 2)].max + 1
     Dir.mktmpdir('bytebudget-signing-') do |dir|
       keychain = File.join(dir, 'signing.keychain-db')
