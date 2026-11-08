@@ -1,0 +1,63 @@
+name: Android live beta package (direct GitHub)
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: Next version code, verified above every existing Play upload
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: bytebudget-store-demo
+  cancel-in-progress: false
+jobs:
+  android:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      BYTEBUDGET_MODE: live
+      BYTEBUDGET_API_BASE: ${{ vars.BYTEBUDGET_API_BASE }}
+      BYTEBUDGET_ANDROID_VERSION_CODE: ${{ inputs.version_code }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.11.0
+          cache: npm
+      - name: Check signing prerequisites and version
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then echo "::error::Missing GitHub Actions secret: $name"; exit 1; fi
+          done
+          node --input-type=module -e "import {parseAndroidVersionCode} from './scripts/package-android.mjs'; parseAndroidVersionCode(process.env.BYTEBUDGET_ANDROID_VERSION_CODE);"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Verify public live API and native CORS
+        run: node scripts/check-live-service.mjs
+      - run: npm ci --ignore-scripts
+      - run: npm test && npm run build && npx cap sync android
+      - name: Build signed live AAB
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: node scripts/package-android.mjs
+      - name: Verify AAB signature
+        run: jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ByteBudget-Android-live-${{ inputs.version_code }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 7
