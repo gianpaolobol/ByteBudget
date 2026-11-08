@@ -1,33 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {selectVenues} from '../src/domain.js';
+import {selectVenues,sourceVenueTier,cityBands} from '../src/domain.js';
 import {spendingSelection} from '../src/spending-slider.js';
-const now=Date.now();
-const venue=(id,sourceTier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,sourceTier,prices:{},venuePrice:{min:max-5,max,updatedAt:new Date(now).toISOString(),source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
-const venues=[venue('cheap','low',20),venue('middle','mid',40),venue('high','high',80),venue('unknown',undefined,15),venue('closed','mid',35,{isOpen:false,openingStatus:'closed'})];
-const criteria={lat:44.49,lng:11.34,radius:1000,meal:'dinner',currency:'EUR',now,sourceTiers:true,includeClosed:true};
-test('sparse real venue sample still selects only the requested source budget tier',()=>{
- assert.deepEqual(selectVenues(venues,{...criteria,tier:'low'}).map(v=>v.id),['cheap']);
- assert.deepEqual(selectVenues(venues,{...criteria,tier:'mid'}).map(v=>v.id),['closed','middle']);
+const now=Date.now(),bands={lowMax:20,midMax:50,highMax:120};
+const venue=(id,sourceTier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,sourceTier,prices:{},venuePrice:{min:max-10,max,updatedAt:new Date(now).toISOString(),source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
+const criteria={lat:44.49,lng:11.34,radius:1000,meal:'dinner',currency:'EUR',now,sourceTiers:true,includeClosed:true,bands};
+test('Trentatre 30–40 EUR is Mid despite Google expensive classification',()=>{
+ const v=venue('Trentatre','high',40);
+ assert.equal(sourceVenueTier(v,'dinner','EUR',now,bands),'mid');
+ assert.deepEqual(selectVenues([v],{...criteria,tier:'mid',maxPrice:40}).map(v=>v.id),['Trentatre']);
+ assert.equal(selectVenues([v],{...criteria,tier:'high',maxPrice:85}).length,0);
 });
-test('numeric spending readout uses actual selected-tier amounts even below ten samples',()=>{
- const selection=spendingSelection(375,null,venues,'dinner','EUR',now,{sourceTiers:true});
- assert.equal(selection.tier,'mid');assert.equal(selection.maxPrice,37.52);
- assert.deepEqual(selectVenues(venues,{...criteria,...selection}).map(v=>v.id),['closed']);
- const luxury=spendingSelection(850,null,venues,'dinner','EUR',now,{sourceTiers:true});assert.equal(luxury.maxPrice,undefined);assert.equal(luxury.unlimited,false);
- assert.equal(spendingSelection(1000,null,venues,'dinner','EUR',now,{sourceTiers:true}).unlimited,true);
+test('numeric price classifies without qualitative label and upper range determines tier',()=>{
+ assert.equal(sourceVenueTier(venue('numeric',undefined,40),'dinner','EUR',now,bands),'mid');
+ assert.equal(sourceVenueTier(venue('crosses','low',60),'dinner','EUR',now,bands),'high');
 });
-test('source tier never fabricates numeric prices and explicit caps exclude unknown amounts',()=>{
- const v=venue('no-price','mid',40,{venuePrice:undefined});
- assert.equal(selectVenues([v],{...criteria,tier:'mid'}).length,1);
- assert.equal(selectVenues([v],{...criteria,tier:'mid',maxPrice:50}).length,0);
- assert.equal(spendingSelection(375,null,[v],'dinner','EUR',now,{sourceTiers:true}).maxPrice,undefined);
+test('missing stale and wrong-currency prices stay out even at unlimited Luxury',()=>{
+ const invalid=[venue('missing','luxury',200,{venuePrice:undefined}),venue('stale','luxury',200,{venuePrice:{min:150,max:200,scope:'venue-estimate',source:'menu',updatedAt:new Date(now-91*86400000).toISOString()}}),venue('foreign','luxury',200,{currency:'GBP'})];
+ for(const tier of ['low','mid','high','luxury'])assert.equal(selectVenues(invalid,{...criteria,tier,maxPrice:null}).length,0);
 });
-test('fractional source prices and highest priced venue remain reachable at tier endpoint',()=>{
- const one=[venue('fractional','mid',20.25)];
- const s=spendingSelection(375,null,one,'dinner','EUR',now,{sourceTiers:true});assert.equal(s.maxPrice,20.25);assert.equal(selectVenues(one,{...criteria,...s}).length,1);
- const wide=[venue('first','mid',10),venue('last','mid',1000)];assert.equal(spendingSelection(499,null,wide,'dinner','EUR',now,{sourceTiers:true}).maxPrice,1000);
+test('Italy reference thresholds remain stable with sparse local sample; no euro fallback abroad',()=>{
+ const v=[venue('Trentatre','high',40)];
+ assert.deepEqual(cityBands(v,'dinner','EUR',now,null,'IT'),{...bands,source:'country-reference',sampleSize:1});
+ assert.equal(cityBands(v,'dinner','EUR',now,null,'FR'),null);
+ assert.equal(cityBands(v,'dinner','JPY',now,null,'JP'),null);
 });
-test('unknown Google priceLevel stays unclassified even when numeric city bands exist',()=>{
- const v=venue('no-source-tier',undefined,25);assert.equal(selectVenues([v],{...criteria,tier:'mid',bands:{lowMax:20,midMax:50,highMax:120}}).length,0);
+test('every tier endpoint is reachable and 30–40 EUR is selectable within Mid',()=>{
+ assert.equal(spendingSelection(499,bands).maxPrice,50);
+ assert.equal(spendingSelection(749,bands).maxPrice,120);
+ const s=spendingSelection(420,bands);assert.equal(s.tier,'mid');assert.ok(s.maxPrice>=40);
+ assert.equal(selectVenues([venue('Trentatre','high',40)],{...criteria,...s}).length,1);
+ assert.equal(spendingSelection(1000,bands).unlimited,true);
+});
+test('exclusive Google upper endpoint fits the last currency unit below the Low boundary',()=>{
+ const v=venue('under20','high',20,{venuePrice:{min:10,max:20,upperExclusive:true,updatedAt:new Date(now).toISOString(),scope:'venue-estimate',source:'Google'}});
+ assert.equal(selectVenues([v],{...criteria,tier:'low',maxPrice:19.99}).length,1);
+ assert.equal(selectVenues([v],{...criteria,tier:'low',maxPrice:19.98}).length,0);
 });

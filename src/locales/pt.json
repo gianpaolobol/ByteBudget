@@ -70,5 +70,7 @@
   "unclassifiedNote": "Estes locais estão separados do orçamento escolhido.",
   "nearbyCount": "locais encontrados nas proximidades",
   "viewPlace": "Ver no Google Maps",
-  "website": "Site"
+  "website": "Site",
+  "referenceBandsNote": "Faixas de orçamento de referência para Itália; preços do Google.",
+  "numericBandsNote": "Faixas baseadas em preços numéricos locais. Locais sem preço excluídos."
 }

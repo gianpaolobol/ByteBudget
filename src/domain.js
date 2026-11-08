@@ -14,21 +14,27 @@ export const PRICE_TIERS=['low','mid','high','luxury'];
 export function validBands(b){return !!b&&[b.lowMax,b.midMax,b.highMax].every(Number.isFinite)&&b.lowMax>0&&b.midMax>b.lowMax&&b.highMax>b.midMax}
 export function matchesTier(price,tier,bands){
  if(!validBands(bands)||!PRICE_TIERS.includes(tier)||!price||!Number.isFinite(price.max))return false;
- const actual=price.max<bands.lowMax?'low':price.max<bands.midMax?'mid':price.max<bands.highMax?'high':'luxury';return actual===tier;
+ const belowLow=price.max<bands.lowMax||(price.upperExclusive===true&&price.min<price.max&&price.max===bands.lowMax);
+ const actual=belowLow?'low':price.max<=bands.midMax?'mid':price.max<=bands.highMax?'high':'luxury';return actual===tier;
 }
 export function sourceVenueTier(v,meal,currency,now=Date.now(),bands=null){
- if(v.currency!==currency)return null;
- if(PRICE_TIERS.includes(v.sourceTier))return v.sourceTier;
- return null;
+ const price=validPrice(v,meal,currency,now);
+ return PRICE_TIERS.find(tier=>matchesTier(price,tier,bands))||null;
+}
+function cappedPrice(price,currency){
+ if(!price.upperExclusive||price.min>=price.max)return price.max;
+ const digits=new Intl.NumberFormat('en',{style:'currency',currency}).resolvedOptions().maximumFractionDigits;
+ return (Math.ceil(price.max*10**digits-1e-8)-1)/10**digits;
 }
 export function selectVenues(venues,q){
  if(!Number.isFinite(q.radius)||q.radius<100||q.radius>1000||!Number.isFinite(q.lat)||!Number.isFinite(q.lng)||q.tier!==undefined&&!PRICE_TIERS.includes(q.tier))throw new RangeError('Invalid search');
  if(q.maxPrice!==undefined&&q.maxPrice!==null&&(!Number.isFinite(q.maxPrice)||q.maxPrice<0))throw new RangeError('Invalid spending limit');
- return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price&&!q.unpricedFallback&&!q.sourceTiers||q.maxPrice!==undefined&&q.maxPrice!==null&&(!price||price.max>q.maxPrice)||q.tier&&(q.sourceTiers?sourceVenueTier(v,q.meal,q.currency,q.now,q.bands)!==q.tier:!matchesTier(price,q.tier,q.bands))||!q.includeClosed&&v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
+ return venues.flatMap(v=>{const price=validPrice(v,q.meal,q.currency,q.now);if(!price&&!q.unpricedFallback||q.maxPrice!==undefined&&q.maxPrice!==null&&(!price||cappedPrice(price,q.currency)>q.maxPrice)||q.tier&&(q.sourceTiers?sourceVenueTier(v,q.meal,q.currency,q.now,q.bands)!==q.tier:!matchesTier(price,q.tier,q.bands))||!q.includeClosed&&v.isOpen!==true||!Number.isFinite(v.lat)||!Number.isFinite(v.lng)||!Number.isFinite(v.rating)||v.rating<0||v.rating>5||!Number.isFinite(v.reviewCount)||v.reviewCount<1)return [];
  const distance=distanceMeters(q.lat,q.lng,v.lat,v.lng);if(distance>q.radius)return [];const score=(v.rating*v.reviewCount+4*50)/(v.reviewCount+50);return [{...v,price,distance,score}];}).sort((a,b)=>b.score-a.score||a.distance-b.distance||a.id.localeCompare(b.id));
 }
-export function cityBands(venues,meal,currency,now=Date.now(),configured=null){
+export function cityBands(venues,meal,currency,now=Date.now(),configured=null,country=null){
  if(validBands(configured))return {lowMax:configured.lowMax,midMax:configured.midMax,highMax:configured.highMax,source:'configured',sampleSize:venues.filter(v=>validPrice(v,meal,currency,now)).length};
+ if(country==='IT'&&currency==='EUR')return {lowMax:20,midMax:50,highMax:120,source:'country-reference',sampleSize:venues.filter(v=>validPrice(v,meal,currency,now)).length};
  const values=venues.map(v=>validPrice(v,meal,currency,now)?.max).filter(Number.isFinite).sort((a,b)=>a-b);if(values.length<10)return null;
  const lowMax=values[Math.floor((values.length-1)/3)],midMax=values[Math.floor((values.length-1)*2/3)];
  // Keep High broad. Luxury starts above both the 95th percentile and 2.4x the middle boundary.

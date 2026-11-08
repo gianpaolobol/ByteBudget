@@ -70,5 +70,7 @@
   "unclassifiedNote": "選択した予算とは別に表示しています。",
   "nearbyCount": "件の周辺スポット",
   "viewPlace": "Google マップで見る",
-  "website": "ウェブサイト"
+  "website": "ウェブサイト",
+  "referenceBandsNote": "イタリアの参考予算帯。店舗の価格は Google 提供。",
+  "numericBandsNote": "現地の数値価格で分類。価格不明の店舗は除外されます。"
 }

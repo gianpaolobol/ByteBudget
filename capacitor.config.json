@@ -3,6 +3,6 @@
   "appName": "ByteBudget",
   "webDir": "dist/client",
   "ios": {
-    "contentInset": "automatic"
+    "contentInset": "never"
   }
 }

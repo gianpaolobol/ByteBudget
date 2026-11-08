@@ -70,5 +70,7 @@
   "unclassifiedNote": "Questi locali sono separati dal budget selezionato.",
   "nearbyCount": "locali trovati nelle vicinanze",
   "viewPlace": "Vedi il locale su Google Maps",
-  "website": "Sito del locale"
+  "website": "Sito del locale",
+  "referenceBandsNote": "Soglie di budget di riferimento per l’Italia; importi dei locali da Google.",
+  "numericBandsNote": "Fasce basate sugli importi numerici locali. Locali senza prezzo esclusi."
 }

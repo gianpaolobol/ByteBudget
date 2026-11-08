@@ -1,0 +1,7 @@
+# Numeric budget and forgiving gestures
+Approved: numeric prices override provider qualitative labels; missing/stale/wrong-currency prices excluded from budget results; both sliders tolerate off-track fingers, lightweight dragging and commit once on release. Preserve actual photos, shared usage caps and internal-only delivery.
+
+1. Reproduce numeric 30–40 EUR misclassification, unknown-price inclusion and per-input DOM replacement in regression tests.
+2. Use explicit city bands first. Italy/EUR uses agreed 20/50/120 reference budget boundaries unless a verified city configuration exists; do not derive an Italian village's bands from a handful of venues. Other countries retain local-currency numeric calibration, never an EUR fallback. Label reference thresholds accurately. Low <20, Mid 20–50, High >50–120, Luxury >120; an exclusive provider upper endpoint belongs below a boundary only when the full interval does.
+3. One shared 88px-high range hit surface, pointer capture after horizontal intent, stable input/readout, one result update at release; preserve vertical scrolling, keyboard and cancellation recovery. Distance uses same controller.
+4. Explicit safe-area CSS with fixed opaque status-area cover and no automatic double inset. Run real DOM gesture tests/full suite/build, independent review; then GitHub, backend and replacement internal binaries. Physical phone validation remains separate.

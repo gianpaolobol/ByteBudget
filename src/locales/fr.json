@@ -70,5 +70,7 @@
   "unclassifiedNote": "Ces lieux sont séparés du budget choisi.",
   "nearbyCount": "lieux trouvés à proximité",
   "viewPlace": "Voir sur Google Maps",
-  "website": "Site web"
+  "website": "Site web",
+  "referenceBandsNote": "Tranches de budget de référence pour l’Italie ; prix fournis par Google.",
+  "numericBandsNote": "Tranches selon les prix numériques locaux. Établissements sans prix exclus."
 }

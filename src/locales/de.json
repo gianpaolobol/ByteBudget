@@ -70,5 +70,7 @@
   "unclassifiedNote": "Diese Orte sind vom gewählten Budget getrennt.",
   "nearbyCount": "Orte in der Nähe gefunden",
   "viewPlace": "Auf Google Maps ansehen",
-  "website": "Webseite"
+  "website": "Webseite",
+  "referenceBandsNote": "Referenzbudgets für Italien; Lokalpreise von Google.",
+  "numericBandsNote": "Stufen nach lokalen Preisangaben. Lokale ohne Preis sind ausgeschlossen."
 }

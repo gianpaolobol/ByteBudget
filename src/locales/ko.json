@@ -70,5 +70,7 @@
   "unclassifiedNote": "선택한 예산과 별도로 표시됩니다.",
   "nearbyCount": "개의 주변 장소",
   "viewPlace": "Google 지도에서 보기",
-  "website": "웹사이트"
+  "website": "웹사이트",
+  "referenceBandsNote": "이탈리아 기준 예산 구간이며 매장 가격은 Google에서 제공합니다.",
+  "numericBandsNote": "현지 숫자 가격으로 분류하며 가격이 없는 매장은 제외합니다."
 }

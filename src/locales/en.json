@@ -70,5 +70,7 @@
   "unclassifiedNote": "These places are separate from your selected budget.",
   "nearbyCount": "places found nearby",
   "viewPlace": "View place on Google Maps",
-  "website": "Website"
+  "website": "Website",
+  "referenceBandsNote": "Reference budget bands for Italy; venue amounts from Google.",
+  "numericBandsNote": "Bands use local numeric prices. Venues without prices are excluded."
 }

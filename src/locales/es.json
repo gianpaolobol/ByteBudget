@@ -70,5 +70,7 @@
   "unclassifiedNote": "Estos locales están separados de tu presupuesto.",
   "nearbyCount": "locales cercanos encontrados",
   "viewPlace": "Ver en Google Maps",
-  "website": "Sitio web"
+  "website": "Sitio web",
+  "referenceBandsNote": "Franjas de presupuesto de referencia para Italia; precios de Google.",
+  "numericBandsNote": "Franjas según precios numéricos locales. Se excluyen locales sin precio."
 }

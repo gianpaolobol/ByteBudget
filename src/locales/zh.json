@@ -70,5 +70,7 @@
   "unclassifiedNote": "这些地点与所选预算分开显示。",
   "nearbyCount": "个附近地点",
   "viewPlace": "在 Google 地图中查看",
-  "website": "网站"
+  "website": "网站",
+  "referenceBandsNote": "意大利参考预算档位；商家价格由 Google 提供。",
+  "numericBandsNote": "按当地具体价格分档；无价格信息的商家不列入结果。"
 }
