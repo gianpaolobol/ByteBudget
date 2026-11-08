@@ -125,3 +125,15 @@ Reviewed bootstrap: enable only Cloud Resource Manager, IAM, IAM Credentials, ST
 Validation: 95 Node tests passed and build succeeded; six bootstrap tests cover approval gate, immutable project identity, least-privilege changes/token non-export, unexpected providers, preexisting elevated account grants and repeat-run idempotence. Independent bounded code review found no remaining Important/Critical issues. These are source/mock tests; IAM writes and GitHub authentication are not yet verified live.
 
 Source: https://docs.cloud.google.com/docs/quotas/set-quota-project and https://docs.cloud.google.com/docs/authentication/rest .
+
+
+## Management consent authorized; Google warning pending — 2026-11-08
+
+Owner explicitly authorized extending the private script's consent to Google Cloud management and creating the reviewed ByteBudget GitHub delegation. Updated saved appsscript.json to script.external_request + cloud-platform. Recorded BYTEBUDGET_BOOTSTRAP_APPROVED=yes in private script properties, selected bootstrapByteBudgetIdentity and started execution. Google requested reauthorization, then displayed Google non ha verificato questa app again for the expanded scope. Owner handoff is required at that warning. Scope is declared, but expanded consent is NOT yet verified granted; no IAM/bootstrap success observed. After the owner finishes, inspect real execution outcome before rerunning: bootstrap may run or may need Run again; successful completion deletes the approval property.
+
+Prepared all three GitHub Actions repository variables, verified in the UI:
+- GCP_PROJECT_ID=bytebudget-f8aaa
+- GCP_WIF_PROVIDER=projects/137839521041/locations/global/workloadIdentityPools/bytebudget-github/providers/github
+- GCP_SERVICE_ACCOUNT=bytebudget-github-ops@bytebudget-f8aaa.iam.gserviceaccount.com
+
+The WIF/provider and ops-account values are the reviewed intended resource names, not proof the resources exist yet. No GitHub Google access workflow launched while consent/bootstrap remains unverified. Next: complete Google consent, verify bootstrap non-secret outputs, dispatch Google Cloud access check, inspect actual GitHub authentication/logs and verify only the read-only role was granted. No Keys/Maps/billing changes.
