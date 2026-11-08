@@ -7,7 +7,7 @@ android {
         applicationId "com.bytebudget.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (project.findProperty('bytebudgetVersionCode') ?: '1').toInteger()
+        versionCode = (project.findProperty('bytebudgetVersionCode') ?: '1').toInteger()
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
