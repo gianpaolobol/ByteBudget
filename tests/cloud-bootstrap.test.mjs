@@ -137,3 +137,23 @@ test('Maps setup enables only the two requested APIs without billing, keys or pr
   assert.equal(mutations[0].url, 'https://serviceusage.googleapis.com/v1/projects/137839521041/services:batchEnable');
   assert.deepEqual(JSON.parse(mutations[0].payload).serviceIds, ['places.googleapis.com', 'geocoding-backend.googleapis.com']);
 });
+
+test('billing audit only enables its management API and reads billing state without financial changes',()=>{
+ const calls=[],logs=[];
+ const c=vm.createContext({
+  console:{log:v=>logs.push(v)},ScriptApp:{getOAuthToken:()=> 'private-test-token'},Utilities:{sleep:()=>{}},
+  UrlFetchApp:{fetch(url,options){
+   calls.push({url,...options});let value;
+   if(url==='https://cloudresourcemanager.googleapis.com/v1/projects/bytebudget-f8aaa')value={projectId:'bytebudget-f8aaa',projectNumber:'137839521041',lifecycleState:'ACTIVE'};
+   else if(url.endsWith('/services:batchEnable'))value={done:true,response:{}};
+   else if(url.endsWith('/projects/bytebudget-f8aaa/billingInfo'))value={billingEnabled:true,billingAccountName:'billingAccounts/test-private-account'};
+   else if(url==='https://apikeys.googleapis.com/v2/projects/137839521041/locations/global/keys?pageSize=100')value={keys:[{displayName:'Existing Firebase key',keyString:'must-never-be-logged',restrictions:{apiTargets:[{service:'identitytoolkit.googleapis.com'}]}}]};
+   else if(url.includes('/billingAccounts/test-private-account/projects'))value={projectBillingInfo:[{projectId:'bytebudget-f8aaa',billingEnabled:true}]};
+   else throw Error('Unexpected audit call '+url);
+   return {getResponseCode:()=>200,getContentText:()=>JSON.stringify(value)};
+  }}
+ });vm.runInContext(source,c);assert.equal(typeof c.prepareByteBudgetBillingAudit,'function');c.prepareByteBudgetBillingAudit();
+ const mutations=calls.filter(x=>x.method!=='get');assert.equal(mutations.length,1);assert.deepEqual(JSON.parse(mutations[0].payload),{serviceIds:['cloudbilling.googleapis.com','apikeys.googleapis.com']});
+ assert.deepEqual(JSON.parse(logs.at(-1)),{billingEnabled:true,linkedProjectCount:1,onlyByteBudget:true,apiKeyCount:1,apiKeys:[{displayName:'Existing Firebase key',services:['identitytoolkit.googleapis.com'],browserRestricted:false,serverRestricted:false}]});
+ assert.ok(!logs.join('').includes('private-test-token'));assert.ok(!logs.join('').includes('test-private-account'));assert.ok(!logs.join('').includes('must-never-be-logged'));
+});

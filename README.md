@@ -4,7 +4,7 @@
 
 ## Current status
 
-Version 0.5.1: working responsive demo, 12 interface languages (English, Italian, Spanish, German, French, Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi), fictional London/Bologna/Tokyo datasets; deterministic tier/meal/currency/freshness filtering and review-confidence ranking; saved places; PWA shell; Capacitor iOS/Android packaging and native foreground GPS. Server-side Google Place Details adapter implemented but not activated; it requires a secret key and verified per-meal menu catalog. Android 1.0(1) is available to the owner on Google Play internal testing. iOS 1.0.0(2) was uploaded and processed VALID; TestFlight group distribution is not yet confirmed. This is a demo and does NOT contain live restaurant data. Illustrations are CSS originals, not restaurant photographs.
+The source implements real foreground GPS, reverse-geocoded city/country/currency and Google Nearby Search in 12 interface languages. A durable shared request budget (500 searches total, no automatic reset) is deployed on the existing web service; 104 Node tests pass. Live Google search remains disabled pending a restricted server key and billing-account free-allowance audit. Firebase Blaze and the project's billing link are verified. The existing TestFlight 1.0.0(2) and Android 1.0(1) are still the earlier fictional-city demo; no replacement native live binary has been delivered. See CONTINUITA.md for verified checkpoints.
 
 ## Run
 
@@ -55,7 +55,7 @@ Latest interaction: one spending slider replaces the four buttons. Four local pr
 
 User selected GitHub Actions for both compilation and store upload, without Expo. Run **Store demo (direct GitHub)** on main, choosing iOS, Android or both. This uses the canonical Capacitor iOS SPM project with Xcode and the Android project with Gradle/JDK21, then Fastlane to deliver internally. No Expo login/token/build/download is used.
 
-See [setup and exact prerequisites](docs/GITHUB_STORE_DELIVERY.md). Actions is currently blocked by account billing/spending limits and this repository has no signing/upload secrets; this new pipeline has not run on native runners. The existing Android demo remains available. Historical EAS workflows are retained but are not part of this delivery path.
+See [setup and exact prerequisites](docs/GITHUB_STORE_DELIVERY.md). Making the repository public resolved runner startup; the store workflow still requires the native-accessible live API and signing/upload secrets. No replacement live store binary has been delivered. The existing Android demo remains available. Historical EAS workflows are retained but are not part of this delivery path.
 
 ## Live location implementation — 2026-11-08
 

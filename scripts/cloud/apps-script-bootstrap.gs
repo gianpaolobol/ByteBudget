@@ -143,3 +143,53 @@ function bbWait_(service, operation) {
   }
   throw new Error('Operation pending; inspect state before resuming bootstrap.');
 }
+
+// Activates only the free management API; never links/changes billing accounts.
+function prepareByteBudgetBillingAudit() {
+  bbProject_();
+  bbWait_('serviceusage', bbRequest_('serviceusage', 'projects/' + BB_NUMBER_ + '/services:batchEnable', 'post', {serviceIds: ['cloudbilling.googleapis.com', 'apikeys.googleapis.com']}));
+  const billing = bbReadBilling_('projects/' + BB_PROJECT_ + '/billingInfo');
+  if (billing.billingEnabled !== true) {
+    console.log(JSON.stringify({billingEnabled: false}));
+    return;
+  }
+  if (!/^billingAccounts\/[A-Za-z0-9-]+$/.test(billing.billingAccountName || '')) throw new Error('Unexpected billing identity.');
+  let token = '', projects = [];
+  for (let page = 0; page < 20; page++) {
+    const result = bbReadBilling_(billing.billingAccountName + '/projects?pageSize=100' + (token ? '&pageToken=' + encodeURIComponent(token) : ''));
+    projects = projects.concat(result.projectBillingInfo || []);
+    token = result.nextPageToken || '';
+    if (!token) break;
+    if (page === 19) throw new Error('Billing project inspection incomplete.');
+  }
+  let keyToken = '', keyCount = 0, keySummaries = [];
+  for (let page = 0; page < 20; page++) {
+    const keyResponse = UrlFetchApp.fetch('https://apikeys.googleapis.com/v2/projects/' + BB_NUMBER_ + '/locations/global/keys?pageSize=100' + (keyToken ? '&pageToken=' + encodeURIComponent(keyToken) : ''), {
+      method: 'get', headers: {Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'x-goog-user-project': BB_PROJECT_}, muteHttpExceptions: true, followRedirects: false
+    });
+    if (keyResponse.getResponseCode() !== 200) throw new Error('Key metadata inspection failed; no key created.');
+    const keyPage = JSON.parse(keyResponse.getContentText());
+    keyCount += (keyPage.keys || []).length;
+    keySummaries = keySummaries.concat((keyPage.keys || []).map(function(key) {
+      const restrictions = key.restrictions || {};
+      return {displayName: key.displayName || '', services: (restrictions.apiTargets || []).map(function(item) {return item.service;}),
+        browserRestricted: !!restrictions.browserKeyRestrictions, serverRestricted: !!restrictions.serverKeyRestrictions};
+    }));
+    keyToken = keyPage.nextPageToken || '';
+    if (!keyToken) break;
+    if (page === 19) throw new Error('Key metadata inspection incomplete.');
+  }
+  console.log(JSON.stringify({billingEnabled: true, linkedProjectCount: projects.length,
+    onlyByteBudget: projects.length === 1 && projects[0].projectId === BB_PROJECT_, apiKeyCount: keyCount, apiKeys: keySummaries}));
+}
+
+function bbReadBilling_(path) {
+  if (!/^(projects\/bytebudget-f8aaa\/billingInfo|billingAccounts\/[A-Za-z0-9-]+\/projects\?pageSize=100(&pageToken=[A-Za-z0-9%_.~-]+)?)$/.test(path)) throw new Error('Unsupported billing read.');
+  const response = UrlFetchApp.fetch('https://cloudbilling.googleapis.com/v1/' + path, {
+    method: 'get', headers: {Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'x-goog-user-project': BB_PROJECT_},
+    muteHttpExceptions: true, followRedirects: false
+  });
+  const status = response.getResponseCode();
+  if (status < 200 || status >= 300) throw new Error('Billing inspection HTTP ' + status + '; no financial action performed.');
+  return JSON.parse(response.getContentText());
+}

@@ -1,0 +1,17 @@
+{
+  "project": "bytebudget-f8aaa",
+  "parent": "projects/137839521041/locations/global",
+  "keyId": "bytebudget-server",
+  "displayName": "ByteBudget server Places and Geocoding",
+  "restrictions": {
+    "apiTargets": [
+      {"service": "places.googleapis.com"},
+      {"service": "geocoding-backend.googleapis.com"}
+    ]
+  },
+  "secretDestination": "Existing ByteBudget Sites runtime: GOOGLE_PLACES_API_KEY",
+  "clientExposure": false,
+  "githubExposure": false,
+  "liveSearchEnabled": false,
+  "status": "Proposal only; key not created."
+}
