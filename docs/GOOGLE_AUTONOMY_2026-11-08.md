@@ -137,3 +137,16 @@ Prepared all three GitHub Actions repository variables, verified in the UI:
 - GCP_SERVICE_ACCOUNT=bytebudget-github-ops@bytebudget-f8aaa.iam.gserviceaccount.com
 
 The WIF/provider and ops-account values are the reviewed intended resource names, not proof the resources exist yet. No GitHub Google access workflow launched while consent/bootstrap remains unverified. Next: complete Google consent, verify bootstrap non-secret outputs, dispatch Google Cloud access check, inspect actual GitHub authentication/logs and verify only the read-only role was granted. No Keys/Maps/billing changes.
+
+
+## Google delegation verified end-to-end — 2026-11-08 (current state)
+
+Expanded cloud-platform consent is now valid. Bootstrap first encountered IAM API activation propagation, then a real implementation bug: serviceAccounts.getIamPolicy used GET; Google's endpoint requires POST. Corrected that method with an observed failing-then-passing regression; all96Node tests and build passed, bounded review found no new Important/Critical issue. Source fix on GitHub commits5405db2b745ce93a03e2d25f7c0673ac1a51fed7 and d4bd312eb776be6ea8463084d08e080c4a4967be.
+
+After correction bootstrapByteBudgetIdentity completed successfully and printed the three expected non-secret IDs. Verified the approval property was removed: script settings again show Add script property with no saved rows. Management APIs, dedicated ops SA, dedicated WIF pool/provider and reviewed role bindings are created. No private key generated/exported. Ops account receives Service Usage Viewer only; its reviewed repository principal set receives Workload Identity User. Other-provider and existing privileged-account checks ran before policy writes.
+
+Dispatched Google Cloud access check on main through GitHub UI. Actual run42437565962, job128599599488 completed SUCCESS in11seconds:
+https://github.com/gianpaolobol/ByteBudget/actions/runs/42437565962
+Verified successful steps: config prerequisite, google-github-actions/auth@v3, setup-gcloud@v3, real gcloud services list for Places/Geocoding and credential cleanup. This proves unattended GitHub→Google authentication works. Query returned no enabled matching Maps/Geocoding services. The read-only connection does not enable Maps, provide venue data, confer full admin access to GitHub, or satisfy remaining live TestFlight release prerequisites.
+
+Preferred reusable route for current/future apps is now proven for ByteBudget: private authorized Apps Script + explicit quota-project header for initial setup, then narrow per-repository keyless WIF. Preserve user's zero-extra-spending constraint and GitHub-native builds. Do not bootstrap other projects with ByteBudget's fixed IDs; use verified per-project/repository identities and permissions. No new recurring triggers, billing links/upgrades, API keys, public endpoint or store binary created. Next live-app prerequisites remain Google Maps free-allowance/billing/enforceable spending controls, backend secret and native API hosting, then GitHub signing/upload credentials and device tests.
