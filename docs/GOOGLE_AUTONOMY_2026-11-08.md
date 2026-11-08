@@ -31,3 +31,14 @@ This does not make TestFlight signing autonomous by itself: ByteBudget GitHub st
 No paid browser run, API request, account upgrade or billing change was performed. Google free usage is aggregated per billing account. A per-minute quota or alerts-only budget is not a hard monthly spending cap. Don't enable a public live service until its permitted call budget and billing-account usage are established.
 
 Sources checked2026-11-08: Google IAM Workload Identity Federation with deployment pipelines; google-github-actions/auth and setup-gcloud; Google API-key management and Service Usage roles. The bootstrap/workflow passed local syntax checks only; real Cloud authentication and administration remain unverified.
+
+
+## Additional verification — 2026-11-08
+
+Official standalone Cloud Shell https://shell.cloud.google.com/ was tried as an alternative to Cloud Console; this browser also returns Site Unavailable. This is a generic accessibility failure, not evidence of a bot challenge or a rejected password. No security controls were bypassed.
+
+Direct unauthenticated request to https://cloudresourcemanager.googleapis.com/v1/projects from the executor returned HTTP401. Thus that administrative API is reachable, but no authorized Google identity is present. An installed CLI alone would not solve authentication.
+
+Read-only inspection of Fungo Italia store-build.yml/pipeline.yml and Pianta Libera store.yml/deploy-cloudflare.yml found no google-github-actions/auth or workload_identity_provider configuration to reuse. No credentials copied, secret values retrieved or other repositories modified. This is a bounded check of those workflows, not a claim to have inspected every repository or secret.
+
+Remaining zero-extra-cost path is one authenticated owner/admin bootstrap followed by scoped OIDC federation. Runtime access is not established yet. Explicit user authorization does not issue Google OAuth/IAM credentials by itself, and paid alternative automation was not started.
