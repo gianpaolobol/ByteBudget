@@ -17,3 +17,8 @@ test('invalid photo resource, absent storage, provider failure and unsafe CDN ne
  assert.equal((await h(request('places/a/photos/b'),{})).status,503);assert.equal(calls,0);
  const r=await h(request('places/a/photos/b'),env());assert.equal(r.status,502);assert.equal(r.headers.get('Location'),null);assert.equal(calls,1);
 });
+test('photo JSON mode works on the Workers redirect contract and never follows an upstream redirect',async()=>{
+ const fetch=async(_url,options)=>{if(options.redirect==='error')throw new TypeError('Workers does not support error redirect mode');assert.equal(options.redirect,'manual');return Response.json({photoUri:'https://lh3.googleusercontent.com/real-image'})};
+ const h=createPhotoHandler({fetch});const r=await h(new Request('https://bb.test/api/photo?name=places/a/photos/b&format=json'),env());assert.equal(r.status,200);assert.deepEqual(await r.json(),{photoUri:'https://lh3.googleusercontent.com/real-image'});
+ const noRedirect=createPhotoHandler({fetch:async()=>new Response(null,{status:302,headers:{Location:'https://evil.example/'}})});assert.equal((await noRedirect(request('places/a/photos/b'),env())).status,502);
+});
