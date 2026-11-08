@@ -78,7 +78,7 @@ function bootstrapByteBudgetIdentity() {
   }
   bbGrant_(policy, 'roles/serviceusage.serviceUsageViewer', 'serviceAccount:' + BB_ACCOUNT_);
   bbRequest_('cloudresourcemanager', projectPath + ':setIamPolicy', 'post', {policy: policy});
-  const accountPolicy = bbRequest_('iam', accountPath + ':getIamPolicy?options.requestedPolicyVersion=3', 'get');
+  const accountPolicy = bbRequest_('iam', accountPath + ':getIamPolicy?options.requestedPolicyVersion=3', 'post');
   bbGrant_(accountPolicy, 'roles/iam.workloadIdentityUser', 'principalSet://iam.googleapis.com/' + BB_POOL_ + '/attribute.repository_id/1449678627');
   bbRequest_('iam', accountPath + ':setIamPolicy', 'post', {policy: accountPolicy});
   properties.deleteProperty('BYTEBUDGET_BOOTSTRAP_APPROVED');
