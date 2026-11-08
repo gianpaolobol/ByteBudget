@@ -1,0 +1,41 @@
+name: Google Cloud access check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bytebudget-google-cloud-ops
+  cancel-in-progress: false
+jobs:
+  inspect:
+    if: github.repository_id == '1449678627' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+      GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+    steps:
+      - name: Check one-time Google connection configuration
+        run: |
+          for name in GCP_PROJECT_ID GCP_WIF_PROVIDER GCP_SERVICE_ACCOUNT; do
+            if [ -z "${!name}" ]; then echo "::error::One-time Google authorization missing: $name"; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Inspect Maps and Geocoding activation without billable Maps calls
+        run: |
+          gcloud services list --enabled --project="$GCP_PROJECT_ID" \
+            --filter='config.name=(places.googleapis.com geocoding-backend.googleapis.com)' \
+            --format='table(config.name,state)'
