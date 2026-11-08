@@ -81,3 +81,14 @@ Manifest appsscript.json:
 ```
 
 After consent, inspect the actual response. The default Apps Script Cloud project may require API configuration; no success is assumed. This diagnostic reads at most the first100projects and reports hasMore. If true, implement pagination before concluding that a project is absent. Only after the exact existing ByteBudget project is identified should a separately reviewed, scoped federation bootstrap run. Read-only consent does not authorize IAM writes by itself.
+
+
+## Consent verified and bootstrap limitation — 2026-11-08
+
+Owner reported consent completed. Re-running inspectGoogleProjects verified authenticated execution, returning HTTP403 SERVICE_DISABLED for cloudresourcemanager.googleapis.com in the script's default consumer project472026022918. This is not a missing login. Default Apps Script projects cannot normally be manually configured by the script owner; Google's documented route is association with a standard Cloud project. The error's direct API activation link also returns Site Unavailable in this browser.
+
+Firebase Console https://console.firebase.google.com/ is accessible and signed in to the same owner account. Its existing-Cloud-project selector lists five projects (three named My First Project, fungoitalia, Default Gemini Project); exact search ByteBudget returns no matching project. This is evidence about selectable projects under this account, not proof that ByteBudget cannot exist under another account/name. No Firebase service was added to existing projects, no terms accepted and no existing project modified.
+
+A supported remaining route is creating a dedicated ByteBudget standard Cloud project through Firebase's free Spark setup (no billing account), which also enables Cloud Resource Manager, then attaching the private Apps Script to that standard project and testing access. Firebase terms require action-time owner confirmation. The UI reports only one project slot remains, so disclose that before creation. Do not enable Analytics, AI assistance, Developer Program enrollment, paid plans or billing. Spark setup only addresses technical bootstrap; it does not activate Maps or guarantee free Maps operation.
+
+Official references: https://developers.google.com/apps-script/guides/cloud-platform-projects ; https://firebase.google.com/docs/projects/use-firebase-with-existing-cloud-project ; https://firebase.google.com/docs/projects/billing/firebase-pricing-plans .
