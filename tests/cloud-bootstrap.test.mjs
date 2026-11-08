@@ -157,3 +157,16 @@ test('billing audit only enables its management API and reads billing state with
  assert.deepEqual(JSON.parse(logs.at(-1)),{billingEnabled:true,linkedProjectCount:1,onlyByteBudget:true,apiKeyCount:1,apiKeys:[{displayName:'Existing Firebase key',services:['identitytoolkit.googleapis.com'],browserRestricted:false,serverRestricted:false}]});
  assert.ok(!logs.join('').includes('private-test-token'));assert.ok(!logs.join('').includes('test-private-account'));assert.ok(!logs.join('').includes('must-never-be-logged'));
 });
+
+test('Maps usage inspection reads aggregate request counts without keys or provider calls',()=>{
+ const calls=[],logs=[];const c=vm.createContext({console:{log:x=>logs.push(x)},ScriptApp:{getOAuthToken:()=> 'private-oauth'},Utilities:{sleep:()=>{}},
+  UrlFetchApp:{fetch(url,options){calls.push({url,...options});let result;
+   if(url==='https://cloudresourcemanager.googleapis.com/v1/projects/bytebudget-f8aaa')result={projectId:'bytebudget-f8aaa',projectNumber:'137839521041',lifecycleState:'ACTIVE'};
+   else if(url.endsWith('/services:batchEnable'))result={done:true,response:{}};
+   else if(url.startsWith('https://monitoring.googleapis.com/v3/projects/bytebudget-f8aaa/timeSeries?'))result={timeSeries:[{resource:{labels:{service:'places.googleapis.com'}},points:[{value:{int64Value:'3'}},{value:{int64Value:'7'}}]}]};
+   else throw Error('Unexpected usage read');return {getResponseCode:()=>200,getContentText:()=>JSON.stringify(result)};
+  }} });vm.runInContext(source,c);assert.equal(typeof c.inspectByteBudgetMapsUsage,'function');c.inspectByteBudgetMapsUsage();
+ const result=JSON.parse(logs.at(-1));assert.equal(result.placesRequests,10);assert.equal(result.geocodingRequests,0);
+ assert.deepEqual(JSON.parse(calls.find(x=>x.method==='post').payload),{serviceIds:['monitoring.googleapis.com']});
+ const url=new URL(calls.find(x=>x.url.includes('/timeSeries?')).url);assert.ok(url.searchParams.get('filter').includes('geocoding-backend.googleapis.com'));assert.equal(url.searchParams.get('view'),'FULL');assert.ok(!logs.join('').includes('private-oauth'));
+});

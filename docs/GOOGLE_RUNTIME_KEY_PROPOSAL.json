@@ -5,13 +5,17 @@
   "displayName": "ByteBudget server Places and Geocoding",
   "restrictions": {
     "apiTargets": [
-      {"service": "places.googleapis.com"},
-      {"service": "geocoding-backend.googleapis.com"}
+      {
+        "service": "places.googleapis.com"
+      },
+      {
+        "service": "geocoding-backend.googleapis.com"
+      }
     ]
   },
   "secretDestination": "Existing ByteBudget Sites runtime: GOOGLE_PLACES_API_KEY",
   "clientExposure": false,
   "githubExposure": false,
-  "liveSearchEnabled": false,
-  "status": "Proposal only; key not created."
+  "liveSearchEnabled": true,
+  "status": "Created after explicit owner approval. Restricted metadata verified; transferred encrypted to Sites server secret; temporary stage cleared. Private live endpoint tested. Native anonymous access still blocked by existing Site audience."
 }

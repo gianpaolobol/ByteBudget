@@ -193,3 +193,86 @@ function bbReadBilling_(path) {
   if (status < 200 || status >= 300) throw new Error('Billing inspection HTTP ' + status + '; no financial action performed.');
   return JSON.parse(response.getContentText());
 }
+
+// Owner explicitly approved this dedicated credential and backend-only destination.
+function createByteBudgetRuntimeKey() {
+  const properties = PropertiesService.getScriptProperties();
+  if (properties.getProperty('BYTEBUDGET_RUNTIME_KEY_APPROVED') !== 'yes') throw new Error('Runtime key approval must be recorded.');
+  bbProject_();
+  const name = 'projects/' + BB_NUMBER_ + '/locations/global/keys/bytebudget-server';
+  let key = bbKeyRequest_(name, 'get', null, true);
+  if (!key) {
+    let operation = bbKeyRequest_('projects/' + BB_NUMBER_ + '/locations/global/keys?keyId=bytebudget-server', 'post', {
+      displayName: 'ByteBudget server Places and Geocoding',
+      restrictions: {apiTargets: [{service: 'places.googleapis.com'}, {service: 'geocoding-backend.googleapis.com'}]}
+    });
+    for (let attempt = 0; !operation.done && attempt < 45; attempt++) {
+      if (!/^operations\/[A-Za-z0-9._/-]+$/.test(operation.name || '')) throw new Error('Unexpected key operation.');
+      Utilities.sleep(1000);
+      operation = bbKeyRequest_(operation.name, 'get');
+    }
+    if (!operation.done || operation.error) throw new Error('Key operation pending or failed; inspect before retrying.');
+    key = bbKeyRequest_(name, 'get');
+  }
+  const restrictions = key.restrictions || {};
+  const services = (restrictions.apiTargets || []).map(function(target) {return target.service;}).sort();
+  if (key.name !== name || JSON.stringify(services) !== JSON.stringify(['geocoding-backend.googleapis.com', 'places.googleapis.com']) ||
+      restrictions.browserKeyRestrictions || restrictions.androidKeyRestrictions || restrictions.iosKeyRestrictions || restrictions.serverKeyRestrictions ||
+      (restrictions.apiTargets || []).some(function(target) {return target.methods && target.methods.length;})) {
+    throw new Error('Existing dedicated key restrictions do not match approval.');
+  }
+  const secret = bbKeyRequest_(name + '/keyString', 'get').keyString;
+  if (typeof secret !== 'string' || !/^AIza[A-Za-z0-9_-]{20,}$/.test(secret)) throw new Error('Unexpected key value; not staged.');
+  properties.setProperty('BYTEBUDGET_RUNTIME_KEY_STAGE', secret);
+  properties.deleteProperty('BYTEBUDGET_RUNTIME_KEY_APPROVED');
+  console.log(JSON.stringify({dedicatedKeyReady: true, restrictedApis: services, stagedForBackendTransfer: true, providerQueriesSent: false}));
+}
+
+function clearByteBudgetRuntimeKeyStage() {
+  PropertiesService.getScriptProperties().deleteProperty('BYTEBUDGET_RUNTIME_KEY_STAGE');
+  console.log(JSON.stringify({temporaryKeyStageCleared: true}));
+}
+
+function bbKeyRequest_(path, method, payload, missingAllowed) {
+  const name = 'projects/' + BB_NUMBER_ + '/locations/global/keys/bytebudget-server';
+  if (!((method === 'get' && (path === name || path === name + '/keyString' || /^operations\/[A-Za-z0-9._/-]+$/.test(path))) ||
+        (method === 'post' && path === 'projects/' + BB_NUMBER_ + '/locations/global/keys?keyId=bytebudget-server'))) throw new Error('Unsupported key management request.');
+  const options = {method: method, headers: {Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'x-goog-user-project': BB_PROJECT_}, muteHttpExceptions: true, followRedirects: false};
+  if (payload) {options.contentType = 'application/json'; options.payload = JSON.stringify(payload);}
+  const response = UrlFetchApp.fetch('https://apikeys.googleapis.com/v2/' + path, options);
+  const status = response.getResponseCode();
+  if (status === 404 && missingAllowed) return null;
+  if (status < 200 || status >= 300) throw new Error('Key management HTTP ' + status + '; secret omitted.');
+  return JSON.parse(response.getContentText());
+}
+
+function inspectByteBudgetMapsUsage() {
+  bbProject_();
+  bbWait_('serviceusage', bbRequest_('serviceusage', 'projects/' + BB_NUMBER_ + '/services:batchEnable', 'post', {serviceIds: ['monitoring.googleapis.com']}));
+  const end = new Date(), start = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 0));
+  // Include the preceding UTC day so the Pacific monthly boundary is never excluded.
+  const filter = 'metric.type="serviceruntime.googleapis.com/api/request_count" AND resource.type="consumed_api" AND (resource.labels.service="places.googleapis.com" OR resource.labels.service="geocoding-backend.googleapis.com")';
+  let token = '', places = 0, geocoding = 0;
+  for (let page = 0; page < 20; page++) {
+    const url = 'https://monitoring.googleapis.com/v3/projects/' + BB_PROJECT_ + '/timeSeries?filter=' + encodeURIComponent(filter) +
+      '&interval.startTime=' + encodeURIComponent(start.toISOString()) + '&interval.endTime=' + encodeURIComponent(end.toISOString()) + '&view=FULL&pageSize=1000' +
+      '&aggregation.alignmentPeriod=86400s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_SUM&aggregation.groupByFields=resource.labels.service' +
+      (token ? '&pageToken=' + encodeURIComponent(token) : '');
+    const response = UrlFetchApp.fetch(url, {method: 'get', headers: {Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'x-goog-user-project': BB_PROJECT_}, muteHttpExceptions: true, followRedirects: false});
+    if (response.getResponseCode() !== 200) throw new Error('Usage inspection HTTP ' + response.getResponseCode() + '; no Maps calls sent.');
+    const result = JSON.parse(response.getContentText());
+    (result.timeSeries || []).forEach(function(series) {
+      const service = series.resource && series.resource.labels && series.resource.labels.service;
+      if (['places.googleapis.com', 'geocoding-backend.googleapis.com'].indexOf(service) < 0) throw new Error('Unexpected usage service.');
+      (series.points || []).forEach(function(point) {
+        const n = Number(point.value && point.value.int64Value);
+        if (!Number.isSafeInteger(n) || n < 0) throw new Error('Unexpected usage counter.');
+        if (service === 'places.googleapis.com') places += n; else geocoding += n;
+      });
+    });
+    token = result.nextPageToken || '';
+    if (!token) break;
+    if (page === 19) throw new Error('Usage inspection incomplete.');
+  }
+  console.log(JSON.stringify({periodStart: start.toISOString(), periodEnd: end.toISOString(), placesRequests: places, geocodingRequests: geocoding, telemetryMayBeDelayed: true}));
+}

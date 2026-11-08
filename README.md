@@ -4,7 +4,7 @@
 
 ## Current status
 
-The source implements real foreground GPS, reverse-geocoded city/country/currency and Google Nearby Search in 12 interface languages. A durable shared request budget (500 searches total, no automatic reset) is deployed on the existing web service; 104 Node tests pass. Live Google search remains disabled pending a restricted server key and billing-account free-allowance audit. Firebase Blaze and the project's billing link are verified. The existing TestFlight 1.0.0(2) and Android 1.0(1) are still the earlier fictional-city demo; no replacement native live binary has been delivered. See CONTINUITA.md for verified checkpoints.
+The source implements real foreground GPS, reverse-geocoded city/country/currency and Google Nearby Search in 12 interface languages. A durable shared request budget (500 searches total, no automatic reset) is deployed on the existing web service; 109 Node tests pass. The dedicated restricted server key is stored as a backend secret and private live Google search has been verified (Bologna/EUR, 14 venues). Anonymous native access remains blocked by the existing private hosting audience. Firebase Blaze and the project's billing link are verified. The existing TestFlight 1.0.0(2) and Android 1.0(1) are still the earlier fictional-city demo; no replacement native live binary has been delivered. See CONTINUITA.md for verified checkpoints.
 
 ## Run
 
