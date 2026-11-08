@@ -127,3 +127,13 @@ test('service account policy is read with the documented POST method', () => {
   assert(request.url.endsWith('?options.requestedPolicyVersion=3'));
   assert.equal(request.payload, undefined);
 });
+
+test('Maps setup enables only the two requested APIs without billing, keys or provider queries', () => {
+  const {context, calls} = runtime();
+  assert.equal(typeof context.enableByteBudgetMapsApis, 'function');
+  context.enableByteBudgetMapsApis();
+  const mutations = calls.filter(c => c.method !== 'get');
+  assert.equal(mutations.length, 1);
+  assert.equal(mutations[0].url, 'https://serviceusage.googleapis.com/v1/projects/137839521041/services:batchEnable');
+  assert.deepEqual(JSON.parse(mutations[0].payload).serviceIds, ['places.googleapis.com', 'geocoding-backend.googleapis.com']);
+});
