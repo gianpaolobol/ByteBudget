@@ -92,3 +92,17 @@ Firebase Console https://console.firebase.google.com/ is accessible and signed i
 A supported remaining route is creating a dedicated ByteBudget standard Cloud project through Firebase's free Spark setup (no billing account), which also enables Cloud Resource Manager, then attaching the private Apps Script to that standard project and testing access. Firebase terms require action-time owner confirmation. The UI reports only one project slot remains, so disclose that before creation. Do not enable Analytics, AI assistance, Developer Program enrollment, paid plans or billing. Spark setup only addresses technical bootstrap; it does not activate Maps or guarantee free Maps operation.
 
 Official references: https://developers.google.com/apps-script/guides/cloud-platform-projects ; https://firebase.google.com/docs/projects/use-firebase-with-existing-cloud-project ; https://firebase.google.com/docs/projects/billing/firebase-pricing-plans .
+
+
+## Firebase project created — 2026-11-08
+
+User explicitly authorized accepting Firebase Terms and creating the project. Terms accepted and project creation completed. Verified Firebase General settings and billing badge:
+- Display name: ByteBudget
+- Project ID: bytebudget-f8aaa
+- Project number: 137839521041
+- Plan: Spark, no cost (0 USD/month)
+- Google Developer Program enrollment, optional Gemini setup and Google Analytics disabled in creation wizard. No billing account linked, no upgrade or Maps activation performed.
+
+Attempted to associate private Apps Script186Uiz3wiE2yd3bb_cISS3F-M4Dfjwzpp01jyMBl-0m4gqEdOYbnd-vfv with project137839521041. Apps Script explicitly rejected association because the standard project's OAuth consent screen must first be configured. The script therefore remains on its default Cloud project; do not claim the original API SERVICE_DISABLED error is resolved or WIF is connected.
+
+Firebase service-account settings expose firebase-adminsdk-fbsvc@bytebudget-f8aaa.iam.gserviceaccount.com and the Generate new private key action. No key generated/downloaded and no IAM role assigned. Firebase Users and Permissions was inspected read-only; owner remains GianPaolo.Franceschini@gmail.com. Do not silently use a broad Owner/Editor service-account key as a substitute for the scoped WIF bootstrap. Next prerequisite is configuring standard-project OAuth consent through an authenticated supported administrative route, then retrying script association and read-only API verification. Existing TestFlight remains the old demo.
