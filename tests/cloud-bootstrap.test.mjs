@@ -118,3 +118,12 @@ test('an approved second bootstrap reuses resources and keeps grants unique', ()
     for (const binding of policy.bindings) assert.equal(new Set(binding.members).size, binding.members.length);
   }
 });
+
+test('service account policy is read with the documented POST method', () => {
+  const {context, calls} = runtime({approved: true});
+  context.bootstrapByteBudgetIdentity();
+  const request = calls.find(c => c.url.includes('/serviceAccounts/') && c.url.includes(':getIamPolicy'));
+  assert.equal(request.method, 'post');
+  assert(request.url.endsWith('?options.requestedPolicyVersion=3'));
+  assert.equal(request.payload, undefined);
+});
