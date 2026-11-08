@@ -164,3 +164,14 @@ Run URL: https://github.com/gianpaolobol/ByteBudget/actions/runs/42438128077
 Firebase still shows Spark,0USD/month. Opened pricing dialog read-only: Spark current; Blaze pay-as-you-go is offered, with charges after free allowances. Did not select Blaze, link/create billing, create API keys, submit billable queries or connect backend. Official Places setup requires billing enabled even for free-allowance use. This is the concrete remaining blocker under user's zero-additional-spending constraint; API enablement is complete but live Maps use is NOT. Free allowances and alerts are not hard spending caps. Owner must explicitly decide whether to authorize a Cloud Billing/Blaze financial setup; final financial steps require owner handoff. Before public/billable queries, implement/enforce permitted call budget and review billing-account shared usage. Don't promise zero billing from QPM or budget alerts.
 
 Sources: https://developers.google.com/maps/documentation/places/web-service/get-api-key ; https://developers.google.com/maps/documentation/places/web-service/usage-and-billing ; https://developers.google.com/maps/billing-and-pricing/overview .
+
+
+## Conditional billing authorization and account-creation blocker — 2026-11-08
+
+Owner authorizes billing only if necessary and would avoid Blaze if unnecessary. Official Google documentation confirms Cloud Billing is required to use Places/Geocoding, including free-allowance use; linking billing automatically corresponds to Firebase Blaze. This is authorization to prepare necessary billing setup, not approval for paid usage beyond the zero-extra-spending constraint.
+
+Selected Blaze in the Firebase pricing dialog to inspect available billing accounts. Firebase explicitly shows no available Cloud Billing account (Non hai un account di fatturazione Cloud) for the signed-in owner account. Clicking Create a Cloud Billing account opened Google Cloud console in a new tab; it returns Site Unavailable in this browser. No billing account created or linked and no payment/financial data entered. ByteBudget remains Spark. The draft Blaze selection is not an activated plan.
+
+Financial account creation/payment details/final confirmation require the owner. Current blocker is both missing billing account and console access in this browser, not missing Google API administrative permissions. Do not request management/WIF permissions again. Owner can create the billing resource using the same Google account; this is persistent account setup, not an attempt to transfer an external browser login/session. After creation, recheck Firebase available accounts and billing status rather than assuming it linked automatically. Do not send live provider queries until usage controls are ready.
+
+Official creation guide: https://docs.cloud.google.com/billing/docs/how-to/create-billing-account . Maps APIs remain ENABLED, verified run42438128077; backend key/native live service remain pending.
