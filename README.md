@@ -4,9 +4,11 @@
 
 ## Current status
 
-Real-location iOS beta **1.0.0 (3)** has been signed, uploaded, processed by Apple and distributed to the existing internal ByteBudget Demo TestFlight group directly from GitHub. Source discovers the real city/country/currency and nearby Google venues; live native bundles exclude fictional city datasets. The public backend has been smoke-tested with actual Bologna data, and the signed IPA's live API origin/location permission configuration checked. Physical iPhone GPS QA remains pending. Android1.0(1) is still the earlier demo; no replacement Android beta has been uploaded.
+Live-location betas are delivered internally on both platforms: **iOS1.0.0(3)** on TestFlight and **Android1.0(2)** on Google Play Test interni. Both are compiled directly on GitHub; Android's signed AAB was uploaded through the existing Play Console session. No new Expo/EAS build is involved.
 
-109 Node tests pass. The restricted Google runtime key stays server-only. A durable shared lifetime cap stops after500searches total, with no automatic reset. Current pricing is sourced general venue estimates, not verified lunch/dinner menu prices. Insufficient pricing coverage is explicitly reported rather than fabricated. See CONTINUITA.md and docs/GITHUB_STORE_DELIVERY.md for verified release evidence.
+114 Node tests and the build pass. Actual signed IPA/AAB inspections confirm the live API origin and foreground location configuration. Live API smoke tests at four public landmarks passed: Bologna/EUR, Ferrara/EUR, London/GBP and Tokyo's Shibuya/JPY, with all returned venues within the requested600m radius and both native origins supported. These are backend tests with supplied public coordinates, not physical-device GPS tests. See docs/QA_LIVE_BETA_2026-11-08.md.
+
+The restricted Google runtime key stays server-only. A durable shared lifetime cap stops after500searches total, with no automatic reset. Current prices are sourced general venue estimates, not verified lunch/dinner menu prices. Insufficient pricing coverage disables price calibration rather than inventing figures. Physical iPhone/Android permission and GPS QA remains pending.
 
 ## Run
 
@@ -40,14 +42,14 @@ See `docs/DATA_PROVIDER.md`. The unconfigured development preview automatically 
 - Configure and validate production coverage for the implemented backend provider, city catalog, opening hours and restaurant menus.
 - Real pedestrian routing if walking minutes must appear in result cards.
 - Real restaurant offer portal, campaign payments, moderation, redemption tracking. No fake advertising flow.
-- Native device QA, final brand artwork, signing, store listings/screenshots, support contact, reviewed privacy and terms.
+- Native device QA, final brand artwork, production store listings/screenshots, support contact, reviewed privacy and terms. Internal beta signing/delivery is complete.
 - Name/trademark availability has not been cleared. GitHub repository availability is not trademark clearance.
 
 No secret keys belong in client code, git, screenshots or documentation.
 
 Build outputs: `dist/client` (web/native assets), `dist/server/index.js` (Worker including assets). `npm start` runs the local Worker adapter. Production runtime variables must be configured as server secrets, never inside client code. See `.env.example` for names only.
 
-Location permission is requested automatically at application startup, through the platform system dialog. There is no separate Use location control. Denial leaves the demo usable; location is not transmitted to the data provider while the service is unconfigured. Language follows the phone preferences until manually changed; Arabic uses RTL. Translation packs are complete but native-speaker editorial review remains recommended before store release.
+Location permission is requested automatically at application startup, through the platform system dialog. There is no separate Use location control. In live mode, denial must show a location error without inventing a city; only an explicitly enabled development preview may use labelled sample data. Location is not transmitted to the provider while the service is unconfigured. Language follows the phone preferences until manually changed; Arabic uses RTL. Translation packs are complete but native-speaker editorial review remains recommended before store release.
 
 The user removed numeric budget entry. Mid is initially selected. City/meal thresholds can be configured as lowMax/midMax/highMax. With sufficient own menu samples, the fallback estimates the low/mid boundaries and sets the Luxury threshold above both the 95th percentile and 2.4 times the Mid boundary. These are descriptive estimates, not a luxury quality certification. Demo thresholds and prices are fictional; Bologna illustrates 20/50/120 EUR.
 
@@ -55,9 +57,9 @@ Latest interaction: one spending slider replaces the four buttons. Four local pr
 
 ## Direct GitHub delivery
 
-User selected GitHub Actions for both compilation and store upload, without Expo. Run **Store demo (direct GitHub)** on main, choosing iOS, Android or both. This uses the canonical Capacitor iOS SPM project with Xcode and the Android project with Gradle/JDK21, then Fastlane to deliver internally. No Expo login/token/build/download is used.
+For iOS use **Store live beta (direct GitHub)** on main, selecting ios. For Android use **Android live beta package (direct GitHub)** with an explicit version code above every existing Play upload, then upload the signed AAB to the existing internal track through Play Console. The legacy Android API-upload lane requires a separate Publisher credential and is not the current delivery route.
 
-See [setup and exact prerequisites](docs/GITHUB_STORE_DELIVERY.md). Making the repository public resolved runner startup; the store workflow still requires the native-accessible live API and signing/upload secrets. No replacement live store binary has been delivered. The existing Android demo remains available. Historical EAS workflows are retained but are not part of this delivery path.
+See docs/GITHUB_STORE_DELIVERY.md for verified releases and exact prerequisites. Existing Apple and Android signing secrets are configured and must be reused. Historical EAS workflows are not part of this delivery path.
 
 ## Live location implementation — 2026-11-08
 
@@ -65,4 +67,4 @@ User rejected the seeded native demo as insufficient. Source now includes foregr
 
 Live bundles exclude fictional venue datasets and demo city selection; API failures do not enable samples. Direct workflow is now **Store live beta (direct GitHub)** and refuses upload without configured nearby API/native CORS.
 
-This source is NOT yet activated on the user's phone: existing TestFlight1.0.0(2) remains the demo. Real Google credentials, native-accessible API hosting/quotas and GitHub signing/upload secrets remain prerequisites. The repository is now public; runner startup was verified after the visibility change. See docs/LIVE_LOCATION_STATUS_2026-11-08.md.
+This live configuration is included in TestFlight1.0.0(3) and Android internal1.0(2). Public backend, restricted server key, durable usage cap and signing setup are active. Installation and real GPS/permission behavior on physical devices remain to be checked. See docs/LIVE_LOCATION_STATUS_2026-11-08.md.

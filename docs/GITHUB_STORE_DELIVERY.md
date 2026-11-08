@@ -1,6 +1,6 @@
 # ByteBudget — direct GitHub store delivery
 
-Both native compilation and store upload run in GitHub Actions. Expo was used only to recover previously stored Apple signing originals after explicit authorization; no new EAS build or submission is part of this delivery path.
+Both native compilations run in GitHub Actions. iOS is uploaded automatically from that workflow; Android's signed AAB is uploaded to Test interni through the existing authenticated Play Console UI. Expo was used only to recover previously stored signing originals after explicit authorization; no new EAS build or submission is part of this delivery path.
 
 ## Verified iOS release
 
@@ -11,13 +11,13 @@ Both native compilation and store upload run in GitHub Actions. Expo was used on
 - Artifact13624646856, ByteBudget-iOS-2-1, retention7days. IPA SHA256bbdd73f9ac86e7c9236e2f0a43ae3daa260fd54ad93cfdb0d20edb505f308397.
 - Actual IPA inspection confirms version/build, foreground location usage description, public real-data API origin, no demo-preview startup marker and no Google key in client. Physical-device GPS QA remains pending.
 
-This is internal TestFlight delivery, not production or external beta review. No new tester invitations were sent. Android was skipped; its existing1.0(1) demo has not been replaced.
+This is internal TestFlight delivery, not production or external beta review. No new tester invitations were sent. Android1.0(2) has now replaced its earlier demo in Test interni; see the Android release below.
 
 ## How to run
 
-Actions → **Store live beta (direct GitHub)** → Run workflow → main → ios/android/both. Select ios until Android secrets are configured. Only main publishes; runs are serialized. The iOS lane uses canonical Xcode/SPM, macos-15/Xcode26.3, Ruby3.3/Fastlane2.240.1, Node24. Android uses ubuntu-24.04/JDK21/Gradle. Tests, live bundling, Capacitor sync and public backend/native-CORS readiness precede signing/upload. BYTEBUDGET_API_BASE is configured to the existing public ByteBudget Site origin.
+iOS: Actions → **Store live beta (direct GitHub)** → Run workflow → main → ios. Android: Actions → **Android live beta package (direct GitHub)** → Run workflow → main → version_code greater than every existing Play upload (currently2). Then upload its signed AAB to the existing Test interni track via Play Console. The old Android API-upload lane still requires PLAY_SERVICE_ACCOUNT_JSON and is not configured; do not select android/both there. Only main publishes; runs are serialized. The iOS lane uses canonical Xcode/SPM, macos-15/Xcode26.3, Ruby3.3/Fastlane2.240.1, Node24. Android uses ubuntu-24.04/JDK21/Gradle. Tests, live bundling, Capacitor sync and public backend/native-CORS readiness precede signing/upload. BYTEBUDGET_API_BASE is configured to the existing public ByteBudget Site origin.
 
-Build numbers come from the current store maximum. Keep this workflow the sole publisher to avoid collisions. Signed artifacts are downloadable from Actions within7days; artifact availability does not prove device QA.
+The iOS build number comes from the current store maximum; the Android version code is explicitly validated and must be checked against Play before dispatch. Avoid concurrent publishers to prevent collisions. Signed artifacts are downloadable from Actions within7days; artifact availability does not prove device QA.
 
 ## Existing iOS secrets — configured and verified
 
@@ -30,9 +30,16 @@ Build numbers come from the current store maximum. Keep this workflow the sole p
 
 All values are encrypted GitHub secrets, never source, logs, issues or artifacts. PKCS12 private key/certificate/profile match verified. Runtime Google key is a separate server-only secret. Existing Apple certificates/other keys were not revoked. Reuse the existing credentials for subsequent iOS runs; repeated authorization is not a request to create duplicate keys. Fastlane uses the dedicated public key IDY58R2Y3BW9.
 
-## Android prerequisites — still missing
+## Verified Android release and configured signing
 
-ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON. Recover the original ByteBudget upload key used for Android1.0(1); do not generate a substitute. Store release track must remain internal. New delegation/credential transfers need their applicable owner authorization. Do not dispatch a known-to-fail Android build before setup.
+- Android1.0/versionCode2, packagecom.bytebudget.app, API36, existing internal track4699301258049471482.
+- Source2f2d1754cb774e45fc2e875599f90b7d284cf2f5; run42522167699/job128857831733 SUCCESS (114tests, build, native CORS, signed AAB, jarsigner and artifact).
+- Artifact13633454146, ByteBudget-Android-live-2-3-1, retention7days. AAB SHA25615fb6747a5dcab12b955abca36bd11a5a8a6ad7a3d1a72d85a76be24b836c6b1.
+- Original upload JKS and both passwords validated privately; its certificate matches Play. Encrypted repository secrets ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD are configured and must be reused.
+- Actual AAB inspection confirms foreground coarse/fine location, no background location, live public backend, no client Maps key and no demo-preview HTML marker.
+- Play accepted the upload and independently shows release **ByteBudget1.0(2) — Live location** available to internal testers. No production publication or new tester invitation.
+- No new Google publishing identity or Publisher JSON was created; the artifact/UI delivery route does not need one. Missing deobfuscation mapping was the only nonblocking warning; minifyEnabled=false.
+- Physical Android GPS/permission QA remains pending.
 
 ## Signing and cleanup
 
