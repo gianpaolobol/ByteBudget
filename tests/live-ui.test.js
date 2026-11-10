@@ -219,3 +219,19 @@ test('a live price response is retained when GPS changes during a slider gesture
  assert.match(document.querySelector('#results-list .card').textContent,/40/);
  assert.match(document.querySelector('[data-distance]').textContent,/89 m/);
 });
+
+test('backgrounding during a drag releases the controls on resume',async()=>{
+ const {document,window}=await boot({ios:true});
+ const input=document.querySelector('#radius'),surface=input.parentElement;
+ surface.getBoundingClientRect=()=>({left:0,width:300});
+ surface.onpointerdown({pointerId:9,clientX:225,clientY:20,button:0,isPrimary:true});
+ Object.defineProperty(document,'visibilityState',{configurable:true,value:'hidden'});
+ document.dispatchEvent(new window.Event('visibilitychange'));
+ Object.defineProperty(document,'visibilityState',{configurable:true,value:'visible'});
+ document.dispatchEvent(new window.Event('visibilitychange'));
+ await new Promise(r=>setTimeout(r,5));
+ assert.equal(document.querySelector('#radius')===input,false);
+ const slider=document.querySelector('#spending');
+ slider.value='249';slider.oninput({target:slider});slider.onchange();
+ assert.match(document.querySelector('#spending-price').textContent,/19.99/);
+});

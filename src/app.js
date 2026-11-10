@@ -189,7 +189,7 @@ function reconcileCards(container,items){
  for(const card of existing.values())card.remove();
 }
 function onGesture(active){
- gestureCount+=active?1:-1;
+ gestureCount=Math.max(0,gestureCount+(active?1:-1));
  if(gestureCount)return;
  const applyData=pendingDataApply,applyPosition=pendingPositionApply;
  pendingDataApply=null;pendingPositionApply=null;
@@ -384,8 +384,10 @@ function startLiveMode(){
  };
  busy=true;message='loading';render();void startLocationWatch();updateClock();
  document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='hidden'){clearTimeout(localTick);liveUpdates.stop();stopLocationWatch()}
-  else{liveUpdates.resume();void startLocationWatch();updateClock()}
+  if(document.visibilityState==='hidden'){
+   clearTimeout(localTick);liveUpdates.stop();stopLocationWatch();
+   gestureCount=0;pendingRender=null;pendingDataApply=null;pendingPositionApply=null;
+  }else{render();liveUpdates.resume();void startLocationWatch();updateClock()}
  });
  return true;
 }
