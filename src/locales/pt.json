@@ -41,7 +41,7 @@
   "noSavedText": "Salve um local na página de detalhes.",
   "privacy": "A localização é solicitada automaticamente ao abrir o app, com permissão do sistema. Sem rastreamento em segundo plano. Preferências e favoritos ficam neste dispositivo. A navegação compartilha o destino com o serviço de mapas escolhido.",
   "about": "Como funciona",
-  "rank": "Ordenados pela nota ponderada pelo número de avaliações. Os resultados permanecem até uma nova busca.",
+  "rank": "Ordenados pela nota ponderada pelo número de avaliações.",
   "imprecise": "Localização muito aproximada. Ative a localização precisa e tente novamente.",
   "coverage": "Preços de refeições verificados ainda não estão disponíveis nesta cidade.",
   "noMenus": "Ainda não há cardápios verificados por perto para esta refeição.",
@@ -77,6 +77,6 @@
   "nearbyCount": "locais encontrados nas proximidades",
   "viewPlace": "Ver no Google Maps",
   "website": "Site",
-  "referenceBandsNote": "Faixas de orçamento de referência para Itália; preços do Google.",
+  "referenceBandsNote": "Faixas de orçamento de referência para Itália.",
   "numericBandsNote": "Faixas baseadas em preços numéricos locais. Locais sem preço excluídos."
 }

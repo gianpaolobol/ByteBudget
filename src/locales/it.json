@@ -41,7 +41,7 @@
   "noSavedText": "Salva un locale dalla sua scheda.",
   "privacy": "La posizione viene richiesta automaticamente all’apertura, con il consenso del sistema. Nessun tracciamento in background. Preferenze e locali salvati restano sul dispositivo. La navigazione condivide la destinazione con il servizio mappe scelto.",
   "about": "Come funziona",
-  "rank": "Classifica basata sul voto ponderato per numero di recensioni. I risultati restano fermi fino alla prossima ricerca.",
+  "rank": "Classifica basata sul voto ponderato per numero di recensioni.",
   "imprecise": "Posizione troppo approssimativa per questo raggio. Abilita la posizione precisa e riprova.",
   "coverage": "Prezzi dei pasti verificati non ancora disponibili in questa città.",
   "noMenus": "Nessun menu verificato nelle vicinanze per questo pasto.",
@@ -77,6 +77,6 @@
   "nearbyCount": "locali trovati nelle vicinanze",
   "viewPlace": "Vedi il locale su Google Maps",
   "website": "Sito del locale",
-  "referenceBandsNote": "Soglie di budget di riferimento per l’Italia; importi dei locali da Google.",
+  "referenceBandsNote": "Soglie di budget di riferimento per l’Italia.",
   "numericBandsNote": "Fasce basate sugli importi numerici locali. Locali senza prezzo esclusi."
 }

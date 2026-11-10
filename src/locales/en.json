@@ -41,7 +41,7 @@
   "noSavedText": "Save a place from its detail page.",
   "privacy": "Location is requested automatically when the app opens, subject to system permission. No background tracking. Preferences and saved places stay on this device. Navigation shares the destination with your chosen map service.",
   "about": "How it works",
-  "rank": "Ranked by rating weighted by review count. Search results stay fixed until you search again.",
+  "rank": "Ranked by rating weighted by review count.",
   "imprecise": "Your location is too approximate for this walking radius. Enable precise location and try again.",
   "coverage": "Verified meal prices are not available in this city yet.",
   "noMenus": "No verified menus nearby for this meal yet.",
@@ -77,6 +77,6 @@
   "nearbyCount": "places found nearby",
   "viewPlace": "View place on Google Maps",
   "website": "Website",
-  "referenceBandsNote": "Reference budget bands for Italy; venue amounts from Google.",
+  "referenceBandsNote": "Reference budget bands for Italy.",
   "numericBandsNote": "Bands use local numeric prices. Venues without prices are excluded."
 }

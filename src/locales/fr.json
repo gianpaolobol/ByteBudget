@@ -41,7 +41,7 @@
   "noSavedText": "Enregistrez un lieu depuis sa fiche.",
   "privacy": "La position est demandée automatiquement à l’ouverture avec l’autorisation du système. Aucun suivi en arrière-plan. Préférences et favoris restent sur cet appareil. La navigation partage la destination avec le service de cartes choisi.",
   "about": "Comment ça marche",
-  "rank": "Classement selon la note pondérée par le nombre d’avis. Les résultats restent fixes jusqu’à la prochaine recherche.",
+  "rank": "Classement selon la note pondérée par le nombre d’avis.",
   "imprecise": "Position trop approximative. Activez la position précise et réessayez.",
   "coverage": "Les prix des repas vérifiés ne sont pas encore disponibles dans cette ville.",
   "noMenus": "Aucun menu vérifié à proximité pour ce repas.",
@@ -77,6 +77,6 @@
   "nearbyCount": "lieux trouvés à proximité",
   "viewPlace": "Voir sur Google Maps",
   "website": "Site web",
-  "referenceBandsNote": "Tranches de budget de référence pour l’Italie ; prix fournis par Google.",
+  "referenceBandsNote": "Tranches de budget de référence pour l’Italie.",
   "numericBandsNote": "Tranches selon les prix numériques locaux. Établissements sans prix exclus."
 }

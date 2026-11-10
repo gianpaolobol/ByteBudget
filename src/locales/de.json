@@ -41,7 +41,7 @@
   "noSavedText": "Speichere einen Ort auf seiner Detailseite.",
   "privacy": "Beim Öffnen wird der Standort mit Zustimmung des Systems automatisch angefragt. Keine Ortung im Hintergrund. Einstellungen und Favoriten bleiben auf dem Gerät. Die Navigation teilt das Ziel mit dem gewählten Kartendienst.",
   "about": "So funktioniert es",
-  "rank": "Sortierung nach Bewertung, gewichtet nach Anzahl der Rezensionen. Die Ergebnisse bleiben bis zur nächsten Suche unverändert.",
+  "rank": "Sortierung nach Bewertung, gewichtet nach Anzahl der Rezensionen.",
   "imprecise": "Dein Standort ist zu ungenau. Aktiviere den genauen Standort und versuche es erneut.",
   "coverage": "Für diese Stadt sind noch keine geprüften Mahlzeitenpreise verfügbar.",
   "noMenus": "Für diese Mahlzeit gibt es in der Nähe noch keine geprüften Speisekarten.",
@@ -77,6 +77,6 @@
   "nearbyCount": "Orte in der Nähe gefunden",
   "viewPlace": "Auf Google Maps ansehen",
   "website": "Webseite",
-  "referenceBandsNote": "Referenzbudgets für Italien; Lokalpreise von Google.",
+  "referenceBandsNote": "Referenzbudgets für Italien.",
   "numericBandsNote": "Stufen nach lokalen Preisangaben. Lokale ohne Preis sind ausgeschlossen."
 }
