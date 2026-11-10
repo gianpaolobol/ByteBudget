@@ -1,5 +1,5 @@
 // Lifetime cap: no automatic rollover, refunds or instance-local fallbacks.
-// 500 searches reserve at most 500 Geocoding + 500 Nearby calls.
+// Each Nearby call reserves one unit; the first call may also use Geocoding.
 const SCOPE='google-maps-v1';
 const LIMIT=500;
 export function providerBudgetConfigured(env){

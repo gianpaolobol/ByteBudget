@@ -40,3 +40,39 @@ test('small towns keep closed and unknown-hour operational places and source the
  assert.equal(d.venues[0].photo.name,'places/closed/photos/realPhoto');assert.equal(d.venues[0].websiteUri,'https://example.com/');
  assert.equal(query.rankPreference,'DISTANCE');assert.ok(query.includedTypes.includes('cafe'));assert.ok(query.includedTypes.includes('bar'));assert.ok(mask.includes('places.photos'));
 });
+test('a saturated distance search supplements priced restaurants without accepting out-of-radius records',async()=>{
+ const db=budgetEnvironment();
+ const nearest=Array.from({length:20},(_,i)=>place({id:'near-'+i,priceRange:undefined}));
+ const calls=[];
+ const h=createNearbyHandler({fetch:async(url,options)=>{
+  calls.push(String(url));
+  if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
+  if(JSON.parse(options.body).rankPreference==='DISTANCE')return Response.json({places:nearest});
+  return Response.json({places:[place({id:'priced'}),place({id:'outside',location:{latitude:45,longitude:12}})]});
+ }});
+ const r=await h(request(),{...env,...db});
+ assert.equal(r.status,200);
+ const data=await r.json();
+ assert.equal(calls.length,3);
+ assert.ok(data.venues.some(v=>v.id==='priced'&&v.venuePrice.max===40));
+ assert.ok(!data.venues.some(v=>v.id==='outside'));
+ assert.equal(Object.hasOwn(data,'citySample'),false);
+});
+test('a published tasting menu uses only the matching live venue inside the radius',async()=>{
+ const id='ChIJIWY_E5bUf0cRn4m0ExE1OKY',location={latitude:44.49637,longitude:11.34235};
+ const fetch=async(url,options)=>{
+  if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
+  const {radius}=JSON.parse(options.body).locationRestriction.circle;
+  return Response.json({places:radius===35?[place({id,location,priceRange:undefined}),place({id:'other',location})]:[]});
+ };
+ const h=createNearbyHandler({fetch,now:()=>Date.parse('2026-11-10T12:00:00Z')});
+ const response=await h(request({radius:1000}),{...env,...budgetEnvironment()});
+ const data=await response.json();
+ assert.equal(data.venues.length,1);
+ assert.equal(data.venues[0].id,id);
+ assert.equal(data.venues[0].venuePrice.kind,'tasting-menu');
+ assert.equal(data.venues[0].venuePrice.max,180);
+ assert.match(data.venues[0].venuePrice.source,/GHM_MENU_CENA_ITA\.pdf$/);
+ const outside=await (await h(request({radius:100}),{...env,...budgetEnvironment()})).json();
+ assert.deepEqual(outside.venues,[]);
+});
