@@ -62,3 +62,31 @@ test('iOS denial or disabled system services do not start GPS',async()=>{
   await assert.rejects(getIosForegroundPosition({checkPermissions,watchPosition:()=>assert.fail('GPS started without permission')},800),{code});
  }
 });
+
+test('iOS takes a short refinement window when the first usable fix is off by a street',async()=>{
+ const position=accuracy=>({timestamp:Date.now(),coords:{latitude:44.49,longitude:11.34,accuracy}});
+ const geo={
+  checkPermissions:async()=>({location:'granted'}),
+  watchPosition:async(options,receive)=>{
+   receive(position(190));
+   receive(position(24));
+   return 'native-watch';
+  },
+  clearWatch:async()=>{}
+ };
+ assert.equal((await getIosForegroundPosition(geo,800,{timeout:100,refineFor:20})).coords.accuracy,24);
+});
+
+test('iOS keeps the best usable fix when the short refinement window ends',async()=>{
+ const position=accuracy=>({timestamp:Date.now(),coords:{latitude:44.49,longitude:11.34,accuracy}});
+ const geo={
+  checkPermissions:async()=>({location:'granted'}),
+  watchPosition:async(options,receive)=>{
+   receive(position(190));
+   receive(position(90));
+   return 'native-watch';
+  },
+  clearWatch:async()=>{}
+ };
+ assert.equal((await getIosForegroundPosition(geo,800,{timeout:100,refineFor:15})).coords.accuracy,90);
+});

@@ -111,7 +111,7 @@ app.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>{meal=b.dataset.mea
 app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;message='';render();scrollTo(0,0)});
 
 const on=(id,fn)=>{const el=app.querySelector('#'+id);if(el)el.onclick=fn};
-on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p>`));on('edit',()=>{view='discover';render()});on('back',()=>{view=detailReturnView;message='';render()});on('search',()=>data?.demo||data?.pricingScope==='venue'?search():locate(true));on('refresh',()=>data?.demo?search():locate(true));
+on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p>`));on('edit',()=>{view='discover';render()});on('back',()=>{view=detailReturnView;message='';render()});on('search',()=>data?.demo?search():locate(true));on('refresh',()=>data?.demo?search():locate(true));
 const spendingInput=app.querySelector('#spending');
 const rad=app.querySelector('#radius');
 if(spendingInput){

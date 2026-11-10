@@ -114,3 +114,12 @@ test('live results surface the closest matching venue and keep other nearby pric
  assert.equal(document.querySelector('main h1')?.textContent,'Fradiavolo');
  assert.equal(requests.filter(u=>u.endsWith('/api/nearby')).length,1);
 });
+
+test('starting a new live search from Discover reacquires the current location',async()=>{
+ const {document,posted}=await boot({observer:true});
+ assert.equal(posted.length,1);
+ document.querySelector('#edit').onclick();
+ document.querySelector('#search').onclick();
+ for(let i=0;i<20&&posted.length<2;i++)await new Promise(r=>setTimeout(r,5));
+ assert.equal(posted.length,2);
+});
