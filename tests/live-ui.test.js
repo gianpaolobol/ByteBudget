@@ -123,3 +123,11 @@ test('starting a new live search from Discover reacquires the current location',
  for(let i=0;i<20&&posted.length<2;i++)await new Promise(r=>setTimeout(r,5));
  assert.equal(posted.length,2);
 });
+
+test('dense streets show every priced venue within the nearby alternatives radius',async()=>{
+ const nearby=Array.from({length:19},(_,i)=>venue(`Nearby venue ${i+1}`,'high',60,{lat:44.49+i*0.00005}));
+ const {document,requests}=await boot({venues:nearby});
+ const alternatives=document.querySelector('#nearby-alternatives');
+ assert.deepEqual([...alternatives.querySelectorAll('[data-id]')].map(e=>e.dataset.id),nearby.map(v=>v.id));
+ assert.equal(requests.filter(u=>u.endsWith('/api/nearby')).length,1);
+});

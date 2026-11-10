@@ -190,7 +190,7 @@ function computeResults(){
    return b.score-a.score||a.distance-b.distance;
   });
   nearbyAlternatives=inRadius.filter(({venue})=>venue.distance<=CLOSE_BY_DISTANCE&&!matching.has(venue.id))
-   .sort((a,b)=>a.venue.distance-b.venue.distance).slice(0,12).map(({venue})=>venue);
+   .sort((a,b)=>a.venue.distance-b.venue.distance).map(({venue})=>venue);
  }
  if(!results.length&&!nearbyAlternatives.length&&data.pricingScope==='venue'&&bandsForMeal){
   const target=selection.maxPrice??(selection.unlimited?bandsForMeal.highMax:null);
