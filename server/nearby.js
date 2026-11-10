@@ -84,6 +84,16 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    if(nearest.length>=8&&(nearest.length===20||!found.has('mid')||!found.has('high'))){
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:20,rankPreference:'POPULARITY',languageCode:locale,locationRestriction:{circle:{center,radius:input.radius}}}));
    }
+   if(nearest.length===20){
+    // In dense areas each group gets its own distance-ranked result allowance.
+    const localCircle={center,radius:Math.min(input.radius,250)};
+    for(const includedTypes of [
+     ['restaurant','pizza_restaurant','chinese_restaurant'],
+     ['bar','pub','cafe','meal_takeaway','fast_food_restaurant']
+    ]){
+     supplemental.push(enrich({includedTypes,maxResultCount:20,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:localCircle}}));
+    }
+   }
    const checkedTiers=new Set(found);
    let menuLookups=0;
    for(const menu of menus){
