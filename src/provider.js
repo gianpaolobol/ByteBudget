@@ -11,7 +11,7 @@ export function validateDataset(d){
  const dateOk=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&new Date(s).toISOString().slice(0,10)===s;
  if(p.validFrom&&!dateOk(p.validFrom)||p.validUntil&&!dateOk(p.validUntil)||p.validFrom&&p.validUntil&&p.validFrom>p.validUntil)fail();
  prices[meal]={...p};}}
- if(v.venuePrice){const p=v.venuePrice;if(p.scope!=='venue-estimate'||!Number.isFinite(p.min)||!Number.isFinite(p.max)||p.min<0||p.max<p.min||!Number.isFinite(Date.parse(p.updatedAt))||typeof p.source!=='string'||!p.source)fail();}
+ if(v.venuePrice){const p=v.venuePrice;if(p.scope!=='venue-estimate'||!Number.isFinite(p.min)||!Number.isFinite(p.max)||p.min<0||p.max<p.min||!Number.isFinite(Date.parse(p.updatedAt))||typeof p.source!=='string'||!p.source||p.kind==='tasting-menu'&&!safeUrl(p.source))fail();}
  const menu=Array.isArray(v.menu)?v.menu.map(item=>{if(!item||typeof item.name!=='string'||!Number.isFinite(item.price)||item.price<0)fail();return {name:item.name,price:item.price}}):[];
  const photo=v.photo&&typeof v.photo.name==='string'&&v.photo.name.length<=3000&&/^places\/[A-Za-z0-9_-]+\/photos\/[A-Za-z0-9_-]+$/.test(v.photo.name)?{name:v.photo.name,authorAttributions:(Array.isArray(v.photo.authorAttributions)?v.photo.authorAttributions:[]).filter(a=>typeof a?.displayName==='string').map(a=>({displayName:a.displayName,uri:safeUrl(a.uri)}))}:undefined;
  return {...v,photo,websiteUri:safeUrl(v.websiteUri),googleMapsUri:safeUrl(v.googleMapsUri),timeZone:d.timeZone,cuisine:typeof v.cuisine==='string'?v.cuisine:'',visual:[0,1,2].includes(v.visual)?v.visual:0,prices,menu};});

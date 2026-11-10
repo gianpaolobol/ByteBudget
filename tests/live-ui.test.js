@@ -22,8 +22,8 @@ test('live UI lets a three-price-or-less town change budget and never mixes Low 
  assert.equal(document.querySelector('.card h3')?.textContent,'Mid restaurant');
  assert.match(document.querySelector('.card')?.textContent||'',/Closed/i);
  const slider=document.querySelector('#spending');assert.equal(slider.hasAttribute('disabled'),false);
- slider.value='249';slider.oninput({target:slider});assert.equal(document.querySelector('#spending-tier').textContent,'Low');assert.match(document.querySelector('#spending-price').textContent,/19.99/);
- assert.equal(document.querySelector('.card h3').textContent,'Mid restaurant');
+ slider.value='249';slider.oninput({target:slider});await Promise.resolve();assert.equal(document.querySelector('#spending-tier').textContent,'Low');assert.match(document.querySelector('#spending-price').textContent,/19.99/);
+ assert.equal(document.querySelector('.card h3').textContent,'Cheap cafe');
  slider.onchange({target:slider});
  for(let i=0;i<4;i++)await new Promise(r=>setTimeout(r,5));for(let i=0;i<100&&!document.querySelector('.result-head');i++)await new Promise(r=>setTimeout(r,5));
  assert.deepEqual([...document.querySelectorAll('.card h3')].map(e=>e.textContent),['Cheap cafe']);
@@ -62,4 +62,17 @@ test('distance uses the same forgiving drag surface and does not request GPS dur
  assert.equal(document.querySelector('#radius'),input);assert.ok(Number(input.value)>800);assert.match(document.querySelector('#distance-label').textContent,/1000 m/);assert.equal(requests.length,before);
 });
 
-test('committing an empty tier updates both cards and result count',async()=>{const {document}=await boot();const slider=document.querySelector('#spending');slider.value='700';slider.oninput({target:slider});assert.equal(document.querySelectorAll('.card').length,1);slider.onchange({target:slider});assert.equal(document.querySelectorAll('.card').length,0);assert.match(document.querySelector('#result-count').textContent,/^0/)});
+test('committing an empty tier updates both cards and result count',async()=>{const {document}=await boot();const slider=document.querySelector('#spending');slider.value='700';slider.oninput({target:slider});assert.equal(document.querySelectorAll('.card').length,1);slider.onchange({target:slider});assert.equal(document.querySelectorAll('.card:not(.alternative-card)').length,0);assert.ok(document.querySelector('.alternative-card'));assert.match(document.querySelector('#result-count').textContent,/^0/)});
+test('both filters respond in the live results without new provider calls',async()=>{
+ const {document,requests}=await boot({observer:true});
+ const rad=document.querySelector('#radius');
+ assert.ok(rad);
+ const before=requests.length;
+ rad.value='100';rad.oninput({target:rad});
+ const slider=document.querySelector('#spending');
+ slider.value='249';slider.oninput({target:slider});
+ await new Promise(r=>setTimeout(r,25));
+ assert.equal(document.querySelector('.card h3')?.textContent,'Cheap cafe');
+ assert.match(document.querySelector('#result-criteria').textContent,/100 m/);
+ assert.equal(requests.length,before);
+});

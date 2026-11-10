@@ -21,7 +21,7 @@ export function sourceVenueTier(v,meal,currency,now=Date.now(),bands=null){
  const price=validPrice(v,meal,currency,now);
  return PRICE_TIERS.find(tier=>matchesTier(price,tier,bands))||null;
 }
-function cappedPrice(price,currency){
+export function cappedPrice(price,currency){
  if(!price.upperExclusive||price.min>=price.max)return price.max;
  const digits=new Intl.NumberFormat('en',{style:'currency',currency}).resolvedOptions().maximumFractionDigits;
  return (Math.ceil(price.max*10**digits-1e-8)-1)/10**digits;

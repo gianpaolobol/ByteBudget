@@ -1,18 +1,21 @@
 // Shared pointer surface for both native range controls. Keyboard/AT retains the
 // real input; touch reserves vertical movement for the document's scroll view.
-export function bindRangeGesture(input){
+export function bindRangeGesture(input,onGesture=()=>{}){
  const surface=input.parentElement;let gesture=null;
  const update=e=>{
-  const rect=surface.getBoundingClientRect(),min=Number(input.getAttribute('min')),max=Number(input.getAttribute('max')),step=Number(input.getAttribute('step'))||1;
-  const width=Math.max(1,rect.width-26),ratio=Math.min(1,Math.max(0,(e.clientX-rect.left-13-gesture.offset)/width));
+  const {rect,min,max,step,offset}=gesture;
+  const width=Math.max(1,rect.width-26),ratio=Math.min(1,Math.max(0,(e.clientX-rect.left-13-offset)/width));
   const value=Math.min(max,Math.max(min,min+Math.round(ratio*(max-min)/step)*step));
   if(Number(input.value)!==value){input.value=String(value);input.oninput?.({target:input});gesture.changed=true}
  };
  surface.onpointerdown=e=>{
   if(input.disabled||e.isPrimary===false||e.button!==0||gesture)return;
-  e.preventDefault();input.focus({preventScroll:true});
-  const rect=surface.getBoundingClientRect(),thumb=rect.left+13+(Number(input.value)-Number(input.getAttribute('min')))/(Number(input.getAttribute('max'))-Number(input.getAttribute('min')))*Math.max(1,rect.width-26);
-  gesture={id:e.pointerId,x:e.clientX,y:e.clientY,active:false,vertical:false,changed:false,offset:Math.abs(e.clientX-thumb)<=38?e.clientX-thumb:0};
+  if(e.pointerType==='mouse')input.focus({preventScroll:true});
+  const rect=surface.getBoundingClientRect();
+  const min=Number(input.min||input.getAttribute('min')),max=Number(input.max||input.getAttribute('max')),step=Number(input.step||input.getAttribute('step'))||1;
+  const thumb=rect.left+13+(Number(input.value)-min)/(max-min)*Math.max(1,rect.width-26);
+  gesture={id:e.pointerId,x:e.clientX,y:e.clientY,active:false,vertical:false,changed:false,rect,min,max,step,offset:Math.abs(e.clientX-thumb)<=38?e.clientX-thumb:0};
+  onGesture(true);
   surface.setPointerCapture?.(e.pointerId);
  };
  surface.onpointermove=e=>{
@@ -26,6 +29,7 @@ export function bindRangeGesture(input){
   const changed=gesture.changed,id=gesture.id;gesture=null;
   try{surface.releasePointerCapture?.(id)}catch{}
   if(changed)input.onchange?.({target:input});
+  onGesture(false);
  };
  surface.onpointerup=e=>finish(e);
  surface.onpointercancel=e=>finish(e,true);

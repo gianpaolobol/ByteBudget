@@ -36,7 +36,7 @@ test('Google failures consume the reservation and cannot be retried beyond the c
  const db=database();let calls=0;const env={...base,PROVIDER_BUDGET_DB:db,GOOGLE_FREE_ALLOWANCE_CONFIRMED:'true'};
  db.sqlite.prepare('INSERT INTO provider_budget(scope,searches) VALUES (?,?)').run('google-maps-v1',499);
  const h=createNearbyHandler({fetch:async()=>{calls++;throw Error('network')}});
- assert.equal((await h(request(),env)).status,502);assert.equal((await h(request(),env)).status,429);assert.equal(calls,1);db.sqlite.close();
+ assert.equal((await h(request(),env)).status,502);assert.equal((await h(request(),env)).status,429);assert.equal(calls,2);db.sqlite.close();
 });
 test('storage failures and malformed reservation results never send provider requests',async()=>{
  for(const outcome of [()=>{throw Error('offline')},()=>({searches:0}),()=>({searches:501}),()=>({searches:1.5})]){

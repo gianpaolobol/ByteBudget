@@ -14,7 +14,7 @@ export function createWorker(assets){
    let response;
    if(url.pathname==='/api/status')response=Response.json({configured:isConfigured(env),...(nearbyConfigured(env)?{mode:'nearby'}:{}),...(env.DEMO_PREVIEW_ENABLED==='true'?{demoPreview:true}:{})},{headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
    else if(url.pathname==='/api/photo')response=await photo(request,env);
-   else if(url.pathname==='/api/nearby')response=await nearby(request,env);
+   else if(url.pathname==='/api/nearby')response=env.DISCOVERY_MODE==='nearby'?await nearby(request,env):Response.json({error:'provider_not_configured'},{status:503,headers:{'Cache-Control':'no-store'}});
    else if(env.DISCOVERY_MODE==='nearby')response=Response.json({error:'not_found'},{status:404});
    else response=await search(request,env);
    for(const [key,value]of Object.entries(cors))response.headers.set(key,value);
