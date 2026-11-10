@@ -1,7 +1,7 @@
 import {providerBudgetConfigured,reserveProviderSearch} from './provider-budget.js';
 import currencies from 'country-to-currency';
 import timeZoneAt from 'tz-lookup';
-import {cityBands,distanceMeters,sourceVenueTier} from '../src/domain.js';
+import {cityBands,distanceMeters,matchesTier,PRICE_TIERS,sourceVenueTier} from '../src/domain.js';
 import {validateDataset} from '../src/provider.js';
 import {verifiedMenus} from './verified-menus.js';
 const MASK='places.id,places.displayName,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.businessStatus,places.priceRange,places.googleMapsUri,places.attributions,places.priceLevel,places.photos,places.websiteUri,places.primaryType';
@@ -84,8 +84,15 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    if(nearest.length>=8&&(nearest.length===20||!found.has('mid')||!found.has('high'))){
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:20,rankPreference:'POPULARITY',languageCode:locale,locationRestriction:{circle:{center,radius:input.radius}}}));
    }
-   const menu=menus.find(menu=>!venues.has(menu.id));
-   if(menu)supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},menu.id));
+   const checkedTiers=new Set(found);
+   let menuLookups=0;
+   for(const menu of menus){
+    const tier=PRICE_TIERS.find(tier=>matchesTier(menu.price,tier,bands));
+    if(!tier||checkedTiers.has(tier)||venues.has(menu.id))continue;
+    checkedTiers.add(tier);
+    supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},menu.id));
+    if(++menuLookups===2)break;
+   }
    await Promise.all(supplemental);
    for(const menu of menus){
     const venue=venues.get(menu.id);
