@@ -51,6 +51,7 @@
   "broad": "Beaucoup de lieux à proximité. Réduisez la distance pour affiner la recherche.",
   "partial": "Seuls les lieux aux prix de menu vérifiés sont inclus. La couverture continue de s’étendre.",
   "permission": "Position indisponible. Vérifiez les autorisations et réessayez.",
+  "loadingNearby": "Position trouvée. Recherche des établissements à proximité…",
   "loading": "Recherche de votre position…",
   "noProvider": "Service de restaurants indisponible. Réessayez plus tard.",
   "browse": "Adresses à proximité",

@@ -45,6 +45,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
   if(count>requestsPerMinute)return failure('rate_limited',429);
   const reservation=await reserveProviderSearch(env);
   if(reservation!=='reserved')return failure(reservation==='exhausted'?'provider_budget_exhausted':'provider_budget_unavailable',reservation==='exhausted'?429:503);
+  const discover=async emit=>{
   try{
    const geoUrl=new URL('https://maps.googleapis.com/maps/api/geocode/json');geoUrl.searchParams.set('latlng',`${input.lat},${input.lng}`);geoUrl.searchParams.set('language',language(input.language));geoUrl.searchParams.set('key',env.GOOGLE_PLACES_API_KEY);
    const locale=language(input.language);
@@ -141,14 +142,32 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},[menu.id]));
     if(++menuLookups===2)break;
    }
+   const snapshot=()=>{
+    const dataset=validateDataset({city,country,currency,timeZone:timeZoneAt(input.lat,input.lng),lat:input.lat,lng:input.lng,demo:false,pricingScope:'venue',venues:[...venues.values()]});
+    return {...dataset,coverage:'nearby-provider-subset',attribution:{provider:'Google Maps',url:'https://maps.google.com'},fetchedAt:new Date(current).toISOString()};
+   };
+   if(emit&&supplemental.length&&venues.size)emit({stage:'nearby',data:snapshot()});
    await Promise.all(supplemental);
    for(const menu of menus){
     const venue=venues.get(menu.id);
     if(venue&&!venue.venuePrice)venues.set(menu.id,{...venue,venuePrice:menu.price});
    }
-   const dataset=validateDataset({city,country,currency,timeZone:timeZoneAt(input.lat,input.lng),lat:input.lat,lng:input.lng,demo:false,pricingScope:'venue',venues:[...venues.values()]});
-   return answer({...dataset,coverage:'nearby-provider-subset',attribution:{provider:'Google Maps',url:'https://maps.google.com'},fetchedAt:new Date(current).toISOString()});
+   return answer(snapshot());
 
   }catch{return failure('provider_unavailable',502)}
+  };
+  if(input.progressive!==true)return discover();
+  const encoder=new TextEncoder();
+  let cancelled=false;
+  const stream=new ReadableStream({
+   async start(controller){
+    const emit=record=>{if(!cancelled)controller.enqueue(encoder.encode(JSON.stringify(record)+'\n'))};
+    const result=await discover(emit);
+    emit({stage:'complete',status:result.status,data:await result.json()});
+    if(!cancelled)controller.close();
+   },
+   cancel(){cancelled=true}
+  });
+  return new Response(stream,{headers:{'Content-Type':'application/x-ndjson; charset=utf-8','Cache-Control':'no-store, no-transform','X-Content-Type-Options':'nosniff'}});
  };
 }

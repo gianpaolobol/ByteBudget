@@ -11,3 +11,27 @@ test('real discovery uses actual GPS and nearby endpoint rather than a remembere
  const next=await loadLiveRestaurants({origin:'https://bb.test',automatic:true,radius:300,spendingPosition:375,meal:'dinner',language:'it',locate:async()=>({coords:{latitude:51.5,longitude:-.12}}),fetch:async(url,opts)=>{if(opts?.method!=='POST')return Response.json({configured:true,mode:'nearby'});endpoint=url;body=JSON.parse(opts.body);return Response.json({city:'London',currency:'GBP',venues:[],demo:false})}});
  assert.equal(endpoint,'https://bb.test/api/nearby');assert.equal(body.lat,51.5);assert.equal(body.lng,-.12);assert.equal(body.radius,300);assert.equal(next.currency,'GBP');assert.equal(next.demo,false);
 });
+
+test('configured native startup posts directly and exposes streamed nearest results before completion',async()=>{
+ const seen=[];
+ const position={coords:{latitude:44.49,longitude:11.34,accuracy:20}};
+ let stream;
+ const body=new ReadableStream({start(controller){stream=controller}});
+ const write=value=>stream.enqueue(new TextEncoder().encode(JSON.stringify(value)+'\n'));
+ const pending=loadLiveRestaurants({native:true,nativeNearby:true,automatic:true,origin:'capacitor://localhost',apiBase:'https://bb.test',radius:800,locate:async()=>position,onNearby:next=>seen.push(next),fetch:async(url,opts)=>{
+  assert.equal(url,'https://bb.test/api/nearby');
+  assert.equal(opts.method,'POST');
+  assert.equal(JSON.parse(opts.body).progressive,true);
+  return new Response(body,{headers:{'Content-Type':'application/x-ndjson'}});
+ }});
+ const outcome=pending.catch(error=>error);
+ write({stage:'nearby',data:{city:'Bologna',venues:[{id:'near'}]}});
+ await new Promise(resolve=>setImmediate(resolve));
+ try{
+  assert.deepEqual(seen.map(next=>[next.city,next.locationAccuracy,next.venues[0].id]),[['Bologna',20,'near']]);
+  write({stage:'complete',status:200,data:{city:'Bologna',venues:[{id:'near'},{id:'extra'}]}});
+ }finally{stream.close()}
+ const final=await outcome;
+ if(final instanceof Error)throw final;
+ assert.equal(final.venues.length,2);
+});

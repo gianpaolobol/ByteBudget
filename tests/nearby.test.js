@@ -110,3 +110,29 @@ test('known coverage gaps are rechecked against live data on saturated searches'
  for(const id of [capuano.id,gingio.id])assert.ok(data.venues.some(v=>v.id===id),id);
  assert.ok(!data.venues.some(v=>v.id===unrelated.id));
 });
+
+test('progressive search sends nearest places before the wider lookup finishes',async()=>{
+ const nearest=Array.from({length:20},(_,i)=>place({id:'initial-'+i}));
+ let finish;
+ const supplemental=new Promise(resolve=>{finish=resolve});
+ const h=createNearbyHandler({fetch:async(url,opts)=>{
+  if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
+  const {rankPreference,locationRestriction}=JSON.parse(opts.body);
+  if(rankPreference==='DISTANCE'&&locationRestriction.circle.radius===600)return Response.json({places:nearest});
+  await supplemental;
+  return Response.json({places:[place({id:'extra'})]});
+ }});
+ const result=h(request({progressive:true}),{...env,...budgetEnvironment()});
+ try{
+  const response=await Promise.race([result,new Promise((_,reject)=>setTimeout(()=>reject(Error('preview blocked')),250))]);
+  assert.match(response.headers.get('content-type'),/ndjson/);
+  const reader=response.body.getReader(),decode=new TextDecoder();
+  const first=JSON.parse(decode.decode((await reader.read()).value));
+  assert.equal(first.stage,'nearby');
+  assert.equal(first.data.venues.length,20);
+  finish();
+  const last=JSON.parse(decode.decode((await reader.read()).value));
+  assert.equal(last.stage,'complete');
+  assert.equal(last.data.venues.length,21);
+ }finally{finish()}
+});

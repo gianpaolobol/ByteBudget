@@ -96,6 +96,7 @@ function resultMarkup(){
   const farther=results.filter(venue=>venue.distance>CLOSE_BY_DISTANCE);
   return cards(closest)+nearbyMarkup()+cards(farther);
  }
+ if(busy&&message==='loadingNearby')return nearbyAlternatives.length?nearbyMarkup():'';
  if(nearbyAlternatives.length)return `<div class="empty"><h2>${t('empty')}</h2></div>`+nearbyMarkup();
  if(alternatives.length)return `<div class="empty"><h2>${t('empty')}</h2><p>${t('budgetAlternatives')}</p></div>${cards(alternatives,true)}`;
  const imprecise=data?.locationAccuracy>radius/2;
@@ -198,27 +199,42 @@ function computeResults(){
  }
  lastSearch=makeSearchSnapshot(results,{meal,...selection,radius,city:data.city,currency:data.currency});
 }
-function search(){computeResults();view='results';message='';render();scrollTo(0,0)}
+function search(){computeResults();view='results';message=busy?'loadingNearby':'';render();scrollTo(0,0)}
 function showDialog(html){const d=app.querySelector('#dialog');d.innerHTML=html+`<button class="secondary" id="close-dialog">${t('close')}</button>`;d.querySelector('#close-dialog').onclick=()=>d.close();d.showModal()}
 function chooseLocation(){if(!__BYTEBUDGET_ALLOW_DEMO__||!demoPreview)return;showDialog(`<h2>${t('choose')}</h2><p class="notice">${t('demo')}</p><select id="demo-city" aria-label="${t('choose')}"><option>London</option><option>Bologna</option><option>Tokyo</option></select><button class="primary" id="set-city">${t('done')}</button>`);app.querySelector('#set-city').onclick=()=>{setData(demoCity(app.querySelector('#demo-city').value));render()}}
 async function locate(refresh=false,automatic=false){
  if(busy)return;
  busy=true;message='loading';render();
  const native=Capacitor.isNativePlatform(),apiBase=window.BYTEBUDGET_CONFIG?.apiBase;
- try{
-  const acquirePosition=Capacitor.getPlatform()==='ios'
-   ?()=>getIosForegroundPosition(Geolocation,radius)
-   :()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),radius,{preciseOnly:native});
-  const next=await loadLiveRestaurants({origin:location.origin,automatic,native,apiBase,radius,nearbyRadius:1000,spendingPosition,meal,language:lang,locate:acquirePosition});
+ let previewShown=false;
+ const applyDataset=(next,preview)=>{
   const validated=validateDataset(next);
   const apply=()=>{
-   const previousMeal=meal;
+   const previousMeal=meal,previousView=view,previousSelection=selected;
    setData(validated);meal=previousMeal;
-   if(automatic||refresh)search();else render();
+   if(previewShown){
+    view=previousView;selected=previousSelection;
+    if(view==='results')computeResults();
+    render();
+   }else if(automatic||refresh)search();else render();
+   if(preview)previewShown=true;
   };
-  busy=false;
   if(gestureCount)pendingRender=apply;else apply();
+ };
+ try{
+  const ios=Capacitor.getPlatform()==='ios';
+  const acquirePosition=ios
+   ?()=>getIosForegroundPosition(Geolocation,radius)
+   :()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),radius,{preciseOnly:native});
+  const next=await loadLiveRestaurants({origin:location.origin,automatic,native,nativeNearby:ios,apiBase,radius,nearbyRadius:1000,spendingPosition,meal,language:lang,locate:acquirePosition,onPosition:()=>{
+   message='loadingNearby';
+   const status=app.querySelector('.status');
+   if(status)status.textContent=t(message);
+  },onNearby:automatic?next=>applyDataset(next,true):undefined});
+  busy=false;
+  applyDataset(next,false);
  }catch(e){
+  pendingRender=null;
   const key={provider_not_configured:'noProvider',price_bands_unavailable:'unknown',city_not_supported:'coverage',no_verified_menus:'noMenus',search_too_broad:'broad',rate_limited:'limited',provider_budget_exhausted:'searchQuotaReached',location_denied:'permission',location_unavailable:'locationUnavailable',location_imprecise:'imprecise'}[e.code]||'error';
   busy=false;message=demoPreview&&data?.demo?'':key;render();
  }

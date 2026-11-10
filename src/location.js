@@ -34,7 +34,7 @@ export async function getForegroundPosition(getPosition,radius,{preciseOnly=fals
 }
 
 // A one-shot Core Location request can return a coarse fix before GPS converges.
-export async function getIosForegroundPosition(geo,radius,{timeout=12000,refineFor=1200}={}){
+export async function getIosForegroundPosition(geo,radius,{timeout=12000,refineFor=300}={}){
  let permission;
  try{
   permission=await geo.checkPermissions();
@@ -47,7 +47,7 @@ export async function getIosForegroundPosition(geo,radius,{timeout=12000,refineF
  if(permission.location!=='granted')throw permissionDenied();
 
  const limit=Math.min(250,radius/2);
- const target=Math.min(50,limit);
+ const target=Math.min(75,limit);
  let registration,timer,refinementTimer,best,receivedCoarse=false;
  try{
   return await new Promise((resolve,reject)=>{

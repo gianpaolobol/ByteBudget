@@ -51,6 +51,7 @@
   "broad": "Many places nearby. Try a smaller distance for a more precise search.",
   "partial": "Results include places with verified menu prices. Coverage is still growing.",
   "permission": "Location unavailable. Enable precise location in Settings and try again.",
+  "loadingNearby": "Location found. Looking for nearby venues…",
   "loading": "Finding your location…",
   "noProvider": "Restaurant service unavailable. Please try again later.",
   "browse": "Nearby picks",

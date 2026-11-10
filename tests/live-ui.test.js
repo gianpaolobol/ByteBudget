@@ -5,7 +5,7 @@ import {build} from 'esbuild';
 import {parseHTML} from 'linkedom';
 const now=new Date().toISOString();
 const venue=(id,tier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,openingStatus:'open',sourceTier:tier,prices:{},venuePrice:{min:max-5,max,updatedAt:now,source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
-async function boot({observer=false,ios=false,venues}={}){
+async function boot({observer=false,ios=false,venues,nearbyResponse}={}){
  const requests=[],observers=[],posted=[];
  const {window,document}=parseHTML('<html><body><div id="app"></div></body></html>');
  const values=new Map([['bb-spending-position','450']]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
@@ -22,7 +22,7 @@ async function boot({observer=false,ios=false,venues}={}){
   clearWatch:async()=>{}
  }`:'export const Geolocation={getCurrentPosition:async()=>({coords:{latitude:44.49,longitude:11.34,accuracy:5}})}';
  const {outputFiles}=await build({entryPoints:['src/app.js'],bundle:true,write:false,format:'iife',define:{__BYTEBUDGET_ALLOW_DEMO__:'false'},plugins:[{name:'native-boundary',setup(b){b.onResolve({filter:/^@capacitor\/(core|geolocation)$/},a=>({path:a.path,namespace:'native-test'}));b.onLoad({filter:/.*/,namespace:'native-test'},a=>({contents:a.path.endsWith('/core')?`export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'${nativePlatform}'}`:geolocation}));}}]});
- const context={window,document,console,Intl,Date,URL,AbortSignal,setTimeout,clearTimeout,scrollTo(){},navigator:{languages:['en']},location:{origin:'https://localhost',protocol:'https:'},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},fetch:async (url,options)=>{requests.push(String(url));if(options?.method==='POST')posted.push(JSON.parse(options.body));return Response.json(String(url).includes('/api/photo?')?{photoUri:'https://lh3.googleusercontent.com/genuine-image'}:String(url).endsWith('/api/status')?{configured:true,mode:'nearby'}:dataset)}};
+ const context={window,document,console,Intl,Date,URL,AbortSignal,TextDecoder,setTimeout,clearTimeout,scrollTo(){},navigator:{languages:['en']},location:{origin:'https://localhost',protocol:'https:'},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},fetch:async (url,options)=>{requests.push(String(url));if(options?.method==='POST'){posted.push(JSON.parse(options.body));if(nearbyResponse)return nearbyResponse(dataset)}return Response.json(String(url).includes('/api/photo?')?{photoUri:'https://lh3.googleusercontent.com/genuine-image'}:String(url).endsWith('/api/status')?{configured:true,mode:'nearby'}:dataset)}};
  if(observer)context.IntersectionObserver=class{constructor(callback){this.callback=callback;this.targets=[];observers.push(this)}observe(el){this.targets.push(el)}unobserve(){}disconnect(){}};
  vm.runInNewContext(outputFiles[0].text,context);
  for(let i=0;i<100&&!document.querySelector('.result-head');i++)await new Promise(r=>setTimeout(r,5));
@@ -130,4 +130,27 @@ test('dense streets show every priced venue within the nearby alternatives radiu
  const alternatives=document.querySelector('#nearby-alternatives');
  assert.deepEqual([...alternatives.querySelectorAll('[data-id]')].map(e=>e.dataset.id),nearby.map(v=>v.id));
  assert.equal(requests.filter(u=>u.endsWith('/api/nearby')).length,1);
+});
+
+
+test('iPhone displays the first live cards while coverage is still arriving',async()=>{
+ let finish;
+ const first=venue('Nearest restaurant','mid',30);
+ const later=venue('Second restaurant','mid',30,{lat:44.491});
+ const {document,requests}=await boot({ios:true,venues:[first,later],nearbyResponse:dataset=>{
+  const body=new ReadableStream({start(controller){
+   const send=record=>controller.enqueue(new TextEncoder().encode(JSON.stringify(record)+'\n'));
+   send({stage:'nearby',data:{...dataset,venues:[first]}});
+   finish=()=>{send({stage:'complete',status:200,data:dataset});controller.close()};
+  }});
+  return new Response(body,{headers:{'Content-Type':'application/x-ndjson'}});
+ }});
+ assert.equal(document.querySelector('.card h3')?.textContent,first.name);
+ assert.match(document.querySelector('.status').textContent,/Location found/);
+ assert.equal(document.querySelectorAll('.card').length,1);
+ finish();
+ for(let i=0;i<20&&document.querySelectorAll('.card').length<2;i++)await new Promise(r=>setTimeout(r,5));
+ assert.equal(document.querySelectorAll('.card').length,2);
+ assert.equal(document.querySelector('.status').textContent,'');
+ assert.deepEqual(requests,['https://bb.test/api/nearby']);
 });

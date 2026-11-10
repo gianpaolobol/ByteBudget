@@ -90,3 +90,18 @@ test('iOS keeps the best usable fix when the short refinement window ends',async
  };
  assert.equal((await getIosForegroundPosition(geo,800,{timeout:100,refineFor:15})).coords.accuracy,90);
 });
+
+test('iOS uses a current 65m fix without waiting for refinement at a wide radius',async()=>{
+ const position={timestamp:Date.now(),coords:{latitude:44.49,longitude:11.34,accuracy:65}};
+ const geo={
+  checkPermissions:async()=>({location:'granted'}),
+  watchPosition:async(options,receive)=>{receive(position);return 'native-watch'},
+  clearWatch:async()=>{}
+ };
+ const result=getIosForegroundPosition(geo,800,{refineFor:300});
+ let resolved=false;
+ result.then(()=>{resolved=true});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(resolved,true);
+ assert.equal(await result,position);
+});

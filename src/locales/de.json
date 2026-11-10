@@ -51,6 +51,7 @@
   "broad": "Viele Orte in der Nähe. Wähle einen kleineren Radius für eine genauere Suche.",
   "partial": "Enthalten sind Orte mit geprüften Menüpreisen. Die Abdeckung wächst noch.",
   "permission": "Standort nicht verfügbar. Prüfe die Berechtigungen und versuche es erneut.",
+  "loadingNearby": "Standort gefunden. Lokale in der Nähe werden gesucht…",
   "loading": "Standort wird ermittelt…",
   "noProvider": "Restaurantdienst nicht verfügbar. Bitte später erneut versuchen.",
   "browse": "Empfehlungen in der Nähe",
