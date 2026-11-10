@@ -22,7 +22,7 @@ let knownDataset=null,lastSearch=null,detailReturnView='results',selectedMeal='d
 const CLOSE_BY_DISTANCE=150;
 let liveUpdates,watchRegistration,watchGeneration=0,localTick,calibration,liveFailure='';
 let filterData,filterMeal,filterMinute,bandsForMeal,selectSpending,ranked=[],alternatives=[];
-let gestureCount=0,pendingRender,filterFrame=false;
+let gestureCount=0,pendingRender,pendingDataApply,pendingPositionApply,filterFrame=false;
 const frame=callback=>typeof requestAnimationFrame==='function'?requestAnimationFrame(callback):Promise.resolve().then(callback);
 let data=null,view='discover',results=[],selected=null,radius=800,spendingPosition=read('bb-spending-position',({low:249,mid:375,high:749,luxury:1000}[read('bb-tier','mid')]||375)),meal='dinner',message='',busy=false;
 if(!Number.isInteger(spendingPosition)||spendingPosition<0||spendingPosition>1000)spendingPosition=375;
@@ -191,6 +191,9 @@ function reconcileCards(container,items){
 function onGesture(active){
  gestureCount+=active?1:-1;
  if(gestureCount)return;
+ const applyData=pendingDataApply,applyPosition=pendingPositionApply;
+ pendingDataApply=null;pendingPositionApply=null;
+ applyData?.();applyPosition?.();
  if(pendingRender){
   const apply=pendingRender;
   pendingRender=null;
@@ -354,7 +357,7 @@ function startLiveMode(){
     if(view==='results')updateFilters();
     const status=app.querySelector('.status');if(status)status.textContent=message?t(message):'';
    };
-   if(gestureCount)pendingRender=apply;else apply();
+   if(gestureCount)pendingPositionApply=apply;else apply();
   },
   onDataset(next,partial){
    const validated=validateDataset(next);
@@ -370,7 +373,7 @@ function startLiveMode(){
     else{selected=previousSelection}
     const status=app.querySelector('.status');if(status)status.textContent=message?t(message):'';
    };
-   if(gestureCount)pendingRender=apply;else apply();
+   if(gestureCount)pendingDataApply=apply;else apply();
   },
   onError:liveError
  });

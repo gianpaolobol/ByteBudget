@@ -197,3 +197,25 @@ test('new live prices update existing cards without replacing the filter control
  assert.equal(document.querySelector('.card'),card);
  assert.match(card.textContent,/40/);
 });
+
+test('a live price response is retained when GPS changes during a slider gesture',async()=>{
+ let finish;
+ const initial=venue('Moving price','mid',30),updated=venue('Moving price','mid',40);
+ const {document,emitPosition}=await boot({ios:true,nearbyResponse:dataset=>{
+  const body=new ReadableStream({start(controller){
+   const send=record=>controller.enqueue(new TextEncoder().encode(JSON.stringify(record)+'\n'));
+   send({stage:'nearby',data:{...dataset,venues:[initial]}});
+   finish=()=>{send({stage:'complete',status:200,data:{...dataset,venues:[updated]}});controller.close()};
+  }});
+  return new Response(body,{headers:{'Content-Type':'application/x-ndjson'}});
+ }});
+ const input=document.querySelector('#radius'),surface=input.parentElement;
+ surface.getBoundingClientRect=()=>({left:0,width:300});
+ const event={pointerId:7,clientX:225,clientY:20,button:0,isPrimary:true,preventDefault(){}};
+ surface.onpointerdown(event);
+ finish();await new Promise(r=>setTimeout(r,5));
+ emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:12}});
+ surface.onpointerup(event);
+ assert.match(document.querySelector('#results-list .card').textContent,/40/);
+ assert.match(document.querySelector('[data-distance]').textContent,/89 m/);
+});
