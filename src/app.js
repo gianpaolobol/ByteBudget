@@ -5,7 +5,7 @@ import {mergeCityDataset,makeSearchSnapshot,selectSavedVenues} from './search-st
 import {strings,languages,resolveLanguage,direction} from './i18n.js';
 import {Capacitor} from '@capacitor/core';
 import {Geolocation} from '@capacitor/geolocation';
-import {getForegroundPosition} from './location.js';
+import {getForegroundPosition,getIosForegroundPosition} from './location.js';
 import {loadLiveRestaurants} from './live-client.js';
 import {selectVenues,cityBands,matchesTier,cappedPrice,PRICE_TIERS} from './domain.js';
 import {validateDataset} from './provider.js';
@@ -180,7 +180,10 @@ async function locate(refresh=false,automatic=false){
  busy=true;message='loading';render();
  const native=Capacitor.isNativePlatform(),apiBase=window.BYTEBUDGET_CONFIG?.apiBase;
  try{
-  const next=await loadLiveRestaurants({origin:location.origin,automatic,native,apiBase,radius,nearbyRadius:1000,spendingPosition,meal,language:lang,locate:()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),radius,{preciseOnly:native})});
+  const acquirePosition=Capacitor.getPlatform()==='ios'
+   ?()=>getIosForegroundPosition(Geolocation,radius)
+   :()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),radius,{preciseOnly:native});
+  const next=await loadLiveRestaurants({origin:location.origin,automatic,native,apiBase,radius,nearbyRadius:1000,spendingPosition,meal,language:lang,locate:acquirePosition});
   const validated=validateDataset(next);
   const apply=()=>{
    const previousMeal=meal;
