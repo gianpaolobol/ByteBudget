@@ -84,7 +84,23 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    if(nearest.length>=8&&(nearest.length===20||!found.has('mid')||!found.has('high'))){
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:20,rankPreference:'POPULARITY',languageCode:locale,locationRestriction:{circle:{center,radius:input.radius}}}));
    }
-   if(nearest.length===20){
+   if(nearest.length===20&&input.radius>250&&Math.abs(input.lat)<89.9){
+    // The central search fills first in dense blocks. Search four overlapping
+    // circles around it and still enforce the user's original radius on merge.
+    const latitudeStep=165/111195;
+    const longitudeStep=latitudeStep/Math.cos(input.lat*Math.PI/180);
+    for(const [north,east] of [[1,1],[1,-1],[-1,1],[-1,-1]]){
+     const localCenter={
+      latitude:input.lat+north*latitudeStep,
+      longitude:(input.lng+east*longitudeStep+540)%360-180
+     };
+     supplemental.push(enrich({
+      includedTypes:['restaurant','pizza_restaurant','chinese_restaurant','bar','pub','cafe','bakery','meal_takeaway','fast_food_restaurant'],
+      maxResultCount:20,rankPreference:'DISTANCE',languageCode:locale,
+      locationRestriction:{circle:{center:localCenter,radius:155}}
+     }));
+    }
+   }else if(nearest.length===20){
     // In dense areas each group gets its own distance-ranked result allowance.
     const localCircle={center,radius:Math.min(input.radius,250)};
     for(const includedTypes of [

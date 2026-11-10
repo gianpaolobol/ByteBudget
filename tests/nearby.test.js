@@ -48,20 +48,21 @@ test('a saturated distance search supplements priced restaurants without accepti
   calls.push(String(url));
   if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
   const query=JSON.parse(options.body);
-  if(query.includedTypes.includes('bakery'))return Response.json({places:nearest});
+  const {center,radius}=query.locationRestriction.circle;
   if(query.rankPreference==='DISTANCE'){
-   const {radius}=query.locationRestriction.circle;
-   assert.equal(radius,250);
-   return Response.json({places:query.includedTypes.includes('bar')
-    ?[place({id:'pizza-gingio'}),place({id:'roxy'})]
-    :[place({id:'near-0'}),place({id:'cesarina'}),place({id:'capuano'}),place({id:'ravioli-2-torri'})]});
+   if(center.latitude===44.49&&center.longitude===11.34)return Response.json({places:nearest});
+   assert.equal(radius,155);
+   const recovered=center.latitude>44.49
+    ?[place({id:'ravioli-2-torri'}),place({id:'pizza-gingio'}),place({id:'roxy'})]
+    :[place({id:'near-0'}),place({id:'cesarina'}),place({id:'capuano'})];
+   return Response.json({places:recovered});
   }
   return Response.json({places:[place({id:'priced'}),place({id:'outside',location:{latitude:45,longitude:12}})]});
  }});
  const r=await h(request(),{...env,...db});
  assert.equal(r.status,200);
  const data=await r.json();
- assert.equal(calls.length,5);
+ assert.equal(calls.length,7);
  for(const id of ['cesarina','capuano','ravioli-2-torri','pizza-gingio','roxy']){
   assert.ok(data.venues.some(v=>v.id===id&&v.venuePrice.max===40),id);
  }
