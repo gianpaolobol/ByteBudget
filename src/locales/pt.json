@@ -18,7 +18,7 @@
   "saved": "Salvos",
   "demo": "Demo · Os locais, preços e avaliações são fictícios.",
   "try": "Explorar a demo",
-  "empty": "Nenhum local nesta faixa",
+  "empty": "Sem locais abertos dentro do orçamento e da distância",
   "closeByAlternatives": "Outros locais a poucos passos",
   "budgetAlternatives": "Alternativas próximas com preço disponível. Podem pertencer a outra faixa ou ultrapassar o teu orçamento.",
   "impreciseTitle": "É necessária uma localização mais precisa",
@@ -26,7 +26,7 @@
   "tastingMenu": "Menu de degustação",
   "dinnerTastingMenu": "Menu de degustação ao jantar",
   "locationUnavailable": "A localização está temporariamente indisponível. Tenta novamente.",
-  "emptyText": "Escolha outra faixa ou aumente a distância, até 1 km.",
+  "emptyText": "Aumenta o orçamento ou a distância. Os locais fechados são excluídos.",
   "open": "Aberto",
   "walk": "Distância em linha reta",
   "directions": "Ir a pé",
@@ -81,5 +81,8 @@
   "viewPlace": "Ver no Google Maps",
   "website": "Site",
   "referenceBandsNote": "Faixas de orçamento de referência para Itália.",
-  "numericBandsNote": "Faixas baseadas em preços numéricos locais. Locais sem preço excluídos."
+  "numericBandsNote": "Faixas baseadas em preços numéricos locais. Locais sem preço excluídos.",
+  "priceUncertain": "Confirma o preço: a estimativa excede parcialmente o orçamento.",
+  "uncertainBudget": "Compatibilidade do orçamento por confirmar",
+  "approximateLocation": "Distâncias aproximadas enquanto a localização melhora."
 }

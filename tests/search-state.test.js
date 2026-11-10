@@ -10,3 +10,11 @@ test('saved nearby restaurants remain visible when source price is unavailable',
  const found=selectSavedVenues([venue],['real-id'],{lat:44.49,lng:11.34,radius:1000,currency:'EUR',meal:'dinner',pricingScope:'venue'});
  assert.equal(found.length,1);assert.equal(found[0].id,'real-id');assert.equal(found[0].price,null);
 });
+test('a saved venue remains available after walking outside the search radius',async()=>{
+ const {selectSavedVenues}=await import('../src/search-state.js');
+ const venue={id:'saved-far',name:'Saved venue',lat:44.49,lng:11.34,currency:'EUR',rating:4.7,reviewCount:20,isOpen:false,openingStatus:'closed',prices:{}};
+ const result=selectSavedVenues([venue],['saved-far'],{lat:44.51,lng:11.34,radius:100,currency:'EUR',meal:'dinner',pricingScope:'venue'});
+ assert.equal(result.length,1);
+ assert.ok(result[0].distance>2000);
+ assert.equal(result[0].isOpen,false);
+});

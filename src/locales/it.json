@@ -18,7 +18,7 @@
   "saved": "Salvati",
   "demo": "Demo · Locali, prezzi e recensioni sono inventati.",
   "try": "Esplora la demo",
-  "empty": "Nessun locale in questa fascia",
+  "empty": "Nessun locale aperto entro budget e distanza",
   "closeByAlternatives": "Altri locali a pochi passi",
   "budgetAlternatives": "Alternative vicine con prezzo disponibile. Possono essere in un’altra fascia o superare il limite di spesa.",
   "impreciseTitle": "Serve una posizione più precisa",
@@ -26,7 +26,7 @@
   "tastingMenu": "Menu degustazione",
   "dinnerTastingMenu": "Degustazione a cena",
   "locationUnavailable": "Posizione temporaneamente non disponibile. Riprova.",
-  "emptyText": "Scegli un’altra fascia o aumenta la distanza, fino a 1 km.",
+  "emptyText": "Aumenta il budget o la distanza. I locali chiusi sono esclusi.",
   "open": "Aperto",
   "walk": "Distanza in linea d’aria",
   "directions": "Portami qui",
@@ -81,5 +81,8 @@
   "viewPlace": "Vedi il locale su Google Maps",
   "website": "Sito del locale",
   "referenceBandsNote": "Soglie di budget di riferimento per l’Italia.",
-  "numericBandsNote": "Fasce basate sugli importi numerici locali. Locali senza prezzo esclusi."
+  "numericBandsNote": "Fasce basate sugli importi numerici locali. Locali senza prezzo esclusi.",
+  "priceUncertain": "Prezzo da verificare: la stima supera in parte il budget.",
+  "uncertainBudget": "Compatibilità di prezzo da verificare",
+  "approximateLocation": "Distanze approssimative: la posizione si sta precisando."
 }

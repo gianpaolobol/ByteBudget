@@ -136,3 +136,16 @@ test('progressive search sends nearest places before the wider lookup finishes',
   assert.equal(last.data.venues.length,21);
  }finally{finish()}
 });
+
+test('a movement refresh uses one provider query and keeps current opening periods',async()=>{
+ let lookups=0;
+ const periods=[{open:{date:{year:2026,month:11,day:10},hour:12},close:{date:{year:2026,month:11,day:10},hour:23}}];
+ const h=createNearbyHandler({fetch:async(url)=>{
+  if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
+  lookups++;
+  return Response.json({places:Array.from({length:20},(_,i)=>place({id:'move-'+i,currentOpeningHours:{openNow:true,periods}}))});
+ }});
+ const data=await(await h(request({quick:true}),{...env,...budgetEnvironment()})).json();
+ assert.equal(lookups,1);
+ assert.deepEqual(data.venues[0].openingPeriods,periods);
+});

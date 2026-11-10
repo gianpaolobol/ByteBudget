@@ -18,7 +18,7 @@
   "saved": "保存済み",
   "demo": "デモ · お店・価格・口コミはすべて架空です。",
   "try": "デモを見る",
-  "empty": "この価格帯のお店はありません",
+  "empty": "予算と距離内で営業中のお店はありません",
   "closeByAlternatives": "すぐ近くのほかのお店",
   "budgetAlternatives": "価格が確認できる近くの候補です。別の価格帯や予算を超える場合があります。",
   "impreciseTitle": "より正確な位置情報が必要です",
@@ -26,7 +26,7 @@
   "tastingMenu": "テイスティングメニュー",
   "dinnerTastingMenu": "ディナーのテイスティングメニュー",
   "locationUnavailable": "一時的に位置情報を取得できません。もう一度お試しください。",
-  "emptyText": "別の価格帯を選ぶか、範囲を最大1kmまで広げてください。",
+  "emptyText": "予算または距離を増やしてください。閉店中のお店は除外されます。",
   "open": "営業中",
   "walk": "直線距離",
   "directions": "徒歩で行く",
@@ -81,5 +81,8 @@
   "viewPlace": "Google マップで見る",
   "website": "ウェブサイト",
   "referenceBandsNote": "イタリアの参考予算帯。",
-  "numericBandsNote": "現地の数値価格で分類。価格不明の店舗は除外されます。"
+  "numericBandsNote": "現地の数値価格で分類。価格不明の店舗は除外されます。",
+  "priceUncertain": "料金をご確認ください。推定額が予算を一部超えています。",
+  "uncertainBudget": "予算に合うか要確認",
+  "approximateLocation": "位置を補正中のため距離は目安です。"
 }

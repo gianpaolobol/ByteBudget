@@ -18,7 +18,7 @@
   "saved": "저장됨",
   "demo": "데모 · 식당, 가격, 리뷰는 모두 가상입니다.",
   "try": "데모 둘러보기",
-  "empty": "이 가격대의 식당이 없습니다",
+  "empty": "예산과 거리 내에 영업 중인 매장이 없습니다",
   "closeByAlternatives": "걸어서 갈 수 있는 다른 곳",
   "budgetAlternatives": "가격이 표시된 주변 대안입니다. 다른 가격대에 속하거나 예산을 초과할 수 있습니다.",
   "impreciseTitle": "더 정확한 위치가 필요합니다",
@@ -26,7 +26,7 @@
   "tastingMenu": "테이스팅 메뉴",
   "dinnerTastingMenu": "저녁 테이스팅 메뉴",
   "locationUnavailable": "일시적으로 위치를 확인할 수 없습니다. 다시 시도해 주세요.",
-  "emptyText": "다른 가격대를 선택하거나 반경을 최대 1km까지 넓혀 보세요.",
+  "emptyText": "예산이나 거리를 늘려보세요. 닫힌 매장은 제외됩니다.",
   "open": "영업 중",
   "walk": "직선거리",
   "directions": "걸어서 가기",
@@ -81,5 +81,8 @@
   "viewPlace": "Google 지도에서 보기",
   "website": "웹사이트",
   "referenceBandsNote": "이탈리아 기준 예산 구간입니다.",
-  "numericBandsNote": "현지 숫자 가격으로 분류하며 가격이 없는 매장은 제외합니다."
+  "numericBandsNote": "현지 숫자 가격으로 분류하며 가격이 없는 매장은 제외합니다.",
+  "priceUncertain": "가격을 확인하세요. 예상 금액이 예산을 일부 초과합니다.",
+  "uncertainBudget": "예산 적합 여부 확인",
+  "approximateLocation": "위치 정확도가 개선되는 동안 거리는 대략적인 값입니다."
 }

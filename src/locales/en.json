@@ -18,7 +18,7 @@
   "saved": "Saved",
   "demo": "Demo · All places, prices and reviews are fictional.",
   "try": "Explore the demo",
-  "empty": "No places in this price range",
+  "empty": "No open venues within your budget and radius",
   "closeByAlternatives": "Other places a short walk away",
   "budgetAlternatives": "Nearby alternatives with a listed price. They may be outside this price range or above your spending limit.",
   "impreciseTitle": "Location needs more precision",
@@ -26,7 +26,7 @@
   "tastingMenu": "Tasting menu",
   "dinnerTastingMenu": "Dinner tasting menu",
   "locationUnavailable": "Location is temporarily unavailable. Try again.",
-  "emptyText": "Choose another price range or increase the distance, up to 1 km.",
+  "emptyText": "Increase your budget or distance. Closed venues are excluded.",
   "open": "Open",
   "walk": "Straight-line distance",
   "directions": "Walk there",
@@ -81,5 +81,8 @@
   "viewPlace": "View place on Google Maps",
   "website": "Website",
   "referenceBandsNote": "Reference budget bands for Italy.",
-  "numericBandsNote": "Bands use local numeric prices. Venues without prices are excluded."
+  "numericBandsNote": "Bands use local numeric prices. Venues without prices are excluded.",
+  "priceUncertain": "Check the price: the estimate partly exceeds your budget.",
+  "uncertainBudget": "Check budget compatibility",
+  "approximateLocation": "Approximate distances while location accuracy improves."
 }

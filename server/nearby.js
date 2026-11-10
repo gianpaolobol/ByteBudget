@@ -70,7 +70,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    const parseVenues=places=>places.flatMap(p=>{
     const lat=p.location?.latitude,lng=p.location?.longitude;
     if(typeof p.id!=='string'||!p.id||typeof p.displayName?.text!=='string'||!Number.isFinite(lat)||Math.abs(lat)>90||!Number.isFinite(lng)||Math.abs(lng)>180||distanceMeters(input.lat,input.lng,lat,lng)>input.radius||!Number.isFinite(p.rating)||p.rating<0||p.rating>5||!Number.isInteger(p.userRatingCount)||p.userRatingCount<1||p.businessStatus!=='OPERATIONAL'||['supermarket','grocery_store','convenience_store','gas_station','tobacco_shop','liquor_store'].includes(p.primaryType))return [];
-    return [{id:p.id,name:p.displayName.text,lat,lng,currency,rating:p.rating,reviewCount:p.userRatingCount,isOpen:p.currentOpeningHours?.openNow===true,openingStatus:typeof p.currentOpeningHours?.openNow==='boolean'?(p.currentOpeningHours.openNow?'open':'closed'):'unknown',sourceTier:({PRICE_LEVEL_FREE:'low',PRICE_LEVEL_INEXPENSIVE:'low',PRICE_LEVEL_MODERATE:'mid',PRICE_LEVEL_EXPENSIVE:'high',PRICE_LEVEL_VERY_EXPENSIVE:'luxury'})[p.priceLevel],googleMapsUri:p.googleMapsUri,websiteUri:p.websiteUri,photo:Array.isArray(p.photos)?p.photos[0]:undefined,prices:{},venuePrice:venuePrice(p.priceRange,currency,current),menu:[],attributions:Array.isArray(p.attributions)?p.attributions:[],ratingSource:'Google Maps'}];
+    return [{id:p.id,name:p.displayName.text,lat,lng,currency,rating:p.rating,reviewCount:p.userRatingCount,isOpen:p.currentOpeningHours?.openNow===true,openingPeriods:Array.isArray(p.currentOpeningHours?.periods)?p.currentOpeningHours.periods:undefined,openingStatus:typeof p.currentOpeningHours?.openNow==='boolean'?(p.currentOpeningHours.openNow?'open':'closed'):'unknown',sourceTier:({PRICE_LEVEL_FREE:'low',PRICE_LEVEL_INEXPENSIVE:'low',PRICE_LEVEL_MODERATE:'mid',PRICE_LEVEL_EXPENSIVE:'high',PRICE_LEVEL_VERY_EXPENSIVE:'luxury'})[p.priceLevel],googleMapsUri:p.googleMapsUri,websiteUri:p.websiteUri,photo:Array.isArray(p.photos)?p.photos[0]:undefined,prices:{},venuePrice:venuePrice(p.priceRange,currency,current),menu:[],attributions:Array.isArray(p.attributions)?p.attributions:[],ratingSource:'Google Maps'}];
    });
    const venues=new Map();
    const merge=places=>{
@@ -94,6 +94,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
     }catch{/* Keep the distance results when supplemental coverage is unavailable. */}
    };
    const supplemental=[];
+   if(input.quick!==true){
    if(nearest.length===20){
     for(const {center:localCenter,places} of coverageChecks){
      const missing=places.filter(([id,lat,lng])=>!venues.has(id)&&distanceMeters(input.lat,input.lng,lat,lng)<=input.radius).map(([id])=>id);
@@ -141,6 +142,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
     checkedTiers.add(tier);
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},[menu.id]));
     if(++menuLookups===2)break;
+   }
    }
    const snapshot=()=>{
     const dataset=validateDataset({city,country,currency,timeZone:timeZoneAt(input.lat,input.lng),lat:input.lat,lng:input.lng,demo:false,pricingScope:'venue',venues:[...venues.values()]});
