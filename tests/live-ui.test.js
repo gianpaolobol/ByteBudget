@@ -33,7 +33,7 @@ test('live UI lets a three-price-or-less town change budget and never mixes Low 
  assert.equal(document.querySelector('.card h3')?.textContent,'Mid restaurant');
  assert.match(document.querySelector('.card')?.textContent||'',/Closed/i);
  const slider=document.querySelector('#spending');assert.equal(slider.hasAttribute('disabled'),false);
- slider.value='249';slider.oninput({target:slider});await Promise.resolve();assert.equal(document.querySelector('#spending-tier').textContent,'Low');assert.match(document.querySelector('#spending-price').textContent,/19.99/);
+ slider.value='249';slider.oninput({target:slider});await Promise.resolve();assert.equal(document.querySelector('[data-tier-label].active').textContent,'Low');assert.match(document.querySelector('#spending-price').textContent,/19.99/);
  assert.equal(document.querySelector('.card h3').textContent,'Cheap cafe');
  slider.onchange({target:slider});
  for(let i=0;i<4;i++)await new Promise(r=>setTimeout(r,5));for(let i=0;i<100&&!document.querySelector('.result-head');i++)await new Promise(r=>setTimeout(r,5));
@@ -84,7 +84,7 @@ test('both filters respond in the live results without new provider calls',async
  slider.value='249';slider.oninput({target:slider});
  await new Promise(r=>setTimeout(r,25));
  assert.equal(document.querySelector('.card h3')?.textContent,'Cheap cafe');
- assert.match(document.querySelector('#result-criteria').textContent,/100 m/);
+ assert.match(document.querySelector('#distance-label').textContent,/100 m/);
  assert.equal(requests.length,before);
 });
 

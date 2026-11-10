@@ -43,12 +43,13 @@ function setData(next){
 }
 
 const plate=(v=0)=>`<div class="thumb v${[0,1,2].includes(v)?v:0}"><div class="plate" aria-hidden="true"></div></div>`;
-function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></header>${data?.demo?`<div class="notice">${t('demo')}</div>`:data?`<p class="maps-attribution" translate="no">Google Maps</p>`:''}`}
+function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></header>${data?.demo?`<div class="notice">${t('demo')}</div>`:''}`}
 function providerCredits(){
  const credits=new Map();for(const v of data?.venues||[])for(const a of v.attributions||[]){if(typeof a.provider!=='string')continue;let url;try{const u=new URL(a.providerUri);if(u.protocol==='https:')url=u.href}catch{}credits.set(a.provider,{name:a.provider,url});}
  return [...credits.values()].map(a=>`<p class="subtle">${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.name)}</a>`:esc(a.name)}</p>`).join('');
 }
-function locationMarkup(){return `<div class="location">⌖ ${data?.demo?`<button id="location">${esc(data.city)}</button>`:`<span>${esc(data?.city||t('location'))}</span>`}${data?.currency?`<span class="badge">${esc(data.currency)}</span>`:''}</div>`}
+function demoLocation(){return data?.demo?`<div class="location"><button id="location">${esc(data.city)}</button></div>`:''}
+function mapsAttribution(){return data&&!data.demo?'<p class="maps-attribution" translate="no">Google Maps</p>':''}
 function prepareFilters(){
  if(filterData===data&&filterMeal===meal)return;
  filterData=data;filterMeal=meal;
@@ -61,13 +62,15 @@ function prepareFilters(){
   tier:PRICE_TIERS.find(tier=>matchesTier(venue.price,tier,bandsForMeal))
  })):[];
 }
-function currentBands(){prepareFilters();return bandsForMeal}
 function currentSpending(){prepareFilters();return selectSpending(spendingPosition)}
 function priceText(selection){return selection.unlimited?'∞':Number.isFinite(selection.maxPrice)?money(selection.maxPrice):data?.pricingScope==='venue'?t('pricesUnavailable'):''}
 function spendingText(selection){const amount=selection.unlimited?t('noLimit'):selection.maxPrice===undefined?'':`${t('upTo')} ${money(selection.maxPrice)} ${t('person')}`;return amount?`${t(selection.tier)} · ${amount}`:t(selection.tier)}
-function bands(){const b=currentBands(),selection=currentSpending();return `<div class="spending-control"><label class="control-row" for="spending">${t('priceTier')}</label><div id="spending-value" class="spending-value" dir="ltr"><span id="spending-tier" dir="auto">${t(selection.tier)}</span><output id="spending-price" for="spending" dir="auto" aria-label="${esc(spendingText(selection))}">${priceText(selection)}</output></div><div class="range-surface"><input id="spending" dir="ltr" type="range" min="0" max="1000" step="1" value="${spendingPosition}"  aria-label="${t('priceTier')}" aria-valuetext="${esc(spendingText(selection))}"></div><div class="tier-labels" aria-hidden="true">${PRICE_TIERS.map(key=>`<span data-tier-label="${key}" class="${selection.tier===key?'active':''}">${t(key)}</span>`).join('')}</div><p class="subtle" id="spending-note">${b?.source==='country-reference'?t('referenceBandsNote'):b?t('numericBandsNote'):t('unknown')}</p></div>`}
+function bands(){
+ const selection=currentSpending(),label=esc(spendingText(selection));
+ return `<div class="spending-control"><output id="spending-price" class="spending-value" for="spending" dir="auto" aria-label="${label}">${priceText(selection)}</output><div class="range-surface"><input id="spending" dir="ltr" type="range" min="0" max="1000" step="1" value="${spendingPosition}" aria-label="${t('priceTier')}" aria-valuetext="${label}"></div><div class="tier-labels" aria-hidden="true">${PRICE_TIERS.map(key=>`<span data-tier-label="${key}" class="${selection.tier===key?'active':''}">${t(key)}</span>`).join('')}</div></div>`;
+}
 function radiusControl(){return `<div class="control"><label class="control-row" for="radius">${t('radius')}<output id="distance-label" class="badge">${radius} m</output></label><div class="range-surface"><input type="range" min="100" max="1000" step="50" id="radius" value="${radius}"></div><div class="ends"><span>100 m</span><span>1 km</span></div></div>`}
-function discover(){return `${locationMarkup()}<h1 class="tagline">${t('tag')}</h1><p class="subtle">${t('desc')}</p><div class="hero"><strong>${t('hero')}</strong>${data?.demo?'<div class="plate" aria-hidden="true"></div>':''}</div>${data?.pricingScope==='venue'?'':`<div class="segmented" aria-label="${t('lunch')} / ${t('dinner')}"><button data-meal="lunch" class="${meal==='lunch'?'active':''}" aria-pressed="${meal==='lunch'}">${t('lunch')}</button><button data-meal="dinner" class="${meal==='dinner'?'active':''}" aria-pressed="${meal==='dinner'}">${t('dinner')}</button></div>`}${bands()}${radiusControl()}<p class="status" role="status">${esc(message?t(message):'')}</p><button class="primary" id="search" ${busy?'disabled':''}>${t('find')}</button>${!data&&demoPreview?`<button class="secondary demo-switch" id="demo">${t('try')}</button>`:`<p class="subtle center">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}`}
+function discover(){return `${demoLocation()}<h1 class="tagline">${t('tag')}</h1><p class="subtle">${t('desc')}</p><div class="hero"><strong>${t('hero')}</strong>${data?.demo?'<div class="plate" aria-hidden="true"></div>':''}</div>${data?.pricingScope==='venue'?'':`<div class="segmented" aria-label="${t('lunch')} / ${t('dinner')}"><button data-meal="lunch" class="${meal==='lunch'?'active':''}" aria-pressed="${meal==='lunch'}">${t('lunch')}</button><button data-meal="dinner" class="${meal==='dinner'?'active':''}" aria-pressed="${meal==='dinner'}">${t('dinner')}</button></div>`}${bands()}${radiusControl()}<p class="status" role="status">${esc(message?t(message):'')}</p><button class="primary" id="search" ${busy?'disabled':''}>${t('find')}</button>${!data&&demoPreview?`<button class="secondary demo-switch" id="demo">${t('try')}</button>`:`<p class="subtle center">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}`}
 function menuLabel(price){return t(price.meal==='dinner'?'dinnerTastingMenu':'tastingMenu')}
 function priceQualifier(price){return price?.kind==='tasting-menu'?' · '+menuLabel(price):''}
 function opening(v){return v.openingStatus==='unknown'?t('hoursUnknown'):v.isOpen?t('open'):t('closedNow')}
@@ -102,10 +105,12 @@ function resultMarkup(){
  const imprecise=data?.locationAccuracy>radius/2;
  return `<div class="empty"><h2>${t(imprecise?'impreciseTitle':'empty')}</h2><p>${t(imprecise?'imprecise':'emptyText')}</p></div>`;
 }
-function listing(){const searched=lastSearch?.criteria||{meal,radius,...currentSpending()};return `${locationMarkup()}<h1>${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><span id="result-criteria" class="subtle">${resultCriteria(searched)}</span><button class="secondary" id="refresh" ${busy?'disabled':''}>↻ ${t('refresh')}</button></div>${bands()}${radiusControl()}<p class="subtle" id="result-count">${results.length} · ${t('nearbyCount')}</p><button class="back" id="edit">${t('back')}</button><div id="results-list" data-accuracy="${data?.locationAccuracy>radius/2?'imprecise':'precise'}">${resultMarkup()}</div><p class="subtle">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p><p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${data.pricingScope==='venue'?t('venueEstimate'):t('partial')}</p>${providerCredits()}<p class="maps-attribution" translate="no">Google Maps</p>`:''}`}
+function listing(){
+ return `<h1 class="visually-hidden">${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p>${bands()}${radiusControl()}<div class="result-head"><p class="subtle" id="result-count">${results.length} · ${t('nearbyCount')}</p><button class="secondary refresh-icon" id="refresh" aria-label="${t('refresh')}" title="${t('refresh')}" ${busy?'disabled':''}><span aria-hidden="true">↻</span></button></div><button class="back" id="edit">${t('back')}</button><div id="results-list" data-accuracy="${data?.locationAccuracy>radius/2?'imprecise':'precise'}">${resultMarkup()}</div>${mapsAttribution()}<p class="subtle">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p><p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${data.pricingScope==='venue'?t('venueEstimate'):t('partial')}</p>${providerCredits()}`:''}`;
+}
 function detail(){const v=selected;return `<button class="back" id="back">← ${t('back')}</button>${data?.demo?`<div class="detail-hero"><div class="plate" aria-hidden="true"></div></div><span class="subtle">${t('illustration')}</span>`:photoMarkup(v,true)}<h1>${esc(v.name)}</h1><p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p><div class="detail-price">${v.price?`${money(v.price.min)}–${money(v.price.max)}`:t('pricesUnavailable')}</div><p class="subtle">${v.price?.kind==='tasting-menu'?menuLabel(v.price):data?.pricingScope==='venue'?t('venueEstimate'):`${t('person')} · ${t(selectedMeal)}`}</p>${v.price?.kind==='tasting-menu'?`<a class="subtle" href="${esc(v.price.source)}" target="_blank" rel="noopener noreferrer">${t('menu')}</a>`:`<p class="subtle">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}<div class="facts"><span class="badge">⌖ ${Math.round(v.distance)} m</span><span class="badge">${opening(v)}</span></div><p>${esc(v.cuisine)}</p><h2>${t('menu')}</h2>${data?.pricingScope==='venue'?`<p class="subtle">${t('menusUnknown')}</p>`:''}${Array.isArray(v.menu)&&v.menu.length?v.menu.map(i=>`<div class="menu-row"><span>${esc(i.name)}</span><b>${money(i.price)}</b></div>`).join(''):`<p class="subtle">—</p>`}<div class="actions">${!data.demo?`<a data-place-link class="secondary" href="${esc(v.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${encodeURIComponent(v.id)}`)}" target="_blank" rel="noopener noreferrer">${t('viewPlace')}</a>${v.websiteUri?`<a class="secondary" href="${esc(v.websiteUri)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}`:''}<button class="primary" id="route">↗ ${t('directions')}</button><button class="secondary" id="save">${saved.includes(v.id)?t('unsave'):t('save')}</button></div><p class="status" role="status">${esc(message?t(message):'')}</p><p class="subtle">${t('walk')} · ${t('route')}</p>${!data.demo?providerCredits():''}`}
 function savedView(){const items=data?selectSavedVenues(knownDataset.venues,saved,{...data,radius:1000,meal,now:Date.now()}):[];return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
-function render(){if(gestureCount){pendingRender??=render;return}document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}<p class="center"><button class="back" id="about">${t('about')}</button></p><nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
+function render(){if(gestureCount){pendingRender??=render;return}document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}${view==='detail'||view==='saved'?mapsAttribution():''}<p class="center"><button class="back" id="about">${t('about')}</button></p><nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
 app.querySelector('#language').disabled=busy;
 app.querySelector('#language').onchange=e=>{lang=e.target.value;write('bb-lang',lang);render()};
 app.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>{meal=b.dataset.meal;render()});
@@ -155,7 +160,6 @@ function updateFilters(){
  if(!spendingInput)return;
  const selection=currentSpending(),label=spendingText(selection);
  const setText=(element,text)=>{if(element.textContent!==text)element.textContent=text};
- setText(app.querySelector('#spending-tier'),t(selection.tier));
  const priceOutput=app.querySelector('#spending-price');
  setText(priceOutput,priceText(selection));
  priceOutput.setAttribute('aria-label',label);
@@ -165,7 +169,6 @@ function updateFilters(){
  if(view!=='results'||!data.demo&&data.pricingScope!=='venue')return;
  const previous=results.map(v=>v.id).join(),previousAlternatives=alternatives.map(v=>v.id).join(),previousNearby=nearbyAlternatives.map(v=>v.id).join();
  computeResults();
- setText(app.querySelector('#result-criteria'),resultCriteria(lastSearch.criteria));
  setText(app.querySelector('#result-count'),results.length+' · '+t('nearbyCount'));
  const list=app.querySelector('#results-list');
  const state=data?.locationAccuracy>radius/2?'imprecise':'precise';
@@ -174,10 +177,6 @@ function updateFilters(){
   list.innerHTML=resultMarkup();
   bindCards();
  }
-}
-function resultCriteria(criteria){
- const prefix=data?.pricingScope==='venue'?'':t(criteria.meal)+' · ';
- return prefix+spendingText(criteria)+' · '+criteria.radius+' m';
 }
 function computeResults(){
  const selection=currentSpending();
