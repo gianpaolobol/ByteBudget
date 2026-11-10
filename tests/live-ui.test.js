@@ -5,10 +5,11 @@ import {build} from 'esbuild';
 import {parseHTML} from 'linkedom';
 const now=new Date().toISOString();
 const venue=(id,tier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,openingStatus:'open',sourceTier:tier,prices:{},venuePrice:{min:max-5,max,updatedAt:now,source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
-async function boot({observer=false,ios=false}={}){
+async function boot({observer=false,ios=false,venues}={}){
  const requests=[],observers=[],posted=[];
  const {window,document}=parseHTML('<html><body><div id="app"></div></body></html>');
  const values=new Map([['bb-spending-position','450']]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
+ if(venues)dataset.venues=venues;
  window.BYTEBUDGET_CONFIG={apiBase:'https://bb.test'};
  const nativePlatform=ios?'ios':'android';
  const geolocation=ios?`export const Geolocation={
@@ -93,4 +94,23 @@ test('iPhone startup searches once with the precise fix, skipping an earlier coa
  assert.equal(posted.length,1);
  assert.equal(posted[0].lat,44.49);
  assert.equal(posted[0].lng,11.34);
+});
+
+test('live results surface the closest matching venue and keep other nearby prices separate',async()=>{
+ const {document,requests}=await boot({venues:[
+  venue('Hamerica’s','mid',30,{rating:4.0}),
+  venue('Well-reviewed farther restaurant','mid',30,{lat:44.494,rating:4.9,reviewCount:400}),
+  venue('Fradiavolo','mid',20,{lat:44.49012,venuePrice:{min:10,max:20,updatedAt:now,source:'Google Maps priceRange',scope:'venue-estimate',upperExclusive:true}}),
+  venue('Tagliatella','mid',50,{lat:44.49029}),
+  venue('Unknown price','mid',40,{venuePrice:undefined}),
+  venue('Too far for nearby alternatives','low',10,{lat:44.494})
+ ]});
+ assert.deepEqual([...document.querySelectorAll('#results-list .card h3')].map(e=>e.textContent),['Hamerica’s','Well-reviewed farther restaurant']);
+ const alternatives=document.querySelector('#nearby-alternatives');
+ assert.ok(alternatives);
+ assert.deepEqual([...alternatives.querySelectorAll('[data-id]')].map(e=>e.dataset.id),['Fradiavolo','Tagliatella']);
+ const nearby=alternatives.querySelector('[data-id="Fradiavolo"]');
+ nearby.onclick();
+ assert.equal(document.querySelector('main h1')?.textContent,'Fradiavolo');
+ assert.equal(requests.filter(u=>u.endsWith('/api/nearby')).length,1);
 });

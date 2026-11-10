@@ -25,3 +25,5 @@
 /* Capacitor contentInset=never: CSS owns the insets, including while scrolling. */
 .shell{padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .safe-area-top{position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:10;pointer-events:none}
+
+#nearby-alternatives{margin:1.5rem 0}#nearby-alternatives h2{margin:0 0 .35rem}.nearby-option{display:grid;gap:.2rem;width:100%;min-height:44px;padding:.55rem .65rem;text-align:start;background:transparent;color:inherit;border:0;border-bottom:1px solid #deddd2;font-weight:650}.nearby-option small{font-weight:400;color:var(--muted)}

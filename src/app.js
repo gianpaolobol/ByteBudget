@@ -18,7 +18,8 @@ const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fa
 const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
 let lang=read('bb-lang',resolveLanguage(navigator.languages||[navigator.language]));if(typeof lang!=='string'||!Object.hasOwn(strings,lang))lang=resolveLanguage(navigator.languages||[navigator.language]);
 let knownDataset=null,lastSearch=null,detailReturnView='results',selectedMeal='dinner';
-let filterData,filterMeal,bandsForMeal,selectSpending,ranked=[],alternatives=[];
+const CLOSE_BY_DISTANCE=150;
+let filterData,filterMeal,bandsForMeal,selectSpending,ranked=[],alternatives=[],nearbyAlternatives=[];
 let gestureCount=0,pendingRender,filterFrame=false;
 const frame=callback=>typeof requestAnimationFrame==='function'?requestAnimationFrame(callback):Promise.resolve().then(callback);
 let data=null,view='discover',results=[],selected=null,radius=800,spendingPosition=read('bb-spending-position',({low:249,mid:375,high:749,luxury:1000}[read('bb-tier','mid')]||375)),meal='dinner',message='',busy=false;
@@ -38,7 +39,7 @@ function setData(next){
  if(data.demo)write('bb-demo-city',data.city);
  knownDataset=mergeCityDataset(knownDataset,data);lastSearch=null;
  const hour=Number(new Intl.DateTimeFormat('en',{hour:'numeric',hourCycle:'h23',timeZone:data.timeZone}).format(new Date()));
- meal=hour<16?'lunch':'dinner';results=[];alternatives=[];selected=null;view='discover';message='';
+ meal=hour<16?'lunch':'dinner';results=[];alternatives=[];nearbyAlternatives=[];selected=null;view='discover';message='';
 }
 
 const plate=(v=0)=>`<div class="thumb v${[0,1,2].includes(v)?v:0}"><div class="plate" aria-hidden="true"></div></div>`;
@@ -78,13 +79,29 @@ function photoMarkup(v,large=false){
  return `<figure class="venue-photo-wrap ${large?'large':''}"><div class="venue-photo ${large?'large':''}"><span>${t('photoUnavailable')}</span><img data-venue-photo data-photo-url="${esc(url.href)}" hidden alt="${esc(v.name)}" loading="lazy" referrerpolicy="no-referrer"></div>${large&&credits?`<figcaption>${t('photoCredit')} ${credits}</figcaption>`:''}</figure>`;
 }
 function cards(items,alternative=false){return items.map(v=>`<button class="${alternative?'card alternative-card':'card'}" data-id="${esc(v.id)}">${photoMarkup(v)}<div><h3>${esc(v.name)}</h3><p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p><p>${v.price?`${money(v.price.min)}–${money(v.price.max)}${data?.pricingScope==='venue'?priceQualifier(v.price):` / ${t('person')}`}`:t('pricesUnavailable')}</p><p class="subtle">${Math.round(v.distance)} m · <span class="${v.isOpen?'open':''}">${opening(v)}</span></p></div></button>`).join('')}
+function nearbyMarkup(){
+ return `<section id="nearby-alternatives" aria-labelledby="nearby-alternatives-title">
+  <h2 id="nearby-alternatives-title">${t('closeByAlternatives')}</h2>
+  <p class="subtle">${t('budgetAlternatives')}</p>
+  ${nearbyAlternatives.map(venue=>`<button class="nearby-option alternative-card" data-id="${esc(venue.id)}">
+   <span>${esc(venue.name)}</span>
+   <small>${Math.round(venue.distance)} m · ${money(venue.price.min)}–${money(venue.price.max)}${priceQualifier(venue.price)} · ${opening(venue)}</small>
+  </button>`).join('')}
+ </section>`;
+}
 function resultMarkup(){
- if(results.length)return cards(results);
+ if(results.length){
+  if(!nearbyAlternatives.length)return cards(results);
+  const closest=results.filter(venue=>venue.distance<=CLOSE_BY_DISTANCE);
+  const farther=results.filter(venue=>venue.distance>CLOSE_BY_DISTANCE);
+  return cards(closest)+nearbyMarkup()+cards(farther);
+ }
+ if(nearbyAlternatives.length)return `<div class="empty"><h2>${t('empty')}</h2></div>`+nearbyMarkup();
  if(alternatives.length)return `<div class="empty"><h2>${t('empty')}</h2><p>${t('budgetAlternatives')}</p></div>${cards(alternatives,true)}`;
  const imprecise=data?.locationAccuracy>radius/2;
  return `<div class="empty"><h2>${t(imprecise?'impreciseTitle':'empty')}</h2><p>${t(imprecise?'imprecise':'emptyText')}</p></div>`;
 }
-function listing(){const searched=lastSearch?.criteria||{meal,radius,...currentSpending()};return `${locationMarkup()}<h1>${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><span id="result-criteria" class="subtle">${resultCriteria(searched)}</span><button class="secondary" id="refresh" ${busy?'disabled':''}>↻ ${t('refresh')}</button></div>${bands()}${radiusControl()}<p class="subtle" id="result-count">${results.length} · ${t('nearbyCount')}</p><button class="back" id="edit">${t('back')}</button><div id="results-list" data-accuracy="${data?.locationAccuracy>radius/2?'imprecise':'precise'}">${resultMarkup()}</div><p class="subtle">${t('rank')}</p><p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${data.pricingScope==='venue'?t('venueEstimate'):t('partial')}</p>${providerCredits()}<p class="maps-attribution" translate="no">Google Maps</p>`:''}`}
+function listing(){const searched=lastSearch?.criteria||{meal,radius,...currentSpending()};return `${locationMarkup()}<h1>${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><span id="result-criteria" class="subtle">${resultCriteria(searched)}</span><button class="secondary" id="refresh" ${busy?'disabled':''}>↻ ${t('refresh')}</button></div>${bands()}${radiusControl()}<p class="subtle" id="result-count">${results.length} · ${t('nearbyCount')}</p><button class="back" id="edit">${t('back')}</button><div id="results-list" data-accuracy="${data?.locationAccuracy>radius/2?'imprecise':'precise'}">${resultMarkup()}</div><p class="subtle">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p><p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${data.pricingScope==='venue'?t('venueEstimate'):t('partial')}</p>${providerCredits()}<p class="maps-attribution" translate="no">Google Maps</p>`:''}`}
 function detail(){const v=selected;return `<button class="back" id="back">← ${t('back')}</button>${data?.demo?`<div class="detail-hero"><div class="plate" aria-hidden="true"></div></div><span class="subtle">${t('illustration')}</span>`:photoMarkup(v,true)}<h1>${esc(v.name)}</h1><p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p><div class="detail-price">${v.price?`${money(v.price.min)}–${money(v.price.max)}`:t('pricesUnavailable')}</div><p class="subtle">${v.price?.kind==='tasting-menu'?menuLabel(v.price):data?.pricingScope==='venue'?t('venueEstimate'):`${t('person')} · ${t(selectedMeal)}`}</p>${v.price?.kind==='tasting-menu'?`<a class="subtle" href="${esc(v.price.source)}" target="_blank" rel="noopener noreferrer">${t('menu')}</a>`:`<p class="subtle">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}<div class="facts"><span class="badge">⌖ ${Math.round(v.distance)} m</span><span class="badge">${opening(v)}</span></div><p>${esc(v.cuisine)}</p><h2>${t('menu')}</h2>${data?.pricingScope==='venue'?`<p class="subtle">${t('menusUnknown')}</p>`:''}${Array.isArray(v.menu)&&v.menu.length?v.menu.map(i=>`<div class="menu-row"><span>${esc(i.name)}</span><b>${money(i.price)}</b></div>`).join(''):`<p class="subtle">—</p>`}<div class="actions">${!data.demo?`<a data-place-link class="secondary" href="${esc(v.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${encodeURIComponent(v.id)}`)}" target="_blank" rel="noopener noreferrer">${t('viewPlace')}</a>${v.websiteUri?`<a class="secondary" href="${esc(v.websiteUri)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}`:''}<button class="primary" id="route">↗ ${t('directions')}</button><button class="secondary" id="save">${saved.includes(v.id)?t('unsave'):t('save')}</button></div><p class="status" role="status">${esc(message?t(message):'')}</p><p class="subtle">${t('walk')} · ${t('route')}</p>${!data.demo?providerCredits():''}`}
 function savedView(){const items=data?selectSavedVenues(knownDataset.venues,saved,{...data,radius:1000,meal,now:Date.now()}):[];return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
 function render(){if(gestureCount){pendingRender??=render;return}document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}<p class="center"><button class="back" id="about">${t('about')}</button></p><nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
@@ -94,7 +111,7 @@ app.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>{meal=b.dataset.mea
 app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;message='';render();scrollTo(0,0)});
 
 const on=(id,fn)=>{const el=app.querySelector('#'+id);if(el)el.onclick=fn};
-on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t('rank')}</p>`));on('edit',()=>{view='discover';render()});on('back',()=>{view=detailReturnView;message='';render()});on('search',()=>data?.demo||data?.pricingScope==='venue'?search():locate(true));on('refresh',()=>data?.demo?search():locate(true));
+on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t(data?.pricingScope==='venue'?'rankNearby':'rank')}</p>`));on('edit',()=>{view='discover';render()});on('back',()=>{view=detailReturnView;message='';render()});on('search',()=>data?.demo||data?.pricingScope==='venue'?search():locate(true));on('refresh',()=>data?.demo?search():locate(true));
 const spendingInput=app.querySelector('#spending');
 const rad=app.querySelector('#radius');
 if(spendingInput){
@@ -111,7 +128,7 @@ if(rad){
 bindCards();
 on('save',()=>{saved=saved.includes(selected.id)?saved.filter(id=>id!==selected.id):[...saved,selected.id];write('bb-saved',saved);render()});
 on('route',()=>{if(data.demo){message='demoRoute';render();return}window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selected.lat+','+selected.lng)}&travelmode=walking`,'_blank','noopener,noreferrer')});}
-function bindCards(){app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const pool=view==='saved'?selectSavedVenues(knownDataset.venues,saved,{...data,radius:1000,meal,now:Date.now()}):[...results,...alternatives];selected=pool.find(v=>v.id===b.dataset.id);selectedMeal=view==='results'?(lastSearch?.criteria.meal||meal):meal;detailReturnView=view;view='detail';message='';render();scrollTo(0,0)});photoObserver?.disconnect();if(gestureCount)return;const images=app.querySelectorAll('[data-venue-photo]');
+function bindCards(){app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const pool=view==='saved'?selectSavedVenues(knownDataset.venues,saved,{...data,radius:1000,meal,now:Date.now()}):[...results,...nearbyAlternatives,...alternatives];selected=pool.find(v=>v.id===b.dataset.id);selectedMeal=view==='results'?(lastSearch?.criteria.meal||meal):meal;detailReturnView=view;view='detail';message='';render();scrollTo(0,0)});photoObserver?.disconnect();if(gestureCount)return;const images=app.querySelectorAll('[data-venue-photo]');
  const load=img=>{
  img.onerror=()=>{img.hidden=true};const url=new URL(img.dataset.photoUrl);url.searchParams.set('format','json');
  if(!photoLoads.has(url.href))photoLoads.set(url.href,fetch(url.href,{signal:AbortSignal.timeout(12000)}).then(async r=>{if(!r.ok)throw Error();const p=await r.json();const u=new URL(p.photoUri);if(u.protocol!=='https:'||!(u.hostname.endsWith('.googleusercontent.com')||u.hostname.endsWith('.ggpht.com')))throw Error();return u.href}).catch(()=>null));
@@ -145,13 +162,13 @@ function updateFilters(){
  app.querySelectorAll('[data-tier-label]').forEach(el=>el.classList.toggle('active',el.dataset.tierLabel===selection.tier));
  setText(app.querySelector('#distance-label'),radius+' m');
  if(view!=='results'||!data.demo&&data.pricingScope!=='venue')return;
- const previous=results.map(v=>v.id).join(),previousAlternatives=alternatives.map(v=>v.id).join();
+ const previous=results.map(v=>v.id).join(),previousAlternatives=alternatives.map(v=>v.id).join(),previousNearby=nearbyAlternatives.map(v=>v.id).join();
  computeResults();
  setText(app.querySelector('#result-criteria'),resultCriteria(lastSearch.criteria));
  setText(app.querySelector('#result-count'),results.length+' · '+t('nearbyCount'));
  const list=app.querySelector('#results-list');
  const state=data?.locationAccuracy>radius/2?'imprecise':'precise';
- if(previous!==results.map(v=>v.id).join()||previousAlternatives!==alternatives.map(v=>v.id).join()||list.dataset.accuracy!==state){
+ if(previous!==results.map(v=>v.id).join()||previousAlternatives!==alternatives.map(v=>v.id).join()||previousNearby!==nearbyAlternatives.map(v=>v.id).join()||list.dataset.accuracy!==state){
   list.dataset.accuracy=state;
   list.innerHTML=resultMarkup();
   bindCards();
@@ -165,8 +182,17 @@ function computeResults(){
  const selection=currentSpending();
  const inRadius=data?.locationAccuracy>radius/2?[]:ranked.filter(({venue})=>venue.distance<=radius);
  results=inRadius.filter(({tier,cap})=>tier===selection.tier&&(selection.maxPrice==null||cap<=selection.maxPrice)).map(({venue})=>venue);
- alternatives=[];
- if(!results.length&&data.pricingScope==='venue'&&bandsForMeal){
+ alternatives=[];nearbyAlternatives=[];
+ if(data.pricingScope==='venue'){
+  const matching=new Set(results.map(venue=>venue.id));
+  results.sort((a,b)=>{
+   if(a.distance<=CLOSE_BY_DISTANCE||b.distance<=CLOSE_BY_DISTANCE)return a.distance-b.distance;
+   return b.score-a.score||a.distance-b.distance;
+  });
+  nearbyAlternatives=inRadius.filter(({venue})=>venue.distance<=CLOSE_BY_DISTANCE&&!matching.has(venue.id))
+   .sort((a,b)=>a.venue.distance-b.venue.distance).slice(0,12).map(({venue})=>venue);
+ }
+ if(!results.length&&!nearbyAlternatives.length&&data.pricingScope==='venue'&&bandsForMeal){
   const target=selection.maxPrice??(selection.unlimited?bandsForMeal.highMax:null);
   if(target!==null)alternatives=inRadius.sort((a,b)=>Math.abs(a.cap-target)-Math.abs(b.cap-target)).slice(0,3).map(({venue})=>venue);
  }
