@@ -8,6 +8,18 @@ const MASK='places.id,places.displayName,places.location,places.rating,places.us
 const answer=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const failure=(error,status)=>answer({error},status);
 const language=value=>({zh:'zh-CN'}[value]||(['en','it','es','de','fr','pt','ru','ja','ko','ar','hi'].includes(value)?value:'en'));
+// Live provider IDs confirmed by smaller searches in two reported coverage gaps.
+const coverageChecks=[
+ {center:{latitude:44.4946,longitude:11.34675},places:[
+  ['ChIJ_2EAwErVf0cRBWPUgCBfOJ0',44.4946971,11.3467351],
+  ['ChIJzS_TY77Uf0cRdfyq-FzZS5U',44.494375,11.3463059],
+  ['ChIJqeBAYL7Uf0cRMNEL19QaggA',44.4941819,11.3461148]
+ ]},
+ {center:{latitude:44.49145,longitude:11.34914},places:[
+  ['ChIJw2CCzLjUf0cRCkzsWFBRLBQ',44.4918852,11.3482866],
+  ['ChIJC_7OYQDVf0cRdt752_-8mrY',44.4906446,11.349405]
+ ]}
+];
 export function nearbyConfigured(env){return env.LIVE_SEARCH_ENABLED==='true'&&env.DISCOVERY_MODE==='nearby'&&!!env.GOOGLE_PLACES_API_KEY&&providerBudgetConfigured(env)}
 function amount(money,currency){
  if(!money||money.currencyCode!==currency||!/^\d+$/.test(String(money.units??'0'))||!Number.isInteger(money.nanos??0)||(money.nanos??0)<0||(money.nanos??0)>999999999)return null;
@@ -73,14 +85,24 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
    const sample=[...venues.values()];
    const bands=cityBands(sample,'dinner',currency,current,null,country);
    const found=new Set(sample.map(venue=>sourceVenueTier(venue,'dinner',currency,current,bands)));
-   const enrich=async(body,onlyId)=>{
+   const enrich=async(body,onlyIds)=>{
     if(await reserveProviderSearch(env)!=='reserved')return;
     try{
      const places=await readPlaces(body,1800);
-     merge(onlyId?places.filter(place=>place.id===onlyId):places);
+     merge(onlyIds?places.filter(place=>onlyIds.includes(place.id)):places);
     }catch{/* Keep the distance results when supplemental coverage is unavailable. */}
    };
    const supplemental=[];
+   if(nearest.length===20){
+    for(const {center:localCenter,places} of coverageChecks){
+     const missing=places.filter(([id,lat,lng])=>!venues.has(id)&&distanceMeters(input.lat,input.lng,lat,lng)<=input.radius).map(([id])=>id);
+     if(missing.length) supplemental.push(enrich({
+      includedTypes:['restaurant','cafe','bar','bakery','meal_takeaway'],
+      maxResultCount:20,rankPreference:'DISTANCE',languageCode:locale,
+      locationRestriction:{circle:{center:localCenter,radius:100}}
+     },missing));
+    }
+   }
    if(nearest.length>=8&&(nearest.length===20||!found.has('mid')||!found.has('high'))){
     supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:20,rankPreference:'POPULARITY',languageCode:locale,locationRestriction:{circle:{center,radius:input.radius}}}));
    }
@@ -116,7 +138,7 @@ export function createNearbyHandler({fetch:fetcher=(...args)=>globalThis.fetch(.
     const tier=PRICE_TIERS.find(tier=>matchesTier(menu.price,tier,bands));
     if(!tier||checkedTiers.has(tier)||venues.has(menu.id))continue;
     checkedTiers.add(tier);
-    supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},menu.id));
+    supplemental.push(enrich({includedTypes:['restaurant'],maxResultCount:8,rankPreference:'DISTANCE',languageCode:locale,locationRestriction:{circle:{center:{latitude:menu.lat,longitude:menu.lng},radius:35}}},[menu.id]));
     if(++menuLookups===2)break;
    }
    await Promise.all(supplemental);

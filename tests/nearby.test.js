@@ -89,3 +89,24 @@ test('a published tasting menu uses only the matching live venue inside the radi
  const outside=await (await h(request({radius:100}),{...env,...budgetEnvironment()})).json();
  assert.deepEqual(outside.venues,[]);
 });
+
+test('known coverage gaps are rechecked against live data on saturated searches',async()=>{
+ const gingio=place({id:'ChIJzS_TY77Uf0cRdfyq-FzZS5U',location:{latitude:44.494375,longitude:11.3463059}});
+ const capuano=place({id:'ChIJC_7OYQDVf0cRdt752_-8mrY',location:{latitude:44.4906446,longitude:11.349405}});
+ const unrelated=place({id:'unrelated',location:gingio.location});
+ const h=createNearbyHandler({fetch:async(url,options)=>{
+  if(String(url).includes('geocode'))return Response.json(geocode('Bologna','IT'));
+  const {radius,center}=JSON.parse(options.body).locationRestriction.circle;
+  if(radius===1000&&JSON.parse(options.body).rankPreference==='DISTANCE'){
+   return Response.json({places:Array.from({length:20},(_,i)=>place({id:'initial-'+i}))});
+  }
+  if(radius!==100)return Response.json({places:[]});
+  return Response.json({places:center.latitude>44.493?[gingio,unrelated]:[capuano]});
+ }});
+ const response=await h(request({lat:44.4934283,lng:11.3470742,radius:1000}),{...env,...budgetEnvironment()});
+ const data=await response.json();
+ assert.equal(response.status,200);
+ assert.equal(data.venues.length,22);
+ for(const id of [capuano.id,gingio.id])assert.ok(data.venues.some(v=>v.id===id),id);
+ assert.ok(!data.venues.some(v=>v.id===unrelated.id));
+});
