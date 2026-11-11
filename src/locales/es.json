@@ -84,5 +84,8 @@
   "numericBandsNote": "Franjas según precios numéricos locales. Se excluyen locales sin precio.",
   "priceUncertain": "Comprueba el precio: la estimación supera en parte tu presupuesto.",
   "uncertainBudget": "Compatibilidad de precio por confirmar",
-  "approximateLocation": "Distancias aproximadas mientras mejora la ubicación."
+  "approximateLocation": "Distancias aproximadas mientras mejora la ubicación.",
+  "openPilotLabel": "Beta de datos abiertos · Bolonia centro y Savigno",
+  "openPilotCoverage": "Estás fuera de las zonas de la beta: Bolonia centro y Savigno.",
+  "openPilotRank": "Los locales se ordenan por distancia. Tu ubicación permanece en el dispositivo y los horarios disponibles proceden de OpenStreetMap."
 }

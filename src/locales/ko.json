@@ -84,5 +84,8 @@
   "numericBandsNote": "현지 숫자 가격으로 분류하며 가격이 없는 매장은 제외합니다.",
   "priceUncertain": "가격을 확인하세요. 예상 금액이 예산을 일부 초과합니다.",
   "uncertainBudget": "예산 적합 여부 확인",
-  "approximateLocation": "위치 정확도가 개선되는 동안 거리는 대략적인 값입니다."
+  "approximateLocation": "위치 정확도가 개선되는 동안 거리는 대략적인 값입니다.",
+  "openPilotLabel": "공개 데이터 베타 · 볼로냐 중심부와 사비뇨",
+  "openPilotCoverage": "베타 범위인 볼로냐 중심부와 사비뇨를 벗어났습니다.",
+  "openPilotRank": "매장은 거리순입니다. 위치는 기기에 남으며, 영업시간은 OpenStreetMap에서 가져옵니다."
 }

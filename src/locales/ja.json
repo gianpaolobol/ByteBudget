@@ -84,5 +84,8 @@
   "numericBandsNote": "現地の数値価格で分類。価格不明の店舗は除外されます。",
   "priceUncertain": "料金をご確認ください。推定額が予算を一部超えています。",
   "uncertainBudget": "予算に合うか要確認",
-  "approximateLocation": "位置を補正中のため距離は目安です。"
+  "approximateLocation": "位置を補正中のため距離は目安です。",
+  "openPilotLabel": "オープンデータ ベータ版 · ボローニャ中心部とサヴィーニョ",
+  "openPilotCoverage": "ボローニャ中心部とサヴィーニョのベータ対象地域外です。",
+  "openPilotRank": "店舗は距離順です。位置情報は端末に保持され、営業時間は OpenStreetMap に基づきます。"
 }

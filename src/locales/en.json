@@ -84,5 +84,8 @@
   "numericBandsNote": "Bands use local numeric prices. Venues without prices are excluded.",
   "priceUncertain": "Check the price: the estimate partly exceeds your budget.",
   "uncertainBudget": "Check budget compatibility",
-  "approximateLocation": "Approximate distances while location accuracy improves."
+  "approximateLocation": "Approximate distances while location accuracy improves.",
+  "openPilotLabel": "Open data beta · Central Bologna and Savigno",
+  "openPilotCoverage": "You are outside the beta areas: central Bologna and Savigno.",
+  "openPilotRank": "Venues are sorted by distance. Your location stays on this device and available hours come from OpenStreetMap."
 }

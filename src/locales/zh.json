@@ -84,5 +84,8 @@
   "numericBandsNote": "按当地具体价格分档；无价格信息的商家不列入结果。",
   "priceUncertain": "请核实价格：估计费用可能超过部分预算。",
   "uncertainBudget": "需核实预算是否合适",
-  "approximateLocation": "位置正在精确定位，距离为估计值。"
+  "approximateLocation": "位置正在精确定位，距离为估计值。",
+  "openPilotLabel": "开放数据测试版 · 博洛尼亚市中心与萨维尼奥",
+  "openPilotCoverage": "当前位置不在测试范围内：博洛尼亚市中心与萨维尼奥。",
+  "openPilotRank": "地点按距离排序。位置信息保留在设备上，营业时间来自 OpenStreetMap。"
 }

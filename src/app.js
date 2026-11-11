@@ -1,3 +1,4 @@
+import {openPilotDataset,selectOpenPilotVenues} from './open-pilot.js';
 import {initialDemoDataset,discoverDemoPreview} from './bootstrap.js';
 import {mergeCityDataset,selectSavedVenues} from './search-state.js';
 import {strings,languages,resolveLanguage,direction} from './i18n.js';
@@ -6,11 +7,12 @@ import {Geolocation} from '@capacitor/geolocation';
 import {getForegroundPosition,getIosForegroundPosition} from './location.js';
 import {createLiveUpdates} from './live-updates.js';
 import {loadLiveRestaurants} from './live-client.js';
-import {cityBands} from './domain.js';
+import {cityBands,distanceMeters} from './domain.js';
 import {DISCOVERY_RADIUS,DISCOVERY_GROUPS,rankDiscovery} from './discovery-ranking.js';
 import {validateDataset} from './provider.js';
 import {demoCity} from './demo.js';
 const app=document.querySelector('#app');
+const openPilot=typeof __BYTEBUDGET_OPEN_PILOT__!=='undefined'&&__BYTEBUDGET_OPEN_PILOT__;
 const photoLoads=new Map(),observedPhotos=new Set();let photoObserver;
 let demoPreview=__BYTEBUDGET_ALLOW_DEMO__&&document.documentElement.dataset.demoPreview==='true';
 
@@ -40,18 +42,21 @@ function setData(next){
 }
 
 const plate=(v=0)=>`<div class="thumb v${[0,1,2].includes(v)?v:0}"><div class="plate" aria-hidden="true"></div></div>`;
-function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></header>${data?.demo?`<div class="notice">${t('demo')}</div>`:''}`}
+function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></header>${openPilot?`<div class="notice">${t('openPilotLabel')}</div>`:data?.demo?`<div class="notice">${t('demo')}</div>`:''}`}
 function providerCredits(){
  const credits=new Map();for(const v of data?.venues||[])for(const a of v.attributions||[]){if(typeof a.provider!=='string')continue;let url;try{const u=new URL(a.providerUri);if(u.protocol==='https:')url=u.href}catch{}credits.set(a.provider,{name:a.provider,url});}
  return [...credits.values()].map(a=>`<p class="subtle">${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.name)}</a>`:esc(a.name)}</p>`).join('');
 }
 function demoLocation(){return data?.demo?`<div class="location"><button id="location">${esc(data.city)}</button></div>`:''}
-function mapsAttribution(){return data&&!data.demo?'<p class="maps-attribution" translate="no">Google Maps</p>':''}
-function discover(){return `${demoLocation()}<h1 class="tagline">${t('tag')}</h1><p class="subtle">${t('desc')}</p><div class="hero"><strong>${t('hero')}</strong>${data?.demo?'<div class="plate" aria-hidden="true"></div>':''}</div>${data?.pricingScope==='venue'?'':`<div class="segmented" aria-label="${t('lunch')} / ${t('dinner')}"><button data-meal="lunch" class="${meal==='lunch'?'active':''}" aria-pressed="${meal==='lunch'}">${t('lunch')}</button><button data-meal="dinner" class="${meal==='dinner'?'active':''}" aria-pressed="${meal==='dinner'}">${t('dinner')}</button></div>`}<p class="status" role="status">${esc(message?t(message):'')}</p><button class="primary" id="search" ${busy?'disabled':''}>${t('find')}</button>${!data&&demoPreview?`<button class="secondary demo-switch" id="demo">${t('try')}</button>`:`<p class="subtle center">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}`}
+function mapsAttribution(){
+ if(openPilot)return '<p class="maps-attribution open-pilot-attribution"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a> · <a href="https://docs.overturemaps.org/attribution/" target="_blank" rel="noopener noreferrer">Overture Maps Foundation</a> · <a href="./public/open-pilot-catalog.json" download>JSON</a></p>';
+ return data&&!data.demo?'<p class="maps-attribution" translate="no">Google Maps</p>':''}
+function discover(){return `${demoLocation()}<h1 class="tagline">${t('tag')}</h1><p class="subtle">${t('desc')}</p><div class="hero"><strong>${t('hero')}</strong>${data?.demo?'<div class="plate" aria-hidden="true"></div>':''}</div>${openPilot||data?.pricingScope==='venue'?'':`<div class="segmented" aria-label="${t('lunch')} / ${t('dinner')}"><button data-meal="lunch" class="${meal==='lunch'?'active':''}" aria-pressed="${meal==='lunch'}">${t('lunch')}</button><button data-meal="dinner" class="${meal==='dinner'?'active':''}" aria-pressed="${meal==='dinner'}">${t('dinner')}</button></div>`}<p class="status" role="status">${esc(message?t(message):'')}</p><button class="primary" id="search" ${busy?'disabled':''}>${t('find')}</button>${openPilot?'':!data&&demoPreview?`<button class="secondary demo-switch" id="demo">${t('try')}</button>`:`<p class="subtle center">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}`}
 function menuLabel(price){return t(price.meal==='dinner'?'dinnerTastingMenu':'tastingMenu')}
 function priceQualifier(price){return price?.kind==='tasting-menu'?' · '+menuLabel(price):''}
 function opening(v){return v.openingStatus==='unknown'?t('hoursUnknown'):v.isOpen?t('open'):t('closedNow')}
 function photoMarkup(v,large=false){
+ if(openPilot)return `<div class="venue-photo category-icon ${large?'large':''}" aria-hidden="true">${({cafe:'☕',bar:'🍷',pub:'🍺',bakery:'🥖',fast_food:'🥡'})[v.category]||'🍽'}</div>`;
  if(data?.demo)return plate(v.visual);
  if(!v.photo)return `<div class="venue-photo ${large?'large':''}"><span>${t('photoUnavailable')}</span></div>`;
  const url=new URL('/api/photo',window.BYTEBUDGET_CONFIG?.apiBase||location.origin);url.searchParams.set('name',v.photo.name);
@@ -59,30 +64,52 @@ function photoMarkup(v,large=false){
  return `<figure class="venue-photo-wrap ${large?'large':''}"><div class="venue-photo ${large?'large':''}"><span>${t('photoUnavailable')}</span><img data-venue-photo data-photo-url="${esc(url.href)}" hidden alt="${esc(v.name)}" loading="lazy" referrerpolicy="no-referrer"></div>${large&&credits?`<figcaption>${t('photoCredit')} ${credits}</figcaption>`:''}</figure>`;
 }
 function cardVersion(v){return JSON.stringify([v.name,v.currency,v.rating,v.reviewCount,v.price?.min,v.price?.max,v.price?.kind,v.isOpen,v.openingStatus,v.photo?.name])}
+function ratingMarkup(v){
+ return Number.isFinite(v.rating)?`<p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p>`:'';
+}
+function placeUrl(v){
+ if(openPilot)return `https://www.openstreetmap.org/?mlat=${v.lat}&mlon=${v.lng}#map=19/${v.lat}/${v.lng}`;
+ return v.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${encodeURIComponent(v.id)}`;
+}
+function savedItems(){
+ if(!data)return [];
+ if(openPilot)return selectOpenPilotVenues(data,Date.now(),saved);
+ return selectSavedVenues(knownDataset.venues,saved,{...data,radius:DISCOVERY_RADIUS,meal,now:Date.now()});
+}
 function cards(items){
- return items.map(v=>`<article class="card" data-card-id="${esc(v.id)}" data-card-version="${esc(cardVersion(v))}"><button class="card-open" data-id="${esc(v.id)}" aria-label="${esc(v.name)}">${photoMarkup(v)}<div><h3>${esc(v.name)}</h3><p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p><p>${v.price?`${money(v.price.min)}–${money(v.price.max)}${priceQualifier(v.price)}`:t('pricesUnavailable')}</p><p class="subtle"><span data-distance="${esc(v.id)}">${Math.round(v.distance)} m</span> · <span class="${v.isOpen?'open':''}">${opening(v)}</span></p></div></button><button class="favorite" data-save-id="${esc(v.id)}" aria-label="${t(saved.includes(v.id)?'unsave':'save')} · ${esc(v.name)}" aria-pressed="${saved.includes(v.id)}"><span aria-hidden="true">${saved.includes(v.id)?'♥':'♡'}</span></button></article>`).join('');
+ return items.map(v=>`<article class="card" data-card-id="${esc(v.id)}" data-card-version="${esc(cardVersion(v))}"><button class="card-open" data-id="${esc(v.id)}" aria-label="${esc(v.name)}">${photoMarkup(v)}<div><h3>${esc(v.name)}</h3>${ratingMarkup(v)}<p>${v.price?`${money(v.price.min)}–${money(v.price.max)}${priceQualifier(v.price)}`:t('pricesUnavailable')}</p><p class="subtle"><span data-distance="${esc(v.id)}">${Math.round(v.distance)} m</span> · <span class="${v.isOpen?'open':''}">${opening(v)}</span></p></div></button><button class="favorite" data-save-id="${esc(v.id)}" aria-label="${t(saved.includes(v.id)?'unsave':'save')} · ${esc(v.name)}" aria-pressed="${saved.includes(v.id)}"><span aria-hidden="true">${saved.includes(v.id)?'♥':'♡'}</span></button></article>`).join('');
 }
 function listing(){
  const sections=DISCOVERY_GROUPS.map(tier=>{
   const venues=resultGroups[tier]||[];
   return `<section class="price-group" data-price-group="${tier}" ${venues.length?'':'hidden'}>${tier==='unclassified'?'':`<h2>${t(tier)}</h2>`}<div>${cards(venues)}</div></section>`;
  }).join('');
- return `<h1 class="visually-hidden">${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><p class="subtle" id="result-count">${resultCount} · ${t('nearbyCount')}</p></div><div id="results-list">${sections}<div class="empty" ${resultCount||busy?'hidden':''}><h2>${t('empty')}</h2><p>${t('emptyText')}</p></div></div>${mapsAttribution()}<p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${t('venueEstimate')}</p>${providerCredits()}`:''}`;
+ return `<h1 class="visually-hidden">${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><p class="subtle" id="result-count">${resultCount} · ${t('nearbyCount')}</p></div><div id="results-list">${sections}<div class="empty" ${resultCount||busy||openPilot&&!data.city?'hidden':''}><h2>${t('empty')}</h2><p>${t('emptyText')}</p></div></div>${mapsAttribution()}<p class="subtle">${t('walk')}</p>${openPilot?'':!data.demo?`<p class="subtle">${t('venueEstimate')}</p>${providerCredits()}`:''}`;
 }
-function detail(){const v=selected;return `<button class="back" id="back">← ${t('back')}</button>${data?.demo?`<div class="detail-hero"><div class="plate" aria-hidden="true"></div></div><span class="subtle">${t('illustration')}</span>`:photoMarkup(v,true)}<h1>${esc(v.name)}</h1><p><span class="star">★</span> <b>${v.rating.toFixed(1)}</b> (${v.reviewCount.toLocaleString(lang)})</p><div class="detail-price">${v.price?`${money(v.price.min)}–${money(v.price.max)}`:t('pricesUnavailable')}</div><p class="subtle">${v.price?.kind==='tasting-menu'?menuLabel(v.price):data?.pricingScope==='venue'?t('venueEstimate'):`${t('person')} · ${t(selectedMeal)}`}</p>${v.price?.kind==='tasting-menu'?`<a class="subtle" href="${esc(v.price.source)}" target="_blank" rel="noopener noreferrer">${t('menu')}</a>`:`<p class="subtle">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}<div class="facts"><span class="badge">⌖ ${Math.round(v.distance)} m</span><span class="badge">${opening(v)}</span></div><p>${esc(v.cuisine)}</p><h2>${t('menu')}</h2>${data?.pricingScope==='venue'?`<p class="subtle">${t('menusUnknown')}</p>`:''}${Array.isArray(v.menu)&&v.menu.length?v.menu.map(i=>`<div class="menu-row"><span>${esc(i.name)}</span><b>${money(i.price)}</b></div>`).join(''):`<p class="subtle">—</p>`}<div class="actions">${!data.demo?`<a data-place-link class="secondary" href="${esc(v.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name)}&query_place_id=${encodeURIComponent(v.id)}`)}" target="_blank" rel="noopener noreferrer">${t('viewPlace')}</a>${v.websiteUri?`<a class="secondary" href="${esc(v.websiteUri)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}`:''}<button class="primary" id="route">↗ ${t('directions')}</button><button class="secondary" id="save">${saved.includes(v.id)?t('unsave'):t('save')}</button></div><p class="status" role="status">${esc(message?t(message):'')}</p><p class="subtle">${t('walk')} · ${t('route')}</p>${!data.demo?providerCredits():''}`}
-function savedView(){const items=data?selectSavedVenues(knownDataset.venues,saved,{...data,radius:DISCOVERY_RADIUS,meal,now:Date.now()}):[];return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
+function detail(){const v=selected;return `<button class="back" id="back">← ${t('back')}</button>${data?.demo?`<div class="detail-hero"><div class="plate" aria-hidden="true"></div></div><span class="subtle">${t('illustration')}</span>`:photoMarkup(v,true)}<h1>${esc(v.name)}</h1>${ratingMarkup(v)}<div class="detail-price">${v.price?`${money(v.price.min)}–${money(v.price.max)}`:t('pricesUnavailable')}</div><p class="subtle">${openPilot?'':v.price?.kind==='tasting-menu'?menuLabel(v.price):data?.pricingScope==='venue'?t('venueEstimate'):`${t('person')} · ${t(selectedMeal)}`}</p>${openPilot?'':v.price?.kind==='tasting-menu'?`<a class="subtle" href="${esc(v.price.source)}" target="_blank" rel="noopener noreferrer">${t('menu')}</a>`:`<p class="subtle">${data?.pricingScope==='venue'?t('venueEstimate'):t('priceNote')}</p>`}<div class="facts"><span class="badge">⌖ ${Math.round(v.distance)} m</span><span class="badge">${opening(v)}</span></div><p>${esc(v.cuisine)}</p>${openPilot?'':`<h2>${t('menu')}</h2>${data?.pricingScope==='venue'?`<p class="subtle">${t('menusUnknown')}</p>`:''}${Array.isArray(v.menu)&&v.menu.length?v.menu.map(i=>`<div class="menu-row"><span>${esc(i.name)}</span><b>${money(i.price)}</b></div>`).join(''):`<p class="subtle">—</p>`}`}<div class="actions">${!data.demo?`<a data-place-link class="secondary" href="${esc(placeUrl(v))}" target="_blank" rel="noopener noreferrer">${t('viewPlace')}</a>${v.websiteUri?`<a class="secondary" href="${esc(v.websiteUri)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}`:''}<button class="primary" id="route">↗ ${t('directions')}</button><button class="secondary" id="save">${saved.includes(v.id)?t('unsave'):t('save')}</button></div><p class="status" role="status">${esc(message?t(message):'')}</p><p class="subtle">${t('walk')} · ${t('route')}</p>${!data.demo?providerCredits():''}`}
+function savedView(){const items=savedItems();return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
 function render(){if(view==='results')computeResults();photoObserver?.disconnect();photoObserver=null;observedPhotos.clear();document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}${view==='detail'||view==='saved'?mapsAttribution():''}<p class="center"><button class="back" id="about">${t('about')}</button></p><nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
 app.querySelector('#language').disabled=busy&&!liveUpdates;
 app.querySelector('#language').onchange=e=>{lang=e.target.value;write('bb-lang',lang);render()};
 app.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>{meal=b.dataset.meal;render()});
-app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view==='discover'&&data?'results':b.dataset.view;message='';render();scrollTo(0,0)});
+app.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view==='discover'&&data?'results':b.dataset.view;message=openPilot&&data&&!data.city&&view==='results'?'openPilotCoverage':'';render();scrollTo(0,0)});
 
 const on=(id,fn)=>{const el=app.querySelector('#'+id);if(el)el.onclick=fn};
-on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t('rankNearby')}</p>`));on('back',()=>{view=detailReturnView;message='';render()});on('search',()=>data?.demo?search():locate(true));
+on('location',chooseLocation);on('demo',chooseLocation);on('about',()=>showDialog(`<h2>${t('about')}</h2><p class="privacy">${t('privacy')}</p>${openPilot?'':!data?.demo?`<p class="privacy">${t('livePrivacy')}</p>`:''}<p class="privacy">${t(openPilot?'openPilotRank':'rankNearby')}</p>`));on('back',()=>{view=detailReturnView;message=openPilot&&!data.city?'openPilotCoverage':'';render()});on('search',()=>{
+ if(data?.demo){search();return}
+ if(openPilot&&liveUpdates){stopLocationWatch();void startLocationWatch();return}
+ void locate(true);
+});
 bindCards();
 on('save',()=>{toggleSaved(selected.id);render()});
-on('route',()=>{if(data.demo){message='demoRoute';render();return}window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selected.lat+','+selected.lng)}&travelmode=walking`,'_blank','noopener,noreferrer')});}
-function bindCards(){app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const pool=view==='saved'?selectSavedVenues(knownDataset.venues,saved,{...data,radius:DISCOVERY_RADIUS,meal,now:Date.now()}):Object.values(resultGroups).flat();selected=pool.find(v=>v.id===b.dataset.id);selectedMeal=meal;detailReturnView=view;view='detail';message='';render();scrollTo(0,0)});const images=app.querySelectorAll('[data-venue-photo]');
+on('route',()=>{if(data.demo){message='demoRoute';render();return}
+ if(openPilot){
+  const target=encodeURIComponent(selected.lat+','+selected.lng);
+  const url=Capacitor.getPlatform()==='ios'?`https://maps.apple.com/?daddr=${target}&dirflg=w`:placeUrl(selected);
+  window.open(url,'_blank','noopener,noreferrer');return;
+ }
+ window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selected.lat+','+selected.lng)}&travelmode=walking`,'_blank','noopener,noreferrer')});}
+function bindCards(){app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const pool=view==='saved'?savedItems():Object.values(resultGroups).flat();selected=pool.find(v=>v.id===b.dataset.id);selectedMeal=meal;detailReturnView=view;view='detail';message='';render();scrollTo(0,0)});const images=app.querySelectorAll('[data-venue-photo]');
  app.querySelectorAll('[data-save-id]').forEach(button=>button.onclick=()=>toggleSaved(button.dataset.saveId));
  const load=img=>{
  img.onerror=()=>{img.hidden=true};const url=new URL(img.dataset.photoUrl);url.searchParams.set('format','json');
@@ -105,9 +132,9 @@ function toggleSaved(id){
  write('bb-saved',saved);
  app.querySelectorAll('[data-save-id]').forEach(button=>{
   if(button.dataset.saveId!==id)return;
-  const venue=knownDataset?.venues.find(venue=>venue.id===id);
+  const name=button.closest('.card')?.querySelector('h3')?.textContent||'';
   button.setAttribute('aria-pressed',String(saved.includes(id)));
-  button.setAttribute('aria-label',t(saved.includes(id)?'unsave':'save')+' · '+(venue?.name||''));
+  button.setAttribute('aria-label',t(saved.includes(id)?'unsave':'save')+' · '+name);
   button.querySelector('span').textContent=saved.includes(id)?'♥':'♡';
  });
  if(view==='saved')render();
@@ -139,7 +166,7 @@ function updateResults(){
  const count=app.querySelector('#result-count');
  const label=resultCount+' · '+t('nearbyCount');
  if(count.textContent!==label)count.textContent=label;
- app.querySelector('#results-list .empty').toggleAttribute('hidden',resultCount>0||busy);
+ app.querySelector('#results-list .empty').toggleAttribute('hidden',resultCount>0||busy||openPilot&&!data.city);
  for(const section of app.querySelectorAll('[data-price-group]')){
   const venues=resultGroups[section.dataset.priceGroup];
   section.toggleAttribute('hidden',venues.length===0);
@@ -149,6 +176,15 @@ function updateResults(){
 }
 function computeResults(){
  const now=Date.now();
+ if(openPilot){
+  const minute=Math.floor(now/60000);
+  if(rankedData===data&&rankedMinute===minute)return;
+  rankedData=data;rankedMinute=minute;
+  const nearby=selectOpenPilotVenues(data,now);
+  resultGroups=Object.fromEntries(DISCOVERY_GROUPS.map(group=>[group,group==='unclassified'?nearby:[]]));
+  resultCount=nearby.length;
+  return;
+ }
  if(data.pricingScope==='venue'){
   const hour=Number(new Intl.DateTimeFormat('en',{hour:'numeric',hourCycle:'h23',timeZone:data.timeZone}).format(now));
   meal=hour<16?'lunch':'dinner';
@@ -188,6 +224,7 @@ async function locate(refresh=false,automatic=false){
   const acquirePosition=ios
    ?()=>getIosForegroundPosition(Geolocation,DISCOVERY_RADIUS)
    :()=>getForegroundPosition(options=>Geolocation.getCurrentPosition(options),DISCOVERY_RADIUS,{preciseOnly:native});
+  if(openPilot){applyPilotPosition(await acquirePosition());return}
   const next=await loadLiveRestaurants({origin:location.origin,automatic,native,nativeNearby:ios,apiBase,radius:DISCOVERY_RADIUS,allPrices:true,meal,language:lang,locate:acquirePosition,onPosition:()=>{
    message='loadingNearby';
    const status=app.querySelector('.status');
@@ -248,10 +285,21 @@ async function startLocationWatch(){
   watchRegistration.catch(error=>{if(generation===watchGeneration)liveError(error)});
  }catch(error){if(generation===watchGeneration)liveError(error)}
 }
+function applyPilotPosition(position){
+ const next=openPilotDataset(position.coords);
+ if(data?.city===next.city&&distanceMeters(data.lat,data.lng,next.lat,next.lng)<5)return;
+ const first=!data;
+ data=next;busy=false;message=data.city?'':'openPilotCoverage';
+ if(first||view==='discover'){view='results';render()}
+ else if(view==='results'){
+  updateResults();
+  app.querySelector('.status').textContent=message?t(message):'';
+ }
+}
 function startLiveMode(){
  if(typeof Geolocation.watchPosition!=='function')return false;
  const native=Capacitor.isNativePlatform(),apiBase=window.BYTEBUDGET_CONFIG?.apiBase;
- liveUpdates=createLiveUpdates({
+ liveUpdates=openPilot?{position:applyPilotPosition,stop(){},resume(){}}:createLiveUpdates({
   search:async(position,onNearby,{extended})=>loadLiveRestaurants({
    origin:location.origin,native,nativeNearby:native,automatic:true,apiBase,radius:DISCOVERY_RADIUS,allPrices:true,
    meal,language:lang,locate:async()=>position,onNearby,quick:!extended

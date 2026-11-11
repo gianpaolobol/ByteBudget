@@ -84,5 +84,8 @@
   "numericBandsNote": "Faixas baseadas em preços numéricos locais. Locais sem preço excluídos.",
   "priceUncertain": "Confirma o preço: a estimativa excede parcialmente o orçamento.",
   "uncertainBudget": "Compatibilidade do orçamento por confirmar",
-  "approximateLocation": "Distâncias aproximadas enquanto a localização melhora."
+  "approximateLocation": "Distâncias aproximadas enquanto a localização melhora.",
+  "openPilotLabel": "Beta de dados abertos · Centro de Bolonha e Savigno",
+  "openPilotCoverage": "Está fora das zonas da beta: centro de Bolonha e Savigno.",
+  "openPilotRank": "Os locais são ordenados por distância. A localização fica no dispositivo e os horários disponíveis vêm do OpenStreetMap."
 }

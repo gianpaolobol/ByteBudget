@@ -84,5 +84,8 @@
   "numericBandsNote": "Fasce basate sugli importi numerici locali. Locali senza prezzo esclusi.",
   "priceUncertain": "Prezzo da verificare: la stima supera in parte il budget.",
   "uncertainBudget": "Compatibilità di prezzo da verificare",
-  "approximateLocation": "Distanze approssimative: la posizione si sta precisando."
+  "approximateLocation": "Distanze approssimative: la posizione si sta precisando.",
+  "openPilotLabel": "Beta dati aperti · Bologna centro e Savigno",
+  "openPilotCoverage": "Sei fuori dalle aree della beta: Bologna centro e Savigno.",
+  "openPilotRank": "Locali ordinati per distanza. La posizione resta sul dispositivo e gli orari disponibili provengono da OpenStreetMap."
 }

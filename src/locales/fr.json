@@ -84,5 +84,8 @@
   "numericBandsNote": "Tranches selon les prix numériques locaux. Établissements sans prix exclus.",
   "priceUncertain": "Prix à vérifier : l’estimation dépasse en partie votre budget.",
   "uncertainBudget": "Compatibilité du budget à vérifier",
-  "approximateLocation": "Distances approximatives pendant la précision de la position."
+  "approximateLocation": "Distances approximatives pendant la précision de la position.",
+  "openPilotLabel": "Bêta données ouvertes · Bologne centre et Savigno",
+  "openPilotCoverage": "Vous êtes hors des zones bêta : Bologne centre et Savigno.",
+  "openPilotRank": "Les établissements sont classés par distance. Votre position reste sur cet appareil et les horaires disponibles proviennent d’OpenStreetMap."
 }

@@ -84,5 +84,8 @@
   "numericBandsNote": "Stufen nach lokalen Preisangaben. Lokale ohne Preis sind ausgeschlossen.",
   "priceUncertain": "Preis prüfen: Die Schätzung überschreitet teilweise dein Budget.",
   "uncertainBudget": "Budgetverträglichkeit prüfen",
-  "approximateLocation": "Ungefähre Entfernungen, der Standort wird präzisiert."
+  "approximateLocation": "Ungefähre Entfernungen, der Standort wird präzisiert.",
+  "openPilotLabel": "Offene Daten · Beta für Bologna Zentrum und Savigno",
+  "openPilotCoverage": "Du bist außerhalb der Beta-Gebiete Bologna Zentrum und Savigno.",
+  "openPilotRank": "Lokale sind nach Entfernung sortiert. Dein Standort bleibt auf dem Gerät. Verfügbare Öffnungszeiten stammen aus OpenStreetMap."
 }

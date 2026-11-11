@@ -7,6 +7,11 @@ on:
         type: choice
         options: [both, ios, android]
         default: both
+      data_source:
+        description: Discovery data source
+        type: choice
+        options: [google, open-pilot]
+        default: google
 permissions:
   contents: read
 concurrency:
@@ -48,9 +53,13 @@ jobs:
           ruby-version: '3.3'
       - run: bundle install --jobs 4 --retry 3
       - name: Verify real native restaurant service
+        if: inputs.data_source != 'open-pilot'
         run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
-      - run: npm test && npm run build && npx cap sync ios
+      - run: npm test
+      - run: npm run build && npx cap sync ios
+        env:
+          BYTEBUDGET_OPEN_PILOT: ${{ inputs.data_source == 'open-pilot' }}
       - name: Build signed IPA and send to TestFlight
         env:
           IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
@@ -96,9 +105,13 @@ jobs:
           ruby-version: '3.3'
       - run: bundle install --jobs 4 --retry 3
       - name: Verify real native restaurant service
+        if: inputs.data_source != 'open-pilot'
         run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
-      - run: npm test && npm run build && npx cap sync android
+      - run: npm test
+      - run: npm run build && npx cap sync android
+        env:
+          BYTEBUDGET_OPEN_PILOT: ${{ inputs.data_source == 'open-pilot' }}
       - name: Build signed AAB and send to Google Play internal testing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
