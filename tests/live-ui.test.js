@@ -6,11 +6,12 @@ import {build} from 'esbuild';
 import {parseHTML} from 'linkedom';
 const now=new Date().toISOString();
 const venue=(id,tier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,openingStatus:'open',sourceTier:tier,prices:{},venuePrice:{min:max-5,max,updatedAt:now,source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
-async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=false}={}){
- const requests=[],observers=[],posted=[];let receivePosition;
+async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=false,websiteStatus=200}={}){
+ const requests=[],observers=[],posted=[],routes=[];let receivePosition;
  const {window,document}=parseHTML('<html><body><div id="app"></div></body></html>');
  const values=new Map([['bb-spending-position','450']]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
  if(venues)dataset.venues=venues;
+ window.open=url=>routes.push(url);
  window.BYTEBUDGET_CONFIG={apiBase:'https://bb.test'};
  const nativePlatform=ios?'ios':'android';
  const geolocation=ios?`export const Geolocation={
@@ -23,12 +24,12 @@ async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=fa
   },
   clearWatch:async()=>{}
  }`:'export const Geolocation={getCurrentPosition:async()=>({coords:{latitude:44.49,longitude:11.34,accuracy:5}})}';
- const {outputFiles}=await build({entryPoints:['src/app.js'],bundle:true,write:false,format:'iife',define:{__BYTEBUDGET_ALLOW_DEMO__:'false',__BYTEBUDGET_OPEN_PILOT__:String(openPilot)},plugins:[{name:'native-boundary',setup(b){b.onResolve({filter:/^@capacitor\/(core|geolocation)$/},a=>({path:a.path,namespace:'native-test'}));b.onLoad({filter:/.*/,namespace:'native-test'},a=>({contents:a.path.endsWith('/core')?`export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'${nativePlatform}'}`:geolocation}));}}]});
+ const {outputFiles}=await build({entryPoints:['src/app.js'],bundle:true,write:false,format:'iife',define:{__BYTEBUDGET_ALLOW_DEMO__:'false',__BYTEBUDGET_OPEN_PILOT__:String(openPilot)},plugins:[{name:'native-boundary',setup(b){b.onResolve({filter:/^@capacitor\/(core|geolocation)$/},a=>({path:a.path,namespace:'native-test'}));b.onLoad({filter:/.*/,namespace:'native-test'},a=>({contents:a.path.endsWith('/core')?`export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'${nativePlatform}'};export const CapacitorHttp={head:async()=>({status:${websiteStatus}})}`:geolocation}));}}]});
  const context={window,document,console,Intl,Date,URL,AbortSignal,TextDecoder,setTimeout,clearTimeout,recordWatch:receive=>{receivePosition=receive},scrollTo(){},navigator:{languages:['en']},location:{origin:'https://localhost',protocol:'https:'},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},fetch:async (url,options)=>{requests.push(String(url));if(options?.method==='POST'){posted.push(JSON.parse(options.body));if(nearbyResponse)return nearbyResponse(dataset)}return Response.json(String(url).includes('/api/photo?')?{photoUri:'https://lh3.googleusercontent.com/genuine-image'}:String(url).endsWith('/api/status')?{configured:true,mode:'nearby'}:dataset)}};
  if(observer)context.IntersectionObserver=class{constructor(callback){this.callback=callback;this.targets=[];observers.push(this)}observe(el){this.targets.push(el)}unobserve(){}disconnect(){}};
  vm.runInNewContext(outputFiles[0].text,context);
  for(let i=0;i<100&&!document.querySelector('.result-head');i++)await new Promise(r=>setTimeout(r,5));
- return {document,window,requests,observers,posted,emitPosition:position=>receivePosition(position)};
+ return {document,window,requests,observers,posted,routes,emitPosition:position=>receivePosition(position)};
 }
 test('discovery ignores old slider settings and ranks by tier and value',async()=>{
  const {document,posted}=await boot({ios:true,venues:[
@@ -112,7 +113,7 @@ test('iPhone displays the first live cards while coverage is still arriving',asy
  assert.deepEqual(requests,['https://bb.test/api/nearby']);
 });
 
-test('new live prices update existing cards without replacing a card in the same tier',async()=>{
+test('live price updates stay hidden without replacing a card in the same tier',async()=>{
  let finish;
  const initial=venue('Price changes','mid',30);
  const updated=venue('Price changes','mid',40);
@@ -125,14 +126,14 @@ test('new live prices update existing cards without replacing a card in the same
   return new Response(body,{headers:{'Content-Type':'application/x-ndjson'}});
  }});
  const card=document.querySelector('.card');
- assert.match(card.textContent,/30/);
+ assert.doesNotMatch(card.textContent,/30/);
  finish();
- for(let i=0;i<20&&!document.querySelector('.card').textContent.includes('40');i++)await new Promise(r=>setTimeout(r,5));
+ await new Promise(r=>setTimeout(r,5));
  assert.equal(document.querySelector('.card'),card);
- assert.match(card.textContent,/40/);
+ assert.doesNotMatch(card.textContent,/40/);
 });
 
-test('a live price response is retained after the GPS position changes',async()=>{
+test('distance stays current when a live price response arrives',async()=>{
  let finish;
  const initial=venue('Moving price','mid',30),updated=venue('Moving price','mid',40);
  const {document,emitPosition}=await boot({ios:true,nearbyResponse:dataset=>{
@@ -145,24 +146,38 @@ test('a live price response is retained after the GPS position changes',async()=
  }});
  emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:12}});
  finish();await new Promise(r=>setTimeout(r,5));
- assert.match(document.querySelector('#results-list .card').textContent,/40/);
+ assert.doesNotMatch(document.querySelector('#results-list .card').textContent,/40/);
  assert.match(document.querySelector('[data-distance]').textContent,/89 m/);
 });
 
 test('open data beta discovers both sources offline and updates coverage as GPS moves',async()=>{
- const {document,requests,emitPosition}=await boot({ios:true,openPilot:true});
- assert.match(document.querySelector('.notice').textContent,/Open data beta/);
- assert.match(document.querySelector('.maps-attribution').textContent,/OpenStreetMap.*Overture/);
+ const {document,requests,routes,emitPosition}=await boot({ios:true,openPilot:true});
+ assert.equal(document.querySelector('.notice'),null);
+ assert.equal(document.querySelector('.maps-attribution'),null);
+ assert.ok(document.querySelector('#credits'));
  const names=()=>[...document.querySelectorAll('#results-list .card h3')].map(e=>e.textContent);
  assert.ok(names().length>100);
  assert.ok(names().includes('Sombrero Bologna'));
  assert.equal(document.querySelector('#results-list .star'),null);
- assert.match(document.querySelector('.card').textContent,/Price unavailable|Price not available/i);
+ assert.doesNotMatch(document.querySelector('.card').textContent,/price|hours/i);
  const first=document.querySelector('.card');
  first.querySelector('.favorite').onclick();
  assert.equal(first.querySelector('.favorite').getAttribute('aria-pressed'),'true');
  first.querySelector('.card-open').onclick();
- assert.match(document.querySelector('[data-place-link]').getAttribute('href'),/^https:\/\/www.openstreetmap.org\//);
+ assert.equal(document.querySelector('[data-place-link]'),null);
+ assert.equal(document.querySelector('#about'),null);
+ assert.match(document.querySelector('[data-detail-distance]').textContent,/\d+ m/);
+ const heart=document.querySelector('.detail-title .favorite');
+ assert.equal(heart.getAttribute('aria-pressed'),'true');
+ heart.onclick();
+ assert.equal(heart.getAttribute('aria-pressed'),'false');
+ assert.ok(heart.getAttribute('aria-label').endsWith(document.querySelector('.detail-title h1').textContent));
+ const previousDistance=document.querySelector('[data-detail-distance]').textContent;
+ emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:10}});
+ assert.notEqual(document.querySelector('[data-detail-distance]').textContent,previousDistance);
+ document.querySelector('#route').onclick();
+ assert.equal(new URL(routes[0]).hostname,'maps.apple.com');
+ assert.equal(new URL(routes[0]).searchParams.get('dirflg'),'w');
  document.querySelector('#back').onclick();
 
  emitPosition({timestamp:Date.now(),coords:{latitude:44.3919473,longitude:11.0745599,accuracy:10}});
@@ -232,4 +247,22 @@ test('piadina, burgers, sushi, cocktail bars and takeaway use separate filters a
   }
  }
  assert.deepEqual(requests,[]);
+});
+
+
+test('Android opens walking directions in Google Maps and hides confirmed broken websites',async()=>{
+ for(const status of [200,404,410,503]){
+  const {document,routes}=await boot({websiteStatus:status,venues:[
+   venue('Osteria','mid',30,{websiteUri:'https://example.com/osteria'}),
+  ]});
+  document.querySelector('.card-open').onclick();
+  await new Promise(resolve=>setTimeout(resolve,0));
+  assert.equal(Boolean(document.querySelector('#venue-website')),status!==404&&status!==410);
+  document.querySelector('#route').onclick();
+  const route=new URL(routes[0]);
+  assert.equal(route.hostname,'www.google.com');
+  assert.equal(route.pathname,'/maps/dir/');
+  assert.equal(route.searchParams.get('destination'),'44.49,11.34');
+  assert.equal(route.searchParams.get('travelmode'),'walking');
+ }
 });
