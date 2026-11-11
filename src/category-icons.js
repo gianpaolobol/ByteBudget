@@ -12,12 +12,13 @@ const artwork = {
  pizza:'<path d="M7 11a27 27 0 0 1 26 0L20 35Z"/><path d="M9 15a23 23 0 0 1 22 0"/><circle cx="17" cy="19" r="1.6"/><circle cx="23" cy="23" r="1.6"/>',
  cafe:'<path d="M8 15h20v8a10 10 0 0 1-20 0Zm20 2h3a4 4 0 1 1 0 8h-3M5 34h29M15 5c-3 2 3 4 0 7m7-7c-3 2 3 4 0 7"/>',
  pub:'<path d="M11 14h18l-3 20H14Z"/><path d="M11 14a4 4 0 0 1 1-8 5 5 0 0 1 8-1 5 5 0 0 1 8 2 4 4 0 0 1 1 7m-12 5 1 10m5-10-1 10"/>',
+ cocktail:'<path d="M6 10h28L20 25ZM11 15h18m-9 10v9m-6 0h12m-3-19 8-10"/><circle cx="31" cy="5" r="2"/>',
  wine:'<path d="M13 6h14l2 9a9 9 0 1 1-18 0ZM12 16h16m-8 8v10m-6 0h12"/>',
  restaurant:'<circle cx="20" cy="20" r="10"/><circle cx="20" cy="20" r="6"/><path d="M4 7v10m3-10v10m-3 0a2 2 0 0 0 3 0m-1.5 2v14M34 7c-3 4-3 8 0 11h2m0-11v26"/>',
  burger:'<path d="M7 17a13 9 0 0 1 26 0Zm0 5h26m-26 5h26v1a4 4 0 0 1-4 4H11a4 4 0 0 1-4-4Z"/><path d="m14 13 1-1m7-1 1 1m4 1 1 1"/>',
 };
 
-export const categoryFilters = ['all','bakery','pizza','cafe','pub','wine','restaurant','piadina','burger','sushi','takeaway','ice_cream','pastry','deli'];
+export const categoryFilters = ['all','bakery','pizza','cafe','pub','wine','cocktail','restaurant','piadina','burger','sushi','takeaway','ice_cream','pastry','deli'];
 
 export function displayCategory(category, takeaway) {
  if (category==='fast_food'&&takeaway) return 'takeaway';

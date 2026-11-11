@@ -205,7 +205,7 @@ test('category rail uses the card pictograms and keeps the selection while walki
 test('gelaterias, pastry shops and delis have their own filters and card icons',async()=>{
  const {document,requests}=await boot({ios:true,openPilot:true});
  const buttons=[...document.querySelectorAll('[data-category-filter]')];
- assert.equal(buttons.length,14);
+ assert.equal(buttons.length,15);
  assert.equal(buttons[0].dataset.categoryFilter,'all');
  for(const key of ['ice_cream','pastry','deli']){
   const button=buttons.find(item=>item.dataset.categoryFilter===key);
@@ -217,15 +217,17 @@ test('gelaterias, pastry shops and delis have their own filters and card icons',
  assert.deepEqual(requests,[]);
 });
 
-test('piadina, burgers, sushi and takeaway use separate filters and confirmed data',async()=>{
+test('piadina, burgers, sushi, cocktail bars and takeaway use separate filters and confirmed data',async()=>{
  const {document,requests}=await boot({ios:true,openPilot:true});
  const byId=new Map(pilotCatalog.venues.map(venue=>[venue.id,venue]));
- for(const key of ['piadina','burger','sushi','takeaway']){
-  document.querySelector(`[data-category-filter="${key}"]`).onclick();
+ for(const key of ['piadina','burger','sushi','cocktail','takeaway']){
+  const button=document.querySelector(`[data-category-filter="${key}"]`);
+  button.onclick();
   const cards=[...document.querySelectorAll('#results-list .card')];
   assert.ok(cards.length>0,key);
   for(const card of cards){
    const venue=byId.get(card.dataset.cardId);
+   if(key==='cocktail') assert.equal(card.querySelector('.category-mark svg').innerHTML,button.querySelector('svg').innerHTML);
    assert.ok(key==='takeaway'?venue.takeaway===true:venue.category===key,venue.name);
   }
  }
