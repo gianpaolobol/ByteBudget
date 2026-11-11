@@ -13,3 +13,20 @@ test('coverage gap consumes no provider request',async()=>{let calls=0;const han
 test('unavailable provider produces sanitized error',async()=>{const handler=createSearchHandler({fetch:async()=>{throw Error('key=test-secret at 44.4949,11.3426')},now:()=>now});const res=await handler(request(),env);assert.equal(res.status,502);assert.equal((await res.text()).includes('test-secret'),false)});
 test('more than 20 verified candidates are rejected before any paid lookup',async()=>{let calls=0;const large=structuredClone(catalog);large.cities[0].venues=Array.from({length:21},(_,i)=>({...large.cities[0].venues[0],placeId:'test-'+i}));const handler=createSearchHandler({fetch:async()=>{calls++},now:()=>now});const res=await handler(request(),{...env,VERIFIED_CATALOG:JSON.stringify(large)});assert.equal(res.status,422);assert.equal(calls,0)});
 test('rate limit blocks further provider lookups',async()=>{let calls=0;const handler=createSearchHandler({requestsPerMinute:1,fetch:async()=>{calls++;return Response.json({id:'place-test',rating:4.8,userRatingCount:824,currentOpeningHours:{openNow:true},businessStatus:'OPERATIONAL'})},now:()=>now});assert.equal((await handler(request(),env)).status,200);assert.equal((await handler(request(),env)).status,429);assert.equal(calls,1)});
+
+test('automatic catalog discovery includes different price tiers in one lookup',async()=>{
+ const verified=structuredClone(catalog);
+ const original=verified.cities[0].venues[0];
+ verified.cities[0].venues.push({
+  ...original,placeId:'place-mid',name:'Mid venue',
+  prices:{lunch:{...original.prices.lunch,min:25,max:35}},
+ });
+ const handler=createSearchHandler({now:()=>now,fetch:async url=>Response.json({
+  id:new URL(url).pathname.split('/').at(-1),rating:4.5,userRatingCount:20,
+  currentOpeningHours:{openNow:true},businessStatus:'OPERATIONAL',
+ })});
+ const response=await handler(request({lat:44.4949,lng:11.3426,radius:1000,meal:'lunch',allPrices:true}),
+  {...env,VERIFIED_CATALOG:JSON.stringify(verified)});
+ assert.equal(response.status,200);
+ assert.deepEqual((await response.json()).venues.map(v=>v.id),['place-test','place-mid']);
+});

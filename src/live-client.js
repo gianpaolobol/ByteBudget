@@ -1,4 +1,4 @@
-export async function loadLiveRestaurants({origin,apiBase,native=false,nativeNearby=false,automatic=false,radius,nearbyRadius=radius,spendingPosition,meal,language,locate,onPosition,onNearby,quick=false,fetch:fetcher=(...args)=>globalThis.fetch(...args)}){
+export async function loadLiveRestaurants({origin,apiBase,native=false,nativeNearby=false,automatic=false,radius,nearbyRadius=radius,spendingPosition,allPrices=false,meal,language,locate,onPosition,onNearby,quick=false,fetch:fetcher=(...args)=>globalThis.fetch(...args)}){
  const fail=code=>{throw Object.assign(new Error(code),{code})};
  if(native&&!apiBase)fail('provider_not_configured');
  const base=new URL(apiBase||origin);
@@ -35,7 +35,14 @@ export async function loadLiveRestaurants({origin,apiBase,native=false,nativeNea
  }
  const nearby=status.mode==='nearby';
  const progressive=nearby&&typeof onNearby==='function'&&typeof TextDecoder==='function';
- const r=await fetcher(new URL(nearby?'/api/nearby':'/api/search',base).href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,radius:nearby?nearbyRadius:radius,spendingPosition,meal,language,...progressive&&{progressive:true},...quick&&{quick:true}}),signal:AbortSignal.timeout(10000)});
+ const body={lat:pos.coords.latitude,lng:pos.coords.longitude,radius:nearby?nearbyRadius:radius,meal,language};
+ if(!allPrices)body.spendingPosition=spendingPosition;
+ else if(!nearby)body.allPrices=true;
+ if(progressive)body.progressive=true;
+ if(quick)body.quick=true;
+ const r=await fetcher(new URL(nearby?'/api/nearby':'/api/search',base).href,{
+  method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(10000),
+ });
  const located=next=>({...next,lat:pos.coords.latitude,lng:pos.coords.longitude,locationAccuracy:pos.coords.accuracy,demo:false});
  const complete=(next,ok)=>{
   if(!ok)fail(['city_not_supported','no_verified_menus','rate_limited','provider_not_configured','search_too_broad','price_bands_unavailable','provider_budget_exhausted'].includes(next?.error)?next.error:'provider_unavailable');
