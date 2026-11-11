@@ -87,5 +87,15 @@
   "approximateLocation": "Approximate distances while location accuracy improves.",
   "openPilotLabel": "Open data beta · Central Bologna and Savigno",
   "openPilotCoverage": "You are outside the beta areas: central Bologna and Savigno.",
-  "openPilotRank": "Venues are sorted by distance. Your location stays on this device and available hours come from OpenStreetMap."
+  "openPilotRank": "Venues are sorted by distance. Your location stays on this device and available hours come from OpenStreetMap.",
+  "categoryFilters": "Categories",
+  "category_all": "All",
+  "category_bakery": "Bakeries",
+  "category_pizza": "Pizzerias",
+  "category_cafe": "Bars and cafés",
+  "category_pub": "Pubs",
+  "category_wine": "Wine bars and shops",
+  "category_restaurant": "Restaurants",
+  "category_fast_food": "Fast food",
+  "categoryEmpty": "No venues in this category nearby"
 }

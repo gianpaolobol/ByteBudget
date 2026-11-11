@@ -87,5 +87,15 @@
   "approximateLocation": "Distanze approssimative: la posizione si sta precisando.",
   "openPilotLabel": "Beta dati aperti · Bologna centro e Savigno",
   "openPilotCoverage": "Sei fuori dalle aree della beta: Bologna centro e Savigno.",
-  "openPilotRank": "Locali ordinati per distanza. La posizione resta sul dispositivo e gli orari disponibili provengono da OpenStreetMap."
+  "openPilotRank": "Locali ordinati per distanza. La posizione resta sul dispositivo e gli orari disponibili provengono da OpenStreetMap.",
+  "categoryFilters": "Categorie",
+  "category_all": "Tutti",
+  "category_bakery": "Forni",
+  "category_pizza": "Pizzerie",
+  "category_cafe": "Bar e caffè",
+  "category_pub": "Pub",
+  "category_wine": "Vinerie ed enoteche",
+  "category_restaurant": "Ristoranti",
+  "category_fast_food": "Fast food",
+  "categoryEmpty": "Nessun locale di questa categoria nelle vicinanze"
 }

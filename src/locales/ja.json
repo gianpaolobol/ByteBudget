@@ -87,5 +87,15 @@
   "approximateLocation": "位置を補正中のため距離は目安です。",
   "openPilotLabel": "オープンデータ ベータ版 · ボローニャ中心部とサヴィーニョ",
   "openPilotCoverage": "ボローニャ中心部とサヴィーニョのベータ対象地域外です。",
-  "openPilotRank": "店舗は距離順です。位置情報は端末に保持され、営業時間は OpenStreetMap に基づきます。"
+  "openPilotRank": "店舗は距離順です。位置情報は端末に保持され、営業時間は OpenStreetMap に基づきます。",
+  "categoryFilters": "カテゴリー",
+  "category_all": "すべて",
+  "category_bakery": "パン屋",
+  "category_pizza": "ピザ店",
+  "category_cafe": "バーとカフェ",
+  "category_pub": "パブ",
+  "category_wine": "ワインバーと酒店",
+  "category_restaurant": "レストラン",
+  "category_fast_food": "ファストフード",
+  "categoryEmpty": "近くにこのカテゴリーのお店はありません"
 }

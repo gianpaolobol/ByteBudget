@@ -87,5 +87,15 @@
   "approximateLocation": "स्थान की सटीकता बढ़ने तक दूरियाँ अनुमानित हैं।",
   "openPilotLabel": "खुले डेटा का बीटा · बोलोन्या केंद्र और साविन्यो",
   "openPilotCoverage": "आप बीटा क्षेत्रों, बोलोन्या केंद्र और साविन्यो, से बाहर हैं।",
-  "openPilotRank": "स्थान दूरी के अनुसार दिखते हैं। आपकी लोकेशन डिवाइस पर रहती है और उपलब्ध समय OpenStreetMap से आता है।"
+  "openPilotRank": "स्थान दूरी के अनुसार दिखते हैं। आपकी लोकेशन डिवाइस पर रहती है और उपलब्ध समय OpenStreetMap से आता है।",
+  "categoryFilters": "श्रेणियाँ",
+  "category_all": "सभी",
+  "category_bakery": "बेकरी",
+  "category_pizza": "पिज़्ज़ा की दुकानें",
+  "category_cafe": "बार और कैफ़े",
+  "category_pub": "पब",
+  "category_wine": "वाइन बार और दुकानें",
+  "category_restaurant": "रेस्तराँ",
+  "category_fast_food": "फ़ास्ट फ़ूड",
+  "categoryEmpty": "आस-पास इस श्रेणी का कोई स्थान नहीं है"
 }

@@ -87,5 +87,15 @@
   "approximateLocation": "المسافات تقريبية أثناء تحسين دقة الموقع.",
   "openPilotLabel": "بيانات مفتوحة تجريبية · وسط بولونيا وسافينيو",
   "openPilotCoverage": "أنت خارج مناطق الاختبار: وسط بولونيا وسافينيو.",
-  "openPilotRank": "تُرتّب الأماكن حسب المسافة. يبقى موقعك على الجهاز وتأتي الساعات المتاحة من OpenStreetMap."
+  "openPilotRank": "تُرتّب الأماكن حسب المسافة. يبقى موقعك على الجهاز وتأتي الساعات المتاحة من OpenStreetMap.",
+  "categoryFilters": "الفئات",
+  "category_all": "الكل",
+  "category_bakery": "مخابز",
+  "category_pizza": "مطاعم بيتزا",
+  "category_cafe": "حانات ومقاهٍ",
+  "category_pub": "حانات بيرة",
+  "category_wine": "حانات ومتاجر النبيذ",
+  "category_restaurant": "مطاعم",
+  "category_fast_food": "وجبات سريعة",
+  "categoryEmpty": "لا توجد أماكن قريبة ضمن هذه الفئة"
 }

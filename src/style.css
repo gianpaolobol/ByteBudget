@@ -23,4 +23,19 @@
 .nav{bottom:0;min-height:calc(70px + env(safe-area-inset-bottom,0px));padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px))}
 .price-group h2{margin:22px 0 8px;color:var(--teal)}
 .open-pilot-attribution{white-space:normal}
-.category-icon{font-size:32px}
+/* The rail stays on the left, including in right-to-left languages. */
+.category-layout{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;direction:ltr}
+.category-results{min-width:0}
+.category-rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);align-self:start;display:grid;gap:2px;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 88px);overflow-y:auto;padding:2px}
+.category-rail button{display:grid;place-items:center;min-height:44px;padding:4px 0;border-radius:12px;background:transparent;color:var(--teal);font-size:10px;overflow-wrap:anywhere}
+.category-rail button[aria-pressed=true]{background:#dce9df;box-shadow:inset 0 0 0 1px #699286}
+.category-rail button:focus-visible{outline-offset:-3px}
+.category-rail svg{width:25px;height:25px}
+.category-mark{display:grid;place-items:center;color:var(--teal);width:56px;flex:0 0 56px}
+.category-mark svg{width:50px;height:50px}
+.detail-mark{width:90px;margin:18px 0}
+.detail-mark svg{width:80px;height:80px}
+.open-pilot-shell .card-open{min-height:100px;padding-inline:8px 42px;gap:8px}
+.open-pilot-shell .card h3{overflow-wrap:anywhere}
+.open-pilot-shell .favorite{inset-inline-end:2px}
+@media(max-width:390px){.open-pilot-shell{padding-inline:10px}.category-layout{gap:4px}.category-mark{width:48px;flex-basis:48px}.category-mark svg{width:44px;height:44px}}

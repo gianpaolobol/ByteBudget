@@ -171,3 +171,32 @@ test('open data beta discovers both sources offline and updates coverage as GPS 
  assert.match(document.querySelector('.status').textContent,/outside the beta areas/);
  assert.deepEqual(requests,[]);
 });
+
+test('category rail uses the card pictograms and keeps the selection while walking',async()=>{
+ const {document,requests,emitPosition}=await boot({ios:true,openPilot:true});
+ const buttons=[...document.querySelectorAll('[data-category-filter]')];
+ const all=buttons[0],pizza=buttons.find(button=>button.dataset.categoryFilter==='pizza');
+ const cards=()=>[...document.querySelectorAll('#results-list .card')];
+ const assertPizza=()=>{
+  assert.ok(cards().length>0);
+  const icon=pizza.querySelector('svg').innerHTML;
+  assert.ok(cards().every(card=>card.querySelector('.category-mark svg').innerHTML===icon));
+  assert.equal(pizza.getAttribute('aria-pressed'),'true');
+ };
+ const count=cards().length;
+ assert.equal(all.dataset.categoryFilter,'all');
+ assert.equal(all.getAttribute('aria-pressed'),'true');
+ assert.equal(document.querySelector('.card .venue-photo'),null);
+ pizza.onclick();
+ assertPizza();
+ assert.ok(cards().length<count);
+ const before=cards()[0].querySelector('[data-distance]').textContent;
+ emitPosition({timestamp:Date.now(),coords:{latitude:44.4904,longitude:11.34,accuracy:10}});
+ assertPizza();
+ assert.notEqual(cards()[0].querySelector('[data-distance]').textContent,before);
+ all.onclick();
+ assert.ok(cards().length>100);
+ assert.equal(all.getAttribute('aria-pressed'),'true');
+ assert.equal(pizza.getAttribute('aria-pressed'),'false');
+ assert.deepEqual(requests,[]);
+});

@@ -42,6 +42,13 @@ def osm_record(kind, key, tags, lat, lng):
     category = tags.get('amenity')
     if category not in OSM_CATEGORIES:
         category = 'bakery' if tags.get('shop') == 'bakery' else None
+    cuisines = {value.strip().lower() for value in tags.get('cuisine','').split(';')}
+    if category in {'restaurant','fast_food'} and 'pizza' in cuisines:
+        category = 'pizza'
+    elif tags.get('shop') == 'wine' or (category == 'bar' and tags.get('bar') == 'wine'):
+        category = 'wine'
+    elif category == 'pub' and tags.get('drink:beer') == 'no':
+        category = 'bar'
     name = tags.get('name', '').strip()
     if name and category and lat is not None and lng is not None:
         return build_row('osm', f'{kind}/{key}', name, lat, lng, category,
@@ -75,7 +82,8 @@ def overture_record(item):
         return None
     taxonomy = item.get('taxonomy') or {}
     kinds = set(taxonomy.get('hierarchy') or []) | {item.get('basic_category'),taxonomy.get('primary')}
-    categories = [('fast_food_restaurant','fast_food'),('pub','pub'),('bar','bar'),
+    categories = [('pizza_restaurant','pizza'),('wine_bar','wine'),('pub','pub'),
+                  ('fast_food_restaurant','fast_food'),('bar','bar'),
                   ('bakery','bakery'),('cafe','cafe'),('food_court','food_court'),('restaurant','restaurant')]
     category = next((value for key,value in categories if key in kinds), None)
     name = ((item.get('names') or {}).get('primary') or '').strip()
@@ -89,6 +97,9 @@ def overture_record(item):
 
 def matching(a,b):
     d = distance(a['lat'],a['lng'],b)
+    specialties = {'pizza','wine','pub','bakery'}
+    if a['category'] in specialties and b['category'] in specialties and a['category'] != b['category']:
+        return False
     if d > 55:
         return False
     names = normalized(a['name']), normalized(b['name'])
@@ -111,6 +122,9 @@ def merge(rows):
             continue
         other=min(candidates,key=lambda candidate:distance(row['lat'],row['lng'],candidate))
         other['sources'] = sorted(set(other['sources']+row['sources']))
+        # Prefer explicit specialties over generic categories on matched records.
+        if other['category'] in {'restaurant','fast_food','bar','cafe'} and row['category'] in {'pizza','wine','pub','bakery'}:
+            other['category'] = row['category']
         for field in ('hours','websiteUri'):
             if field not in other and row.get(field):
                 other[field]=row[field]

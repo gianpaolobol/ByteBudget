@@ -87,5 +87,15 @@
   "approximateLocation": "Distances approximatives pendant la précision de la position.",
   "openPilotLabel": "Bêta données ouvertes · Bologne centre et Savigno",
   "openPilotCoverage": "Vous êtes hors des zones bêta : Bologne centre et Savigno.",
-  "openPilotRank": "Les établissements sont classés par distance. Votre position reste sur cet appareil et les horaires disponibles proviennent d’OpenStreetMap."
+  "openPilotRank": "Les établissements sont classés par distance. Votre position reste sur cet appareil et les horaires disponibles proviennent d’OpenStreetMap.",
+  "categoryFilters": "Catégories",
+  "category_all": "Tous",
+  "category_bakery": "Boulangeries",
+  "category_pizza": "Pizzerias",
+  "category_cafe": "Bars et cafés",
+  "category_pub": "Pubs",
+  "category_wine": "Bars à vin et cavistes",
+  "category_restaurant": "Restaurants",
+  "category_fast_food": "Restauration rapide",
+  "categoryEmpty": "Aucun établissement de cette catégorie à proximité"
 }

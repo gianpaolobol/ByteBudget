@@ -87,5 +87,15 @@
   "approximateLocation": "位置正在精确定位，距离为估计值。",
   "openPilotLabel": "开放数据测试版 · 博洛尼亚市中心与萨维尼奥",
   "openPilotCoverage": "当前位置不在测试范围内：博洛尼亚市中心与萨维尼奥。",
-  "openPilotRank": "地点按距离排序。位置信息保留在设备上，营业时间来自 OpenStreetMap。"
+  "openPilotRank": "地点按距离排序。位置信息保留在设备上，营业时间来自 OpenStreetMap。",
+  "categoryFilters": "类别",
+  "category_all": "全部",
+  "category_bakery": "面包店",
+  "category_pizza": "比萨店",
+  "category_cafe": "酒吧和咖啡馆",
+  "category_pub": "啤酒馆",
+  "category_wine": "葡萄酒吧和酒铺",
+  "category_restaurant": "餐厅",
+  "category_fast_food": "快餐",
+  "categoryEmpty": "附近没有此类场所"
 }

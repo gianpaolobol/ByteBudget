@@ -87,5 +87,15 @@
   "approximateLocation": "Расстояния приблизительные, местоположение уточняется.",
   "openPilotLabel": "Бета открытых данных · Центр Болоньи и Савиньо",
   "openPilotCoverage": "Вы за пределами тестовых зон: центр Болоньи и Савиньо.",
-  "openPilotRank": "Заведения отсортированы по расстоянию. Геопозиция остаётся на устройстве, часы работы взяты из OpenStreetMap."
+  "openPilotRank": "Заведения отсортированы по расстоянию. Геопозиция остаётся на устройстве, часы работы взяты из OpenStreetMap.",
+  "categoryFilters": "Категории",
+  "category_all": "Все",
+  "category_bakery": "Пекарни",
+  "category_pizza": "Пиццерии",
+  "category_cafe": "Бары и кафе",
+  "category_pub": "Пабы",
+  "category_wine": "Винные бары и магазины",
+  "category_restaurant": "Рестораны",
+  "category_fast_food": "Фастфуд",
+  "categoryEmpty": "Поблизости нет заведений этой категории"
 }

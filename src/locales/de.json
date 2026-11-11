@@ -87,5 +87,15 @@
   "approximateLocation": "Ungefähre Entfernungen, der Standort wird präzisiert.",
   "openPilotLabel": "Offene Daten · Beta für Bologna Zentrum und Savigno",
   "openPilotCoverage": "Du bist außerhalb der Beta-Gebiete Bologna Zentrum und Savigno.",
-  "openPilotRank": "Lokale sind nach Entfernung sortiert. Dein Standort bleibt auf dem Gerät. Verfügbare Öffnungszeiten stammen aus OpenStreetMap."
+  "openPilotRank": "Lokale sind nach Entfernung sortiert. Dein Standort bleibt auf dem Gerät. Verfügbare Öffnungszeiten stammen aus OpenStreetMap.",
+  "categoryFilters": "Kategorien",
+  "category_all": "Alle",
+  "category_bakery": "Bäckereien",
+  "category_pizza": "Pizzerien",
+  "category_cafe": "Bars und Cafés",
+  "category_pub": "Pubs",
+  "category_wine": "Weinbars und Weinläden",
+  "category_restaurant": "Restaurants",
+  "category_fast_food": "Fast Food",
+  "categoryEmpty": "Keine Lokale dieser Kategorie in der Nähe"
 }

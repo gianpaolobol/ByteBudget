@@ -31,11 +31,11 @@ the same radii as the prior OpenStreetMap sample.
 | Zone | Radius | OSM in merged catalog | Additional Overture records | Combined | With raw opening hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Cinema Rialto | 350 m | 37 | 25 | 62 | 14 |
-| Piazza della Mercanzia | 350 m | 161 | 85 | 246 | 43 |
+| Piazza della Mercanzia | 350 m | 164 | 85 | 249 | 44 |
 | Savigno | 1 km | 2 | 10 | 12 | 1 |
 
-The Mercanzia count differs slightly from the first OSM sample (163) due to
-additional alias matching and the combined extracts. Five of the six named
+The Mercanzia count differs from the first OSM sample (163) because the importer
+now includes explicitly tagged wine shops and resolves aliases across extracts. Five of the six named
 Rialto examples appear in the combined catalog: Fram, O' Sole Mio, Miky &
 Max, Sombrero and Bar Baldi. Pizzeria da Rialto remains unconfirmed. This is
 a comparison with a small previously verified list, not a full coverage or
@@ -43,3 +43,7 @@ recall estimate. Overture confidence is used to qualify catalog entries and
 is never shown as a customer rating. None of the pilot entries has a verified
 price or customer rating. The pilot shows distance order, category icons and
 known weekly hours. It shows unknown hours for missing or unsupported rules.
+
+The category rail filters the distance-ordered list and keeps the selection
+when the location changes. Specialized categories require explicit source tags
+or taxonomy. A generic bar is shown with the café pictogram.

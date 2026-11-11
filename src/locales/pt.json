@@ -87,5 +87,15 @@
   "approximateLocation": "Distâncias aproximadas enquanto a localização melhora.",
   "openPilotLabel": "Beta de dados abertos · Centro de Bolonha e Savigno",
   "openPilotCoverage": "Está fora das zonas da beta: centro de Bolonha e Savigno.",
-  "openPilotRank": "Os locais são ordenados por distância. A localização fica no dispositivo e os horários disponíveis vêm do OpenStreetMap."
+  "openPilotRank": "Os locais são ordenados por distância. A localização fica no dispositivo e os horários disponíveis vêm do OpenStreetMap.",
+  "categoryFilters": "Categorias",
+  "category_all": "Todos",
+  "category_bakery": "Padarias",
+  "category_pizza": "Pizzarias",
+  "category_cafe": "Bares e cafés",
+  "category_pub": "Pubs",
+  "category_wine": "Bares e lojas de vinhos",
+  "category_restaurant": "Restaurantes",
+  "category_fast_food": "Comida rápida",
+  "categoryEmpty": "Nenhum local desta categoria por perto"
 }
