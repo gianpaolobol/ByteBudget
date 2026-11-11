@@ -23,7 +23,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      BYTEBUDGET_OPEN_PILOT: ${{ inputs.data_source == 'open-pilot' }}
       BYTEBUDGET_MODE: live
       BYTEBUDGET_API_BASE: ${{ vars.BYTEBUDGET_API_BASE }}
       BYTEBUDGET_ANDROID_VERSION_CODE: ${{ inputs.version_code }}
@@ -55,7 +54,10 @@ jobs:
         if: inputs.data_source != 'open-pilot'
         run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
-      - run: npm test && npm run build && npx cap sync android
+      - run: npm test
+      - run: npm run build && npx cap sync android
+        env:
+          BYTEBUDGET_OPEN_PILOT: ${{ inputs.data_source == 'open-pilot' }}
       - name: Build signed live AAB
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
