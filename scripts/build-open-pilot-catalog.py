@@ -41,7 +41,7 @@ def build_row(source, key, name, lat, lng, category, hours=None, website=None):
 # Exact chain names only, and only for records already classified as food venues.
 BURGER_BRANDS = re.compile(r"^(?:mcdonald[’']?s|burger king|hamerica[’']?s)(?:\s*[-–(].*)?$", re.I)
 PIADINA_NAME = re.compile(r"\bpiadiner(?:ia|ie|o)\b|\bpiadin[ae]\b", re.I)
-SPECIALTIES = {'pizza','wine','pub','bakery','ice_cream','pastry','deli','burger','piadina'}
+SPECIALTIES = {'pizza','wine','pub','bakery','ice_cream','pastry','deli','burger','piadina','sushi'}
 
 
 def named_specialty(name, category):
@@ -64,6 +64,8 @@ def osm_record(kind, key, tags, lat, lng):
     cuisines = {value.strip().lower() for value in tags.get('cuisine','').split(';')}
     if category in {'restaurant','fast_food'} and 'pizza' in cuisines:
         category = 'pizza'
+    elif category in {'restaurant','fast_food'} and 'sushi' in cuisines:
+        category = 'sushi'
     elif category in {'restaurant','fast_food'} and 'burger' in cuisines:
         category = 'burger'
     elif category in {'restaurant','fast_food'} and 'piadina' in cuisines:
@@ -112,7 +114,7 @@ def overture_record(item):
     taxonomy = item.get('taxonomy') or {}
     kinds = set(taxonomy.get('hierarchy') or []) | {item.get('basic_category'),taxonomy.get('primary')}
     categories = [('ice_cream_shop','ice_cream'),('delicatessen','deli'),('pastry_shop','pastry'),
-                  ('pizza_restaurant','pizza'),('burger_restaurant','burger'),('piadina_restaurant','piadina'),('wine_bar','wine'),('pub','pub'),
+                  ('pizza_restaurant','pizza'),('sushi_restaurant','sushi'),('burger_restaurant','burger'),('piadina_restaurant','piadina'),('wine_bar','wine'),('pub','pub'),
                   ('fast_food_restaurant','fast_food'),('bar','bar'),
                   ('bakery','bakery'),('cafe','cafe'),('food_court','food_court'),('restaurant','restaurant')]
     category = next((value for key,value in categories if key in kinds), None)
