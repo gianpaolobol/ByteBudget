@@ -97,5 +97,8 @@
   "category_wine": "वाइन बार और दुकानें",
   "category_restaurant": "रेस्तराँ",
   "category_fast_food": "फ़ास्ट फ़ूड",
-  "categoryEmpty": "आस-पास इस श्रेणी का कोई स्थान नहीं है"
+  "categoryEmpty": "आस-पास इस श्रेणी का कोई स्थान नहीं है",
+  "category_ice_cream": "आइसक्रीम की दुकानें",
+  "category_pastry": "पेस्ट्री की दुकानें",
+  "category_deli": "तैयार भोजन की दुकानें"
 }

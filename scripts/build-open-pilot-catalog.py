@@ -41,10 +41,17 @@ def build_row(source, key, name, lat, lng, category, hours=None, website=None):
 def osm_record(kind, key, tags, lat, lng):
     category = tags.get('amenity')
     if category not in OSM_CATEGORIES:
-        category = 'bakery' if tags.get('shop') == 'bakery' else None
+        category = None
+    shop = tags.get('shop')
+    if shop in {'bakery','pastry','deli'}:
+        category = shop
+    if tags.get('amenity') == 'ice_cream' or shop == 'ice_cream':
+        category = 'ice_cream'
     cuisines = {value.strip().lower() for value in tags.get('cuisine','').split(';')}
     if category in {'restaurant','fast_food'} and 'pizza' in cuisines:
         category = 'pizza'
+    elif category in {'restaurant','fast_food'} and 'rotisserie' in cuisines:
+        category = 'deli'
     elif tags.get('shop') == 'wine' or (category == 'bar' and tags.get('bar') == 'wine'):
         category = 'wine'
     elif category == 'pub' and tags.get('drink:beer') == 'no':
@@ -82,11 +89,15 @@ def overture_record(item):
         return None
     taxonomy = item.get('taxonomy') or {}
     kinds = set(taxonomy.get('hierarchy') or []) | {item.get('basic_category'),taxonomy.get('primary')}
-    categories = [('pizza_restaurant','pizza'),('wine_bar','wine'),('pub','pub'),
+    categories = [('ice_cream_shop','ice_cream'),('delicatessen','deli'),('pastry_shop','pastry'),
+                  ('pizza_restaurant','pizza'),('wine_bar','wine'),('pub','pub'),
                   ('fast_food_restaurant','fast_food'),('bar','bar'),
                   ('bakery','bakery'),('cafe','cafe'),('food_court','food_court'),('restaurant','restaurant')]
     category = next((value for key,value in categories if key in kinds), None)
     name = ((item.get('names') or {}).get('primary') or '').strip()
+    # The dessert taxonomy also includes dessert cafés and sweet shops.
+    if 'dessert_shop' in kinds and re.search(r'\bpasticceri[ae]\b', name, re.I) and category != 'ice_cream':
+        category = 'pastry'
     if not category or not name:
         return None
     bbox = item['bbox']
@@ -97,7 +108,7 @@ def overture_record(item):
 
 def matching(a,b):
     d = distance(a['lat'],a['lng'],b)
-    specialties = {'pizza','wine','pub','bakery'}
+    specialties = {'pizza','wine','pub','bakery','ice_cream','pastry','deli'}
     if a['category'] in specialties and b['category'] in specialties and a['category'] != b['category']:
         return False
     if d > 55:
@@ -123,7 +134,7 @@ def merge(rows):
         other=min(candidates,key=lambda candidate:distance(row['lat'],row['lng'],candidate))
         other['sources'] = sorted(set(other['sources']+row['sources']))
         # Prefer explicit specialties over generic categories on matched records.
-        if other['category'] in {'restaurant','fast_food','bar','cafe'} and row['category'] in {'pizza','wine','pub','bakery'}:
+        if other['category'] in {'restaurant','fast_food','bar','cafe'} and row['category'] in {'pizza','wine','pub','bakery','ice_cream','pastry','deli'}:
             other['category'] = row['category']
         for field in ('hours','websiteUri'):
             if field not in other and row.get(field):

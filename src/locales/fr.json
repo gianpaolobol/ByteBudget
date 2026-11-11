@@ -97,5 +97,8 @@
   "category_wine": "Bars à vin et cavistes",
   "category_restaurant": "Restaurants",
   "category_fast_food": "Restauration rapide",
-  "categoryEmpty": "Aucun établissement de cette catégorie à proximité"
+  "categoryEmpty": "Aucun établissement de cette catégorie à proximité",
+  "category_ice_cream": "Glaciers",
+  "category_pastry": "Pâtisseries",
+  "category_deli": "Traiteurs et rôtisseries"
 }

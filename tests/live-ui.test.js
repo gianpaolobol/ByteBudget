@@ -200,3 +200,18 @@ test('category rail uses the card pictograms and keeps the selection while walki
  assert.equal(pizza.getAttribute('aria-pressed'),'false');
  assert.deepEqual(requests,[]);
 });
+
+test('gelaterias, pastry shops and delis have their own filters and card icons',async()=>{
+ const {document,requests}=await boot({ios:true,openPilot:true});
+ const buttons=[...document.querySelectorAll('[data-category-filter]')];
+ assert.equal(buttons.length,11);
+ assert.equal(buttons[0].dataset.categoryFilter,'all');
+ for(const key of ['ice_cream','pastry','deli']){
+  const button=buttons.find(item=>item.dataset.categoryFilter===key);
+  button.onclick();
+  const cards=[...document.querySelectorAll('#results-list .card')];
+  assert.ok(cards.length>0,key);
+  assert.ok(cards.every(card=>card.querySelector('.category-mark svg').innerHTML===button.querySelector('svg').innerHTML),key);
+ }
+ assert.deepEqual(requests,[]);
+});

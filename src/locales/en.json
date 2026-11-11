@@ -97,5 +97,8 @@
   "category_wine": "Wine bars and shops",
   "category_restaurant": "Restaurants",
   "category_fast_food": "Fast food",
-  "categoryEmpty": "No venues in this category nearby"
+  "categoryEmpty": "No venues in this category nearby",
+  "category_ice_cream": "Ice cream shops",
+  "category_pastry": "Pastry shops",
+  "category_deli": "Delis and rotisseries"
 }

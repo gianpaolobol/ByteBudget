@@ -97,5 +97,8 @@
   "category_wine": "葡萄酒吧和酒铺",
   "category_restaurant": "餐厅",
   "category_fast_food": "快餐",
-  "categoryEmpty": "附近没有此类场所"
+  "categoryEmpty": "附近没有此类场所",
+  "category_ice_cream": "冰淇淋店",
+  "category_pastry": "糕点店",
+  "category_deli": "熟食店"
 }

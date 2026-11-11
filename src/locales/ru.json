@@ -97,5 +97,8 @@
   "category_wine": "Винные бары и магазины",
   "category_restaurant": "Рестораны",
   "category_fast_food": "Фастфуд",
-  "categoryEmpty": "Поблизости нет заведений этой категории"
+  "categoryEmpty": "Поблизости нет заведений этой категории",
+  "category_ice_cream": "Кафе-мороженое",
+  "category_pastry": "Кондитерские",
+  "category_deli": "Кулинарии"
 }

@@ -97,5 +97,8 @@
   "category_wine": "ワインバーと酒店",
   "category_restaurant": "レストラン",
   "category_fast_food": "ファストフード",
-  "categoryEmpty": "近くにこのカテゴリーのお店はありません"
+  "categoryEmpty": "近くにこのカテゴリーのお店はありません",
+  "category_ice_cream": "アイスクリーム店",
+  "category_pastry": "洋菓子店",
+  "category_deli": "惣菜店"
 }

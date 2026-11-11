@@ -97,5 +97,8 @@
   "category_wine": "Bares e lojas de vinhos",
   "category_restaurant": "Restaurantes",
   "category_fast_food": "Comida rápida",
-  "categoryEmpty": "Nenhum local desta categoria por perto"
+  "categoryEmpty": "Nenhum local desta categoria por perto",
+  "category_ice_cream": "Gelatarias",
+  "category_pastry": "Pastelarias",
+  "category_deli": "Lojas de comida preparada"
 }

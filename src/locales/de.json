@@ -97,5 +97,8 @@
   "category_wine": "Weinbars und Weinläden",
   "category_restaurant": "Restaurants",
   "category_fast_food": "Fast Food",
-  "categoryEmpty": "Keine Lokale dieser Kategorie in der Nähe"
+  "categoryEmpty": "Keine Lokale dieser Kategorie in der Nähe",
+  "category_ice_cream": "Eisdielen",
+  "category_pastry": "Konditoreien",
+  "category_deli": "Feinkostläden und Imbisse"
 }

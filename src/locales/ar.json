@@ -97,5 +97,8 @@
   "category_wine": "حانات ومتاجر النبيذ",
   "category_restaurant": "مطاعم",
   "category_fast_food": "وجبات سريعة",
-  "categoryEmpty": "لا توجد أماكن قريبة ضمن هذه الفئة"
+  "categoryEmpty": "لا توجد أماكن قريبة ضمن هذه الفئة",
+  "category_ice_cream": "محلات الآيس كريم",
+  "category_pastry": "محلات المعجنات",
+  "category_deli": "محلات الأطعمة الجاهزة"
 }

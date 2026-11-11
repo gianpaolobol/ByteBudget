@@ -97,5 +97,8 @@
   "category_wine": "Vinerie ed enoteche",
   "category_restaurant": "Ristoranti",
   "category_fast_food": "Fast food",
-  "categoryEmpty": "Nessun locale di questa categoria nelle vicinanze"
+  "categoryEmpty": "Nessun locale di questa categoria nelle vicinanze",
+  "category_ice_cream": "Gelaterie",
+  "category_pastry": "Pasticcerie",
+  "category_deli": "Gastronomie e rosticcerie"
 }

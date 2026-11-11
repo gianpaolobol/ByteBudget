@@ -30,12 +30,12 @@ the same radii as the prior OpenStreetMap sample.
 
 | Zone | Radius | OSM in merged catalog | Additional Overture records | Combined | With raw opening hours |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Cinema Rialto | 350 m | 37 | 25 | 62 | 14 |
-| Piazza della Mercanzia | 350 m | 164 | 85 | 249 | 44 |
-| Savigno | 1 km | 2 | 10 | 12 | 1 |
+| Cinema Rialto | 350 m | 43 | 24 | 67 | 18 |
+| Piazza della Mercanzia | 350 m | 186 | 90 | 276 | 52 |
+| Savigno | 1 km | 3 | 10 | 13 | 1 |
 
 The Mercanzia count differs from the first OSM sample (163) because the importer
-now includes explicitly tagged wine shops and resolves aliases across extracts. Five of the six named
+now includes explicitly tagged wine, ice cream, pastry and deli shops and resolves aliases across extracts. Five of the six named
 Rialto examples appear in the combined catalog: Fram, O' Sole Mio, Miky &
 Max, Sombrero and Bar Baldi. Pizzeria da Rialto remains unconfirmed. This is
 a comparison with a small previously verified list, not a full coverage or

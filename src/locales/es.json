@@ -97,5 +97,8 @@
   "category_wine": "Vinotecas",
   "category_restaurant": "Restaurantes",
   "category_fast_food": "Comida rápida",
-  "categoryEmpty": "No hay locales de esta categoría cerca"
+  "categoryEmpty": "No hay locales de esta categoría cerca",
+  "category_ice_cream": "Heladerías",
+  "category_pastry": "Pastelerías",
+  "category_deli": "Tiendas de comida preparada"
 }
