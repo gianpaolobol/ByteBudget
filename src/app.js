@@ -106,7 +106,13 @@ function resultMarkup(){
  if(busy)return '';
  return `<div class="empty"><h2>${t('empty')}</h2><p>${t('emptyText')}</p></div>`;
 }
-function filterDock(){return `<section class="filter-dock" aria-label="${t('priceTier')}"><div class="dock-inner">${radiusControl()}${bands()}</div></section>`}
+function filterDock(){
+ return `<section class="filter-dock" aria-label="${t('priceTier')}">${bands()}</section>
+ <section class="distance-rail" aria-label="${t('radius')}">
+  <output id="distance-label" for="radius" dir="ltr">${radius} m</output>
+  <div class="range-surface"><input type="range" min="100" max="1000" step="50" id="radius" value="${radius}" aria-label="${t('radius')}" aria-orientation="vertical" aria-valuetext="${radius} m"></div>
+ </section>`;
+}
 function listing(){
  return `<h1 class="visually-hidden">${t('browse')}</h1><p class="status" role="status">${esc(message?t(message):'')}</p><div class="result-head"><p class="subtle" id="result-count">${results.length} · ${t('nearbyCount')}</p></div><div id="results-list">${resultMarkup()}</div><div id="uncertain-results">${uncertainMarkup()}</div>${mapsAttribution()}<p class="subtle">${t('walk')}</p>${!data.demo?`<p class="subtle">${t('venueEstimate')}</p>${providerCredits()}`:''}${filterDock()}`;
 }
@@ -216,6 +222,7 @@ function updateFilters(){
  spendingInput.setAttribute('aria-valuetext',label);
  app.querySelectorAll('[data-tier-label]').forEach(el=>el.classList.toggle('active',el.dataset.tierLabel===selection.tier));
  setText(app.querySelector('#distance-label'),radius+' m');
+ app.querySelector('#radius')?.setAttribute('aria-valuetext',radius+' m');
  if(data&&liveUpdates&&['','approximateLocation'].includes(message)){
   message=data.locationAccuracy>radius/2?'approximateLocation':'';
   const status=app.querySelector('.status');if(status)status.textContent=message?t(message):'';

@@ -65,12 +65,12 @@ test('dragging keeps card DOM and photo observer unchanged until release; unknow
  assert.equal(document.querySelectorAll('.card').length,1);assert.equal(document.querySelector('.card h3').textContent,'Cheap cafe');
 });
 
-test('distance uses the same forgiving drag surface and does not request GPS during movement',async()=>{
+test('distance increases upward in the side rail without requesting GPS',async()=>{
  const {document,requests}=await boot();
  const input=document.querySelector('#radius'),surface=input.parentElement;
- surface.getBoundingClientRect=()=>({left:0,width:300,top:0,height:88});input.focus=()=>{};
- const event=(x,y=44)=>({pointerId:5,clientX:x,clientY:y,button:0,isPrimary:true,preventDefault(){}});
- const before=requests.length;surface.onpointerdown(event(226,8));surface.onpointermove(event(260,9));surface.onpointermove(event(285,130));surface.onpointerup(event(285,130));
+ surface.getBoundingClientRect=()=>({left:0,width:44,top:0,height:300});input.focus=()=>{};
+ const event=(x,y)=>({pointerId:5,clientX:x,clientY:y,button:0,isPrimary:true,preventDefault(){}});
+ const before=requests.length;surface.onpointerdown(event(8,74));surface.onpointermove(event(9,40));surface.onpointermove(event(-30,15));surface.onpointerup(event(-30,15));
  assert.equal(document.querySelector('#radius'),input);assert.ok(Number(input.value)>800);assert.match(document.querySelector('#distance-label').textContent,/1000 m/);assert.equal(requests.length,before);
 });
 
@@ -84,7 +84,8 @@ test('increasing the budget and infinity retain the affordable results',async()=
  }
  assert.equal(document.querySelector('#refresh'),null);
  assert.ok(document.querySelector('.filter-dock'));
- assert.equal(document.querySelector('.filter-dock input').id,'radius');
+ assert.equal(document.querySelector('.filter-dock input').id,'spending');
+ assert.equal(document.querySelector('.distance-rail input').getAttribute('aria-orientation'),'vertical');
 });
 test('both filters respond in the live results without new provider calls',async()=>{
  const {document,requests}=await boot({observer:true});
@@ -210,8 +211,8 @@ test('a live price response is retained when GPS changes during a slider gesture
   return new Response(body,{headers:{'Content-Type':'application/x-ndjson'}});
  }});
  const input=document.querySelector('#radius'),surface=input.parentElement;
- surface.getBoundingClientRect=()=>({left:0,width:300});
- const event={pointerId:7,clientX:225,clientY:20,button:0,isPrimary:true,preventDefault(){}};
+ surface.getBoundingClientRect=()=>({left:0,width:44,top:0,height:300});
+ const event={pointerId:7,clientX:22,clientY:75,button:0,isPrimary:true,preventDefault(){}};
  surface.onpointerdown(event);
  finish();await new Promise(r=>setTimeout(r,5));
  emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:12}});
@@ -223,8 +224,8 @@ test('a live price response is retained when GPS changes during a slider gesture
 test('backgrounding during a drag releases the controls on resume',async()=>{
  const {document,window}=await boot({ios:true});
  const input=document.querySelector('#radius'),surface=input.parentElement;
- surface.getBoundingClientRect=()=>({left:0,width:300});
- surface.onpointerdown({pointerId:9,clientX:225,clientY:20,button:0,isPrimary:true});
+ surface.getBoundingClientRect=()=>({left:0,width:44,top:0,height:300});
+ surface.onpointerdown({pointerId:9,clientX:22,clientY:75,button:0,isPrimary:true});
  Object.defineProperty(document,'visibilityState',{configurable:true,value:'hidden'});
  document.dispatchEvent(new window.Event('visibilitychange'));
  Object.defineProperty(document,'visibilityState',{configurable:true,value:'visible'});
