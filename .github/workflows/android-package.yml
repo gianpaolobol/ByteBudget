@@ -6,6 +6,12 @@ on:
         description: Next version code, verified above every existing Play upload
         required: true
         type: string
+      data_source:
+        description: Discovery data source
+        required: true
+        default: google
+        type: choice
+        options: [google, open-pilot]
 permissions:
   contents: read
 concurrency:
@@ -17,6 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
+      BYTEBUDGET_OPEN_PILOT: ${{ inputs.data_source == 'open-pilot' }}
       BYTEBUDGET_MODE: live
       BYTEBUDGET_API_BASE: ${{ vars.BYTEBUDGET_API_BASE }}
       BYTEBUDGET_ANDROID_VERSION_CODE: ${{ inputs.version_code }}
@@ -45,6 +52,7 @@ jobs:
         with:
           packages: platform-tools platforms;android-36 build-tools;36.0.0
       - name: Verify public live API and native CORS
+        if: inputs.data_source != 'open-pilot'
         run: node scripts/check-live-service.mjs
       - run: npm ci --ignore-scripts
       - run: npm test && npm run build && npx cap sync android
