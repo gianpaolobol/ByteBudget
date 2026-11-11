@@ -58,7 +58,7 @@ function menuLabel(price){return t(price.meal==='dinner'?'dinnerTastingMenu':'ta
 function priceQualifier(price){return price?.kind==='tasting-menu'?' · '+menuLabel(price):''}
 function opening(v){return v.openingStatus==='unknown'?t('hoursUnknown'):v.isOpen?t('open'):t('closedNow')}
 function photoMarkup(v,large=false){
- if(openPilot)return `<span class="category-mark ${large?'detail-mark':''}">${categoryIcon(displayCategory(v.category))}</span>`;
+ if(openPilot)return `<span class="category-mark ${large?'detail-mark':''}">${categoryIcon(displayCategory(v.category,v.takeaway))}</span>`;
  if(data?.demo)return plate(v.visual);
  if(!v.photo)return `<div class="venue-photo ${large?'large':''}"><span>${t('photoUnavailable')}</span></div>`;
  const url=new URL('/api/photo',window.BYTEBUDGET_CONFIG?.apiBase||location.origin);url.searchParams.set('name',v.photo.name);
@@ -202,7 +202,7 @@ function computeResults(){
   if(rankedData===data&&rankedMinute===minute&&rankedCategory===activeCategory)return;
   rankedData=data;rankedMinute=minute;rankedCategory=activeCategory;
   const nearby=selectOpenPilotVenues(data,now).filter(venue=>
-   activeCategory==='all'||displayCategory(venue.category)===activeCategory);
+   activeCategory==='all'||(activeCategory==='takeaway'?venue.takeaway===true:displayCategory(venue.category)===activeCategory));
   resultGroups=Object.fromEntries(DISCOVERY_GROUPS.map(group=>[group,group==='unclassified'?nearby:[]]));
   resultCount=nearby.length;
   return;
