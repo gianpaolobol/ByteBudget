@@ -116,5 +116,9 @@
   "venueAlreadyListed": "근처에 같은 이름의 장소가 이미 있습니다.",
   "localVenue": "이 기기에 추가됨",
   "addOnOsm": "OpenStreetMap 편집기 열기",
-  "removeLocalVenue": "이 기기에서 삭제"
+  "removeLocalVenue": "이 기기에서 삭제",
+  "venueComments": "댓글",
+  "commentsOnDevice": "댓글은 이 기기에 저장됩니다.",
+  "writeComment": "댓글 작성",
+  "saveComment": "댓글 저장"
 }

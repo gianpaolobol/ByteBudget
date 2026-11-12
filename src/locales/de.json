@@ -116,5 +116,9 @@
   "venueAlreadyListed": "Ein Ort mit diesem Namen ist bereits in der Nähe eingetragen.",
   "localVenue": "Auf diesem Gerät hinzugefügt",
   "addOnOsm": "OpenStreetMap-Editor öffnen",
-  "removeLocalVenue": "Von diesem Gerät entfernen"
+  "removeLocalVenue": "Von diesem Gerät entfernen",
+  "venueComments": "Kommentare",
+  "commentsOnDevice": "Kommentare werden auf diesem Gerät gespeichert.",
+  "writeComment": "Kommentar schreiben",
+  "saveComment": "Kommentar speichern"
 }

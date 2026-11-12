@@ -116,5 +116,9 @@
   "venueAlreadyListed": "附近已有同名店铺。",
   "localVenue": "已添加到此设备",
   "addOnOsm": "打开 OpenStreetMap 编辑器",
-  "removeLocalVenue": "从此设备移除"
+  "removeLocalVenue": "从此设备移除",
+  "venueComments": "评论",
+  "commentsOnDevice": "评论保存在此设备上。",
+  "writeComment": "写评论",
+  "saveComment": "保存评论"
 }

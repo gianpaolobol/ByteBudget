@@ -27,6 +27,9 @@ let rankedData,rankedMinute,rankedMeal,resultGroups={},resultCount=0;
 let data=null,view='discover',selected=null,meal='dinner',message='',busy=false;
 let saved=read('bb-saved',[]);if(!Array.isArray(saved))saved=[];
 const t=k=>strings[lang][k];const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const commentsKey='bb-venue-comments';
+const storedComments=read(commentsKey,{});
+const venueComments=Object.assign(Object.create(null),storedComments&&typeof storedComments==='object'&&!Array.isArray(storedComments)?storedComments:{});
 const venueCategories=categoryFilters.filter(key=>key!=='all');
 let localVenues=openPilot?read('bb-local-venues',[]):[];
 if(!Array.isArray(localVenues))localVenues=[];
@@ -116,8 +119,9 @@ function detail(){
  const site=!data.demo&&v.websiteUri&&!brokenWebsites.has(v.websiteUri)?v.websiteUri:null;
  return `<button class="back" id="back">← ${t('back')}</button>
  <div class="detail-title">${photoMarkup(v,true)}
- <h1><span>${esc(v.name)}</span>${favoriteButton(v)}</h1></div>
- <div class="facts"><span class="badge" data-detail-distance>⌖ ${Math.round(v.distance)} m</span></div>
+ <div class="detail-heading"><h1>${esc(v.name)}</h1>
+ <span class="detail-controls">${favoriteButton(v)}<button type="button" id="venue-comments" aria-label="${esc(t('venueComments'))}" aria-haspopup="dialog">${categoryIcon('comments')}</button>
+ <span class="badge" data-detail-distance>⌖ ${Math.round(v.distance)} m</span></span></div></div>
  <div class="actions">
  ${site?`<a id="venue-website" class="secondary" href="${esc(site)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}
  <button class="primary" id="route">↗ ${t('directions')}</button>
@@ -127,7 +131,7 @@ function detail(){
  </div>`;
 }
 function savedView(){const items=savedItems();return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
-function render(){if(view==='results')computeResults();photoObserver?.disconnect();photoObserver=null;observedPhotos.clear();document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell ${openPilot?'open-pilot-shell':''}">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}${!openPilot&&view==='saved'?mapsAttribution():''}<nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
+function render(){if(view==='results')computeResults();photoObserver?.disconnect();photoObserver=null;observedPhotos.clear();document.documentElement.lang=lang;document.documentElement.dir=direction(lang);app.innerHTML=`<div class="safe-area-top" aria-hidden="true"></div><main class="shell ${openPilot?'open-pilot-shell':''} ${openPilot&&view==='results'?'discovery-shell':''}">${header()}${view==='detail'?detail():view==='results'?listing():view==='saved'?savedView():discover()}${!openPilot&&view==='saved'?mapsAttribution():''}<nav class="nav" aria-label="${t('discover')}"><button data-view="discover" class="${view!=='saved'?'active':''}"><span>⌕</span>${t('discover')}</button><button data-view="saved" class="${view==='saved'?'active':''}"><span>♡</span>${t('saved')}</button></nav></main><dialog id="dialog"></dialog>`;
 app.querySelector('#language').disabled=busy&&!liveUpdates;
 app.querySelector('#language').onchange=e=>{lang=e.target.value;write('bb-lang',lang);render()};
 app.querySelectorAll('[data-meal]').forEach(b=>b.onclick=()=>{meal=b.dataset.meal;render()});
@@ -140,11 +144,11 @@ app.querySelectorAll('[data-category-filter]').forEach(button=>button.onclick=()
  app.querySelectorAll('[data-category-filter]').forEach(filter=>
   filter.setAttribute('aria-pressed',String(filter.dataset.categoryFilter===activeCategory)));
  updateResults();
- scrollTo(0,0);
+ app.querySelector('.category-results').scrollTop=0;
 });
 
 const on=(id,fn)=>{const el=app.querySelector('#'+id);if(el)el.onclick=fn};
-on('add-venue',showAddVenue);on('remove-local-venue',confirmRemoveVenue);on('location',chooseLocation);on('demo',chooseLocation);on('credits',()=>showDialog(`<h2>${esc(t('dataLicenses'))}</h2>${mapsAttribution()}`));on('back',()=>{view=detailReturnView;message=openPilot&&!data.city?'openPilotCoverage':'';render()});on('search',()=>{
+on('venue-comments',showVenueComments);on('add-venue',showAddVenue);on('remove-local-venue',confirmRemoveVenue);on('location',chooseLocation);on('demo',chooseLocation);on('credits',()=>showDialog(`<h2>${esc(t('dataLicenses'))}</h2>${mapsAttribution()}`));on('back',()=>{view=detailReturnView;message=openPilot&&!data.city?'openPilotCoverage':'';render()});on('search',()=>{
  if(data?.demo){search();return}
  if(openPilot&&liveUpdates){stopLocationWatch();void startLocationWatch();return}
  void locate(true);
@@ -176,7 +180,7 @@ function toggleSaved(id){
  write('bb-saved',saved);
  app.querySelectorAll('[data-save-id]').forEach(button=>{
   if(button.dataset.saveId!==id)return;
-  const name=button.closest('.card,.detail-title')?.querySelector('h3,h1 > span')?.textContent||'';
+  const name=button.closest('.card,.detail-title')?.querySelector('h3,h1')?.textContent||'';
   button.setAttribute('aria-pressed',String(saved.includes(id)));
   button.setAttribute('aria-label',t(saved.includes(id)?'unsave':'save')+' · '+name);
   button.querySelector('span').textContent=saved.includes(id)?'♥':'♡';
@@ -248,7 +252,29 @@ function computeResults(){
  resultCount=Object.values(resultGroups).reduce((total,venues)=>total+venues.length,0);
 }
 function search(){view='results';message=busy?'loadingNearby':'';render();scrollTo(0,0)}
-function showDialog(html){const d=app.querySelector('#dialog');d.innerHTML=html+`<button class="secondary" id="close-dialog">${t('close')}</button>`;d.querySelector('#close-dialog').onclick=()=>d.close();d.showModal()}
+function showDialog(html){const d=app.querySelector('#dialog');d.innerHTML=html+`<button class="secondary" id="close-dialog">${t('close')}</button>`;d.querySelector('#close-dialog').onclick=()=>d.close();if(!d.open&&!d.hasAttribute('open'))d.showModal()}
+function showVenueComments(){
+ const id=selected.id;
+ const entries=Object.hasOwn(venueComments,id)&&Array.isArray(venueComments[id])
+  ?venueComments[id].filter(value=>typeof value==='string')
+  :[];
+ const list=entries.length?`<ul class="venue-comments-list">${entries.map(value=>`<li>${esc(value)}</li>`).join('')}</ul>`:'';
+ showDialog(`<h2>${esc(t('venueComments'))}</h2><p class="subtle">${esc(t('commentsOnDevice'))}</p>${list}
+ <form id="venue-comment-form"><label for="venue-comment">${esc(t('writeComment'))}</label>
+ <textarea id="venue-comment" required maxlength="500" rows="3"></textarea>
+ <p class="status" role="status"></p><button class="primary" type="submit">${esc(t('saveComment'))}</button></form>`);
+ const form=app.querySelector('#venue-comment-form');
+ form.onsubmit=event=>{
+  event.preventDefault();
+  const value=form.querySelector('textarea').value.trim();
+  if(!value||value.length>500)return;
+  const next=[value,...entries];
+  try{localStorage.setItem(commentsKey,JSON.stringify({...venueComments,[id]:next}))}
+  catch{form.querySelector('[role="status"]').textContent=t('error');return}
+  venueComments[id]=next;
+  showVenueComments();
+ };
+}
 function osmEditorUrl(venue){
  return `https://www.openstreetmap.org/edit?editor=id#map=20/${venue.lat.toFixed(6)}/${venue.lng.toFixed(6)}`;
 }

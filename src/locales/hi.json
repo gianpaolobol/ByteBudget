@@ -116,5 +116,9 @@
   "venueAlreadyListed": "इस नाम का एक स्थान पहले से पास में दर्ज है।",
   "localVenue": "इस डिवाइस पर जोड़ा गया",
   "addOnOsm": "OpenStreetMap संपादक खोलें",
-  "removeLocalVenue": "इस डिवाइस से हटाएँ"
+  "removeLocalVenue": "इस डिवाइस से हटाएँ",
+  "venueComments": "टिप्पणियाँ",
+  "commentsOnDevice": "टिप्पणियाँ इस डिवाइस पर सहेजी जाती हैं।",
+  "writeComment": "टिप्पणी लिखें",
+  "saveComment": "टिप्पणी सहेजें"
 }

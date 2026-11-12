@@ -116,5 +116,9 @@
   "venueAlreadyListed": "A venue with this name is already listed nearby.",
   "localVenue": "Added on this device",
   "addOnOsm": "Open the OpenStreetMap editor",
-  "removeLocalVenue": "Remove from this device"
+  "removeLocalVenue": "Remove from this device",
+  "venueComments": "Comments",
+  "commentsOnDevice": "Comments are saved on this device.",
+  "writeComment": "Write a comment",
+  "saveComment": "Save comment"
 }

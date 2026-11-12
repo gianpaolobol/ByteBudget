@@ -116,5 +116,9 @@
   "venueAlreadyListed": "Un établissement de ce nom existe déjà à proximité.",
   "localVenue": "Ajouté sur cet appareil",
   "addOnOsm": "Ouvrir l’éditeur OpenStreetMap",
-  "removeLocalVenue": "Supprimer de cet appareil"
+  "removeLocalVenue": "Supprimer de cet appareil",
+  "venueComments": "Commentaires",
+  "commentsOnDevice": "Les commentaires sont enregistrés sur cet appareil.",
+  "writeComment": "Écrire un commentaire",
+  "saveComment": "Enregistrer le commentaire"
 }

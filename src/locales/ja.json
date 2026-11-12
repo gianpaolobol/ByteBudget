@@ -116,5 +116,9 @@
   "venueAlreadyListed": "近くに同じ名前のお店が登録されています。",
   "localVenue": "この端末に追加済み",
   "addOnOsm": "OpenStreetMap エディターを開く",
-  "removeLocalVenue": "この端末から削除"
+  "removeLocalVenue": "この端末から削除",
+  "venueComments": "コメント",
+  "commentsOnDevice": "コメントはこの端末に保存されます。",
+  "writeComment": "コメントを書く",
+  "saveComment": "コメントを保存"
 }

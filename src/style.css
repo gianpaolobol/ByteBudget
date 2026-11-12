@@ -24,10 +24,17 @@
 .price-group h2{margin:22px 0 8px;color:var(--teal)}
 .open-pilot-attribution{white-space:normal}
 /* The rail stays on the left, including in right-to-left languages. */
-.category-layout{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;direction:ltr;margin-top:-12px}
-.category-results{min-width:0}
-.category-rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 3px);align-self:start;display:grid;gap:0;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 66px);overflow-y:auto;padding:2px}
-.category-rail button{display:grid;place-items:center;min-height:40px;padding:2px 0;border-radius:12px;background:transparent;color:var(--teal);font-size:10px;overflow-wrap:anywhere}
+.discovery-shell{height:100dvh;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);padding-bottom:calc(54px + env(safe-area-inset-bottom,0px));overflow:hidden}
+.discovery-shell .top{margin-bottom:8px}
+.discovery-shell .nav{height:calc(52px + env(safe-area-inset-bottom,0px));min-height:0;padding:0 0 env(safe-area-inset-bottom,0px);align-items:end}
+.discovery-shell .nav button{min-height:44px;gap:0}
+.category-layout{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;direction:ltr;min-height:0}
+.category-results{min-width:0;overflow-y:auto;overscroll-behavior-y:contain}
+.category-rail{display:grid;grid-template-rows:minmax(0,1fr) clamp(30px,5dvh,40px);gap:0;overflow-y:auto;padding:2px}
+.category-buttons{display:grid;grid-template-rows:minmax(38px,1.12fr);grid-auto-rows:minmax(29px,1fr)}
+.category-rail button{display:grid;place-items:center;align-content:center;min-height:0;padding:1px 0;border-radius:12px;background:transparent;color:var(--teal);font-size:10px;line-height:1.15;overflow-wrap:anywhere}
+@media(max-height:600px){.category-rail{grid-template-rows:auto 34px}}
+@media(min-width:700px){.discovery-shell{height:calc(100dvh - 64px)}.discovery-shell .nav{bottom:32px}}
 .category-rail button[aria-pressed=true]{background:#dce9df;box-shadow:inset 0 0 0 1px #699286}
 .category-rail button:focus-visible{outline-offset:-3px}
 .category-rail svg{width:25px;height:25px}
@@ -42,10 +49,18 @@
 .header-controls{display:flex;align-items:center;gap:4px}
 .credits{width:36px;height:40px;background:transparent;color:var(--teal)}
 .detail-title{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin-top:20px}
-.detail-title h1{min-width:0;overflow-wrap:anywhere;margin:0;font-size:clamp(27px,7vw,39px)}
+.detail-heading{min-width:0;line-height:1.15}
+.detail-title h1{display:inline;overflow-wrap:anywhere;margin:0;font-size:clamp(27px,7vw,39px)}
+.detail-controls{display:inline-flex;flex-wrap:wrap;align-items:center;vertical-align:middle;max-width:100%}
+.detail-controls .badge{white-space:nowrap}
+#venue-comments{display:grid;place-items:center;width:44px;height:44px;background:transparent;color:var(--teal)}
+#venue-comments svg{width:27px;height:27px}
+.venue-comments-list{list-style:none;padding:0;max-height:30dvh;overflow:auto}
+.venue-comments-list li{padding:8px 0;border-bottom:1px solid #d9dfd3;white-space:pre-wrap;overflow-wrap:anywhere}
+#venue-comment-form{display:grid;gap:8px;margin-bottom:12px}
+#venue-comment{font:inherit;width:100%;padding:8px}
 .detail-title .favorite{position:static;display:inline-grid;place-items:center;vertical-align:middle}
 .actions a{text-align:center}
-.category-buttons{display:grid}
 #add-venue{background:#e4eee6}
 .detail-title .detail-mark{width:52px;flex:0 0 52px;margin:0}
 .detail-title .detail-mark svg{width:48px;height:48px}

@@ -116,5 +116,9 @@
   "venueAlreadyListed": "يوجد مكان بهذا الاسم في الجوار.",
   "localVenue": "أُضيف على هذا الجهاز",
   "addOnOsm": "فتح محرر OpenStreetMap",
-  "removeLocalVenue": "إزالة من هذا الجهاز"
+  "removeLocalVenue": "إزالة من هذا الجهاز",
+  "venueComments": "التعليقات",
+  "commentsOnDevice": "تُحفظ التعليقات على هذا الجهاز.",
+  "writeComment": "اكتب تعليقًا",
+  "saveComment": "حفظ التعليق"
 }

@@ -6,10 +6,10 @@ import {build} from 'esbuild';
 import {parseHTML} from 'linkedom';
 const now=new Date().toISOString();
 const venue=(id,tier,max,extra={})=>({id,name:id,lat:44.49,lng:11.34,currency:'EUR',rating:4.5,reviewCount:20,isOpen:true,openingStatus:'open',sourceTier:tier,prices:{},venuePrice:{min:max-5,max,updatedAt:now,source:'Google Maps priceRange',scope:'venue-estimate'},...extra});
-async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=false,websiteStatus=200}={}){
+async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=false,websiteStatus=200,initialValues=[]}={}){
  const requests=[],observers=[],posted=[],routes=[];let receivePosition;
  const {window,document}=parseHTML('<html><body><div id="app"></div></body></html>');
- const values=new Map([['bb-spending-position','450']]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
+ const values=new Map([['bb-spending-position','450'],...initialValues]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
  if(venues)dataset.venues=venues;
  window.open=url=>routes.push(url);
  window.HTMLElement.prototype.showModal=function(){this.setAttribute('open','')};
@@ -172,7 +172,7 @@ test('open data beta discovers both sources offline and updates coverage as GPS 
  assert.equal(heart.getAttribute('aria-pressed'),'true');
  heart.onclick();
  assert.equal(heart.getAttribute('aria-pressed'),'false');
- assert.ok(heart.getAttribute('aria-label').endsWith(document.querySelector('.detail-title h1 > span').textContent));
+ assert.ok(heart.getAttribute('aria-label').endsWith(document.querySelector('.detail-title h1').textContent));
  const previousDistance=document.querySelector('[data-detail-distance]').textContent;
  emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:10}});
  assert.notEqual(document.querySelector('[data-detail-distance]').textContent,previousDistance);
@@ -277,9 +277,9 @@ test('the plus adds a local venue with a chosen category and links to the mapped
  form.querySelector('#venue-name').value=name;
  form.querySelector('#venue-category option[value="sushi"]').selected=true;
  form.onsubmit({preventDefault(){}});
- assert.equal(document.querySelector('.detail-title h1 > span').textContent,name);
+ assert.equal(document.querySelector('.detail-title h1').textContent,name);
  assert.equal(document.querySelector('.detail-title').firstElementChild.classList.contains('category-mark'),true);
- assert.equal(document.querySelector('.detail-title h1 > span').nextElementSibling.className,'favorite');
+ assert.equal(document.querySelector('.detail-title h1').nextElementSibling.firstElementChild.className,'favorite');
  const editor=document.querySelector('a[href*="openstreetmap.org/edit"]');
  assert.equal(new URL(editor.href).hash,'#map=20/44.490000/11.340000');
  assert.match(document.querySelector('[data-detail-distance]').textContent,/0 m/);
@@ -289,4 +289,30 @@ test('the plus adds a local venue with a chosen category and links to the mapped
  emitPosition({timestamp:Date.now(),coords:{latitude:44.3919473,longitude:11.0745599,accuracy:10}});
  assert.ok(![...document.querySelectorAll('.card h3')].some(el=>el.textContent===name));
  assert.deepEqual(requests,[]);
+});
+
+test('venue comments are displayed in detail order and persist for that venue only',async()=>{
+ const venues=[venue('Caffè A','low',15),venue('Caffè B','low',15)];
+ const {document,values}=await boot({venues});
+ const open=id=>document.querySelector(`[data-id="${id}"]`).onclick();
+ open('Caffè A');
+ const controls=[...document.querySelector('.detail-controls').children];
+ assert.ok(controls[0].matches('.favorite'));
+ assert.equal(controls[1].id,'venue-comments');
+ assert.ok(controls[2].matches('[data-detail-distance]'));
+ controls[1].onclick();
+ const form=document.querySelector('#venue-comment-form');
+ const comment='Great coffee <b>and cake</b>';
+ form.querySelector('textarea').value=comment;
+ form.onsubmit({preventDefault(){}});
+ assert.equal(document.querySelector('.venue-comments-list li').textContent,comment);
+ assert.equal(document.querySelector('.venue-comments-list li b'),null);
+ const reboot=await boot({venues,initialValues:values});
+ reboot.document.querySelector('[data-id="Caffè A"]').onclick();
+ reboot.document.querySelector('#venue-comments').onclick();
+ assert.equal(reboot.document.querySelector('.venue-comments-list li').textContent,comment);
+ reboot.document.querySelector('#back').onclick();
+ reboot.document.querySelector('[data-id="Caffè B"]').onclick();
+ reboot.document.querySelector('#venue-comments').onclick();
+ assert.equal(reboot.document.querySelector('.venue-comments-list li'),null);
 });
