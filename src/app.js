@@ -47,7 +47,7 @@ function setData(next){
 }
 
 const plate=(v=0)=>`<div class="thumb v${[0,1,2].includes(v)?v:0}"><div class="plate" aria-hidden="true"></div></div>`;
-function header(){return `<header class="top"><div class="brand"><img src="./public/icon.svg" alt="">ByteBudget</div><div class="header-controls">${openPilot?`<button id="credits" class="credits" aria-label="${esc(t('dataLicenses'))}">ⓘ</button>`:''}<select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></div></header>${!openPilot&&data?.demo?`<div class="notice">${t('demo')}</div>`:''}`}
+function header(){return `<header class="top"><div class="brand"><img src="./public/icon-192.png" alt="">ByteBudget</div><div class="header-controls">${openPilot?`<button id="credits" class="credits" aria-label="${esc(t('dataLicenses'))}">ⓘ</button>`:''}<select class="language" aria-label="${t('language')}" id="language">${languages.map(({code,name})=>`<option value="${code}" ${lang===code?'selected':''}>${name}</option>`).join('')}</select></div></header>${!openPilot&&data?.demo?`<div class="notice">${t('demo')}</div>`:''}`}
 function providerCredits(){
  const credits=new Map();for(const v of data?.venues||[])for(const a of v.attributions||[]){if(typeof a.provider!=='string')continue;let url;try{const u=new URL(a.providerUri);if(u.protocol==='https:')url=u.href}catch{}credits.set(a.provider,{name:a.provider,url});}
  return [...credits.values()].map(a=>`<p class="subtle">${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.name)}</a>`:esc(a.name)}</p>`).join('');
