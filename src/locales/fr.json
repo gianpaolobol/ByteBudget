@@ -105,5 +105,16 @@
   "category_deli": "Traiteurs et rôtisseries",
   "category_sushi": "Sushi",
   "category_cocktail": "Bars à cocktails",
-  "dataLicenses": "Licences des données"
+  "dataLicenses": "Licences des données",
+  "addVenue": "Ajouter un établissement",
+  "addVenueAccuracy": "Attendez une position plus précise, puis réessayez.",
+  "addVenuePosition": "Ouvrez le formulaire devant le lieu. La position relevée à son ouverture sera utilisée.",
+  "venueName": "Nom de l’établissement",
+  "chooseVenueCategory": "Choisissez une catégorie",
+  "saveLocalVenue": "Ajouter sur cet appareil",
+  "venueFormRequired": "Saisissez le nom et la catégorie.",
+  "venueAlreadyListed": "Un établissement de ce nom existe déjà à proximité.",
+  "localVenue": "Ajouté sur cet appareil",
+  "addOnOsm": "Ouvrir l’éditeur OpenStreetMap",
+  "removeLocalVenue": "Supprimer de cet appareil"
 }

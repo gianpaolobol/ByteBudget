@@ -105,5 +105,16 @@
   "category_deli": "熟食店",
   "category_sushi": "寿司",
   "category_cocktail": "鸡尾酒吧",
-  "dataLicenses": "数据许可"
+  "dataLicenses": "数据许可",
+  "addVenue": "添加店铺",
+  "addVenueAccuracy": "请等待定位更准确后重试。",
+  "addVenuePosition": "请在店铺门前打开表单，将使用打开表单时记录的位置。",
+  "venueName": "店铺名称",
+  "chooseVenueCategory": "选择类别",
+  "saveLocalVenue": "添加到此设备",
+  "venueFormRequired": "请输入名称并选择类别。",
+  "venueAlreadyListed": "附近已有同名店铺。",
+  "localVenue": "已添加到此设备",
+  "addOnOsm": "打开 OpenStreetMap 编辑器",
+  "removeLocalVenue": "从此设备移除"
 }

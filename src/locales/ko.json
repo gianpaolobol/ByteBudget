@@ -105,5 +105,16 @@
   "category_deli": "델리와 즉석식품점",
   "category_sushi": "스시",
   "category_cocktail": "칵테일 바",
-  "dataLicenses": "데이터 라이선스"
+  "dataLicenses": "데이터 라이선스",
+  "addVenue": "장소 추가",
+  "addVenueAccuracy": "위치가 더 정확해지면 다시 시도하세요.",
+  "addVenuePosition": "장소 앞에서 양식을 여세요. 양식을 연 시점의 위치를 사용합니다.",
+  "venueName": "장소 이름",
+  "chooseVenueCategory": "카테고리 선택",
+  "saveLocalVenue": "이 기기에 추가",
+  "venueFormRequired": "이름을 입력하고 카테고리를 선택하세요.",
+  "venueAlreadyListed": "근처에 같은 이름의 장소가 이미 있습니다.",
+  "localVenue": "이 기기에 추가됨",
+  "addOnOsm": "OpenStreetMap 편집기 열기",
+  "removeLocalVenue": "이 기기에서 삭제"
 }

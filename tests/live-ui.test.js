@@ -12,6 +12,7 @@ async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=fa
  const values=new Map([['bb-spending-position','450']]);const dataset={city:'Valsamoggia',country:'IT',currency:'EUR',timeZone:'Europe/Rome',lat:44.49,lng:11.34,demo:false,pricingScope:'venue',venues:[venue('Unknown price','high',40,{venuePrice:undefined}),venue('Cheap cafe','low',15,{photo:{name:'places/cheap/photos/real',authorAttributions:[{displayName:'Real author',uri:'https://maps.google.com/maps/contrib/1'}]}}),venue('Mid restaurant','high',40,{isOpen:false,openingStatus:'closed',websiteUri:'https://example.com',googleMapsUri:'https://maps.google.com/?cid=123'})]};
  if(venues)dataset.venues=venues;
  window.open=url=>routes.push(url);
+ window.HTMLElement.prototype.showModal=function(){this.setAttribute('open','')};
  window.BYTEBUDGET_CONFIG={apiBase:'https://bb.test'};
  const nativePlatform=ios?'ios':'android';
  const geolocation=ios?`export const Geolocation={
@@ -25,11 +26,11 @@ async function boot({observer=false,ios=false,venues,nearbyResponse,openPilot=fa
   clearWatch:async()=>{}
  }`:'export const Geolocation={getCurrentPosition:async()=>({coords:{latitude:44.49,longitude:11.34,accuracy:5}})}';
  const {outputFiles}=await build({entryPoints:['src/app.js'],bundle:true,write:false,format:'iife',define:{__BYTEBUDGET_ALLOW_DEMO__:'false',__BYTEBUDGET_OPEN_PILOT__:String(openPilot)},plugins:[{name:'native-boundary',setup(b){b.onResolve({filter:/^@capacitor\/(core|geolocation)$/},a=>({path:a.path,namespace:'native-test'}));b.onLoad({filter:/.*/,namespace:'native-test'},a=>({contents:a.path.endsWith('/core')?`export const Capacitor={isNativePlatform:()=>true,getPlatform:()=>'${nativePlatform}'};export const CapacitorHttp={head:async()=>({status:${websiteStatus}})}`:geolocation}));}}]});
- const context={window,document,console,Intl,Date,URL,AbortSignal,TextDecoder,setTimeout,clearTimeout,recordWatch:receive=>{receivePosition=receive},scrollTo(){},navigator:{languages:['en']},location:{origin:'https://localhost',protocol:'https:'},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},fetch:async (url,options)=>{requests.push(String(url));if(options?.method==='POST'){posted.push(JSON.parse(options.body));if(nearbyResponse)return nearbyResponse(dataset)}return Response.json(String(url).includes('/api/photo?')?{photoUri:'https://lh3.googleusercontent.com/genuine-image'}:String(url).endsWith('/api/status')?{configured:true,mode:'nearby'}:dataset)}};
+ const context={window,document,console,Intl,Date,URL,crypto,AbortSignal,TextDecoder,setTimeout,clearTimeout,recordWatch:receive=>{receivePosition=receive},scrollTo(){},navigator:{languages:['en']},location:{origin:'https://localhost',protocol:'https:'},localStorage:{getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},fetch:async (url,options)=>{requests.push(String(url));if(options?.method==='POST'){posted.push(JSON.parse(options.body));if(nearbyResponse)return nearbyResponse(dataset)}return Response.json(String(url).includes('/api/photo?')?{photoUri:'https://lh3.googleusercontent.com/genuine-image'}:String(url).endsWith('/api/status')?{configured:true,mode:'nearby'}:dataset)}};
  if(observer)context.IntersectionObserver=class{constructor(callback){this.callback=callback;this.targets=[];observers.push(this)}observe(el){this.targets.push(el)}unobserve(){}disconnect(){}};
  vm.runInNewContext(outputFiles[0].text,context);
  for(let i=0;i<100&&!document.querySelector('.result-head');i++)await new Promise(r=>setTimeout(r,5));
- return {document,window,requests,observers,posted,routes,emitPosition:position=>receivePosition(position)};
+ return {document,window,requests,observers,posted,routes,values,emitPosition:position=>receivePosition(position)};
 }
 test('discovery ignores old slider settings and ranks by tier and value',async()=>{
  const {document,posted}=await boot({ios:true,venues:[
@@ -171,7 +172,7 @@ test('open data beta discovers both sources offline and updates coverage as GPS 
  assert.equal(heart.getAttribute('aria-pressed'),'true');
  heart.onclick();
  assert.equal(heart.getAttribute('aria-pressed'),'false');
- assert.ok(heart.getAttribute('aria-label').endsWith(document.querySelector('.detail-title h1').textContent));
+ assert.ok(heart.getAttribute('aria-label').endsWith(document.querySelector('.detail-title h1 > span').textContent));
  const previousDistance=document.querySelector('[data-detail-distance]').textContent;
  emitPosition({timestamp:Date.now(),coords:{latitude:44.4908,longitude:11.34,accuracy:10}});
  assert.notEqual(document.querySelector('[data-detail-distance]').textContent,previousDistance);
@@ -265,4 +266,27 @@ test('Android opens walking directions in Google Maps and hides confirmed broken
   assert.equal(route.searchParams.get('destination'),'44.49,11.34');
   assert.equal(route.searchParams.get('travelmode'),'walking');
  }
+});
+
+test('the plus adds a local venue with a chosen category and links to the mapped position',async()=>{
+ const {document,values,requests,emitPosition}=await boot({ios:true,openPilot:true});
+ const name='A new sushi venue';
+ assert.equal(document.querySelector('.category-rail').lastElementChild.id,'add-venue');
+ document.querySelector('#add-venue').onclick();
+ const form=document.querySelector('#venue-form');
+ form.querySelector('#venue-name').value=name;
+ form.querySelector('#venue-category option[value="sushi"]').selected=true;
+ form.onsubmit({preventDefault(){}});
+ assert.equal(document.querySelector('.detail-title h1 > span').textContent,name);
+ assert.equal(document.querySelector('.detail-title').firstElementChild.classList.contains('category-mark'),true);
+ assert.equal(document.querySelector('.detail-title h1 > span').nextElementSibling.className,'favorite');
+ const editor=document.querySelector('a[href*="openstreetmap.org/edit"]');
+ assert.equal(new URL(editor.href).hash,'#map=20/44.490000/11.340000');
+ assert.match(document.querySelector('[data-detail-distance]').textContent,/0 m/);
+ assert.equal(JSON.parse(values.get('bb-local-venues'))[0].category,'sushi');
+ document.querySelector('#back').onclick();
+ assert.ok([...document.querySelectorAll('.card h3')].some(el=>el.textContent===name));
+ emitPosition({timestamp:Date.now(),coords:{latitude:44.3919473,longitude:11.0745599,accuracy:10}});
+ assert.ok(![...document.querySelectorAll('.card h3')].some(el=>el.textContent===name));
+ assert.deepEqual(requests,[]);
 });

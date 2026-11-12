@@ -105,5 +105,16 @@
   "category_deli": "Feinkostläden und Imbisse",
   "category_sushi": "Sushi",
   "category_cocktail": "Cocktailbars",
-  "dataLicenses": "Datenlizenzen"
+  "dataLicenses": "Datenlizenzen",
+  "addVenue": "Ort hinzufügen",
+  "addVenueAccuracy": "Warte auf einen genaueren Standort und versuche es erneut.",
+  "addVenuePosition": "Öffne das Formular vor dem Ort. Der beim Öffnen ermittelte Standort wird verwendet.",
+  "venueName": "Name des Ortes",
+  "chooseVenueCategory": "Kategorie auswählen",
+  "saveLocalVenue": "Auf diesem Gerät hinzufügen",
+  "venueFormRequired": "Gib einen Namen und eine Kategorie an.",
+  "venueAlreadyListed": "Ein Ort mit diesem Namen ist bereits in der Nähe eingetragen.",
+  "localVenue": "Auf diesem Gerät hinzugefügt",
+  "addOnOsm": "OpenStreetMap-Editor öffnen",
+  "removeLocalVenue": "Von diesem Gerät entfernen"
 }

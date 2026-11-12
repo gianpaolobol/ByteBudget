@@ -105,5 +105,16 @@
   "category_deli": "محلات الأطعمة الجاهزة",
   "category_sushi": "سوشي",
   "category_cocktail": "بارات الكوكتيل",
-  "dataLicenses": "تراخيص البيانات"
+  "dataLicenses": "تراخيص البيانات",
+  "addVenue": "إضافة مكان",
+  "addVenueAccuracy": "انتظر حتى يصبح الموقع أدق ثم حاول مجددًا.",
+  "addVenuePosition": "افتح النموذج أمام المكان. سيُستخدم الموقع المسجل عند فتحه.",
+  "venueName": "اسم المكان",
+  "chooseVenueCategory": "اختر فئة",
+  "saveLocalVenue": "إضافة على هذا الجهاز",
+  "venueFormRequired": "أدخل اسمًا واختر فئة.",
+  "venueAlreadyListed": "يوجد مكان بهذا الاسم في الجوار.",
+  "localVenue": "أُضيف على هذا الجهاز",
+  "addOnOsm": "فتح محرر OpenStreetMap",
+  "removeLocalVenue": "إزالة من هذا الجهاز"
 }

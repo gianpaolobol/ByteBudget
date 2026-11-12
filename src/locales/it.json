@@ -105,5 +105,16 @@
   "category_deli": "Gastronomie e rosticcerie",
   "category_sushi": "Sushi",
   "category_cocktail": "Cocktail bar",
-  "dataLicenses": "Licenze dei dati"
+  "dataLicenses": "Licenze dei dati",
+  "addVenue": "Aggiungi un locale",
+  "addVenueAccuracy": "Attendi una posizione più precisa e riprova.",
+  "addVenuePosition": "Apri il modulo quando sei davanti al locale. Verrà usata la posizione rilevata all’apertura.",
+  "venueName": "Nome del locale",
+  "chooseVenueCategory": "Scegli una categoria",
+  "saveLocalVenue": "Aggiungi su questo dispositivo",
+  "venueFormRequired": "Inserisci nome e categoria.",
+  "venueAlreadyListed": "Un locale con questo nome è già presente nelle vicinanze.",
+  "localVenue": "Aggiunto su questo dispositivo",
+  "addOnOsm": "Apri l’editor di OpenStreetMap",
+  "removeLocalVenue": "Rimuovi da questo dispositivo"
 }

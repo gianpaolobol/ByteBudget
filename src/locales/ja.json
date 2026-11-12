@@ -105,5 +105,16 @@
   "category_deli": "惣菜店",
   "category_sushi": "寿司",
   "category_cocktail": "カクテルバー",
-  "dataLicenses": "データのライセンス"
+  "dataLicenses": "データのライセンス",
+  "addVenue": "お店を追加",
+  "addVenueAccuracy": "位置情報の精度が上がってから再試行してください。",
+  "addVenuePosition": "お店の前でフォームを開いてください。開いた時点の位置を使用します。",
+  "venueName": "店名",
+  "chooseVenueCategory": "カテゴリを選択",
+  "saveLocalVenue": "この端末に追加",
+  "venueFormRequired": "店名を入力し、カテゴリを選択してください。",
+  "venueAlreadyListed": "近くに同じ名前のお店が登録されています。",
+  "localVenue": "この端末に追加済み",
+  "addOnOsm": "OpenStreetMap エディターを開く",
+  "removeLocalVenue": "この端末から削除"
 }

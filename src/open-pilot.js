@@ -58,15 +58,17 @@ export function openPilotDataset({latitude:lat,longitude:lng,accuracy:locationAc
  };
 }
 
-export function selectOpenPilotVenues(data, now=Date.now(), savedIds) {
+export function selectOpenPilotVenues(data, now=Date.now(), savedIds,localVenues=[]) {
  const parts=Object.fromEntries(clock.formatToParts(now).map(p=>[p.type,p.value]));
  const day=days.indexOf(parts.weekday.slice(0,2));
  const minute=Number(parts.hour)*60+Number(parts.minute);
- const venues=savedIds?catalog.venues.filter(v=>savedIds.includes(v.id)):data.venues;
+ const venues=savedIds
+  ?[...catalog.venues,...localVenues].filter(v=>savedIds.includes(v.id))
+  :[...data.venues,...localVenues];
  return venues.flatMap(venue=>{
   const distance=distanceMeters(data.lat,data.lng,venue.lat,venue.lng);
   if (!savedIds && distance>DISCOVERY_RADIUS) return [];
-  const isOpen=hoursById.get(venue.id)(day,minute);
+  const isOpen=hoursById.get(venue.id)?.(day,minute)??null;
   if (!savedIds && isOpen===false) return [];
   return [{...venue,distance,isOpen,openingStatus:isOpen===null?'unknown':isOpen?'open':'closed'}];
  }).sort((a,b)=>a.distance-b.distance||a.id.localeCompare(b.id));

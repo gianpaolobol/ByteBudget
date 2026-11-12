@@ -105,5 +105,16 @@
   "category_deli": "Delis and rotisseries",
   "category_sushi": "Sushi",
   "category_cocktail": "Cocktail bars",
-  "dataLicenses": "Data licenses"
+  "dataLicenses": "Data licenses",
+  "addVenue": "Add a venue",
+  "addVenueAccuracy": "Wait for a more precise location and try again.",
+  "addVenuePosition": "Open this form when you are in front of the venue. The location recorded when you opened it will be used.",
+  "venueName": "Venue name",
+  "chooseVenueCategory": "Choose a category",
+  "saveLocalVenue": "Add on this device",
+  "venueFormRequired": "Enter a name and choose a category.",
+  "venueAlreadyListed": "A venue with this name is already listed nearby.",
+  "localVenue": "Added on this device",
+  "addOnOsm": "Open the OpenStreetMap editor",
+  "removeLocalVenue": "Remove from this device"
 }

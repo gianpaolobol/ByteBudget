@@ -1,5 +1,6 @@
 // Shared pictograms for venue cards and the filter rail.
 const artwork = {
+ add:'<path d="M20 8v24M8 20h24"/>',
  other:'<path d="M20 35c-5-6-12-12-12-19a12 12 0 0 1 24 0c0 7-7 13-12 19Z"/><circle cx="20" cy="16" r="3"/>',
  all:'<rect x="7" y="7" width="11" height="11" rx="2"/><rect x="22" y="7" width="11" height="11" rx="2"/><rect x="7" y="22" width="11" height="11" rx="2"/><rect x="22" y="22" width="11" height="11" rx="2"/>',
  bakery:'<path d="M9 32c-3 0-5-3-3-6L23 9c4-4 9 1 6 5L12 31Z"/><path d="m13 20 4 1m1-6 4 1m1-6 4 1"/><path d="M18 33c1-6 5-10 10-10s9 4 10 10l-6-3-4 4-4-4Z"/>',

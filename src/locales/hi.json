@@ -105,5 +105,16 @@
   "category_deli": "तैयार भोजन की दुकानें",
   "category_sushi": "सुशी",
   "category_cocktail": "कॉकटेल बार",
-  "dataLicenses": "डेटा लाइसेंस"
+  "dataLicenses": "डेटा लाइसेंस",
+  "addVenue": "स्थान जोड़ें",
+  "addVenueAccuracy": "अधिक सटीक स्थान मिलने की प्रतीक्षा करें और फिर कोशिश करें।",
+  "addVenuePosition": "स्थान के सामने फ़ॉर्म खोलें। खोलते समय दर्ज स्थान का उपयोग होगा।",
+  "venueName": "स्थान का नाम",
+  "chooseVenueCategory": "श्रेणी चुनें",
+  "saveLocalVenue": "इस डिवाइस पर जोड़ें",
+  "venueFormRequired": "नाम दर्ज करें और श्रेणी चुनें।",
+  "venueAlreadyListed": "इस नाम का एक स्थान पहले से पास में दर्ज है।",
+  "localVenue": "इस डिवाइस पर जोड़ा गया",
+  "addOnOsm": "OpenStreetMap संपादक खोलें",
+  "removeLocalVenue": "इस डिवाइस से हटाएँ"
 }

@@ -27,6 +27,12 @@ let rankedData,rankedMinute,rankedMeal,resultGroups={},resultCount=0;
 let data=null,view='discover',selected=null,meal='dinner',message='',busy=false;
 let saved=read('bb-saved',[]);if(!Array.isArray(saved))saved=[];
 const t=k=>strings[lang][k];const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const venueCategories=categoryFilters.filter(key=>key!=='all');
+let localVenues=openPilot?read('bb-local-venues',[]):[];
+if(!Array.isArray(localVenues))localVenues=[];
+localVenues=localVenues.filter(v=>typeof v?.name==='string'&&v.id?.startsWith?.('local:')&&
+ venueCategories.includes(v.category)&&Number.isFinite(v.lat)&&Math.abs(v.lat)<=90&&
+ Number.isFinite(v.lng)&&Math.abs(v.lng)<=180);
 function setData(next){
  data=next;rankedData=null;
  const activePhotos=new Set(data.venues.map(v=>v.photo?.name).filter(Boolean));
@@ -85,17 +91,17 @@ function favoriteButton(v){
 }
 function savedItems(){
  if(!data)return [];
- if(openPilot)return selectOpenPilotVenues(data,Date.now(),saved);
+ if(openPilot)return selectOpenPilotVenues(data,Date.now(),saved,localVenues);
  return selectSavedVenues(knownDataset.venues,saved,{...data,radius:DISCOVERY_RADIUS,meal,now:Date.now()});
 }
 function cards(items){
  return items.map(v=>`<article class="card" data-card-id="${esc(v.id)}" data-card-version="${esc(cardVersion(v))}"><button class="card-open" data-id="${esc(v.id)}" aria-label="${esc(v.name)}">${photoMarkup(v)}<div><h3>${esc(v.name)}</h3>${ratingMarkup(v)}<p class="subtle"><span data-distance="${esc(v.id)}">${Math.round(v.distance)} m</span></p></div></button>${favoriteButton(v)}</article>`).join('');
 }
 function categoryRail(){
- return `<div class="category-rail" role="group" aria-label="${t('categoryFilters')}">${categoryFilters.map(category=>{
+ return `<div class="category-rail"><div class="category-buttons" role="group" aria-label="${t('categoryFilters')}">${categoryFilters.map(category=>{
   const label=esc(t('category_'+category));
   return `<button type="button" data-category-filter="${category}" aria-label="${label}" title="${label}" aria-pressed="${category===activeCategory}">${categoryIcon(category)}${category==='all'?`<span>${label}</span>`:''}</button>`;
- }).join('')}</div>`;
+ }).join('')}</div><button type="button" id="add-venue" aria-label="${esc(t('addVenue'))}" title="${esc(t('addVenue'))}">${categoryIcon('add')}</button></div>`;
 }
 function listing(){
  const sections=DISCOVERY_GROUPS.map(tier=>{
@@ -109,12 +115,15 @@ function detail(){
  const v=selected;
  const site=!data.demo&&v.websiteUri&&!brokenWebsites.has(v.websiteUri)?v.websiteUri:null;
  return `<button class="back" id="back">← ${t('back')}</button>
- ${photoMarkup(v,true)}
- <div class="detail-title"><h1>${esc(v.name)}</h1>${favoriteButton(v)}</div>
+ <div class="detail-title">${photoMarkup(v,true)}
+ <h1><span>${esc(v.name)}</span>${favoriteButton(v)}</h1></div>
  <div class="facts"><span class="badge" data-detail-distance>⌖ ${Math.round(v.distance)} m</span></div>
  <div class="actions">
  ${site?`<a id="venue-website" class="secondary" href="${esc(site)}" target="_blank" rel="noopener noreferrer">${t('website')}</a>`:''}
  <button class="primary" id="route">↗ ${t('directions')}</button>
+ ${v.id.startsWith('local:')?`<p class="subtle">${esc(t('localVenue'))} · ${esc(t('category_'+v.category))}</p>
+ <a class="secondary" href="${esc(osmEditorUrl(v))}" target="_blank" rel="noopener noreferrer">${t('addOnOsm')}</a>
+ <button class="back" id="remove-local-venue">${t('removeLocalVenue')}</button>`:''}
  </div>`;
 }
 function savedView(){const items=savedItems();return `<h1>${t('saved')}</h1>${items.length?cards(items):`<div class="empty"><h2>${t('noSaved')}</h2><p>${t('noSavedText')}</p></div>`}`}
@@ -135,7 +144,7 @@ app.querySelectorAll('[data-category-filter]').forEach(button=>button.onclick=()
 });
 
 const on=(id,fn)=>{const el=app.querySelector('#'+id);if(el)el.onclick=fn};
-on('location',chooseLocation);on('demo',chooseLocation);on('credits',()=>showDialog(`<h2>${esc(t('dataLicenses'))}</h2>${mapsAttribution()}`));on('back',()=>{view=detailReturnView;message=openPilot&&!data.city?'openPilotCoverage':'';render()});on('search',()=>{
+on('add-venue',showAddVenue);on('remove-local-venue',confirmRemoveVenue);on('location',chooseLocation);on('demo',chooseLocation);on('credits',()=>showDialog(`<h2>${esc(t('dataLicenses'))}</h2>${mapsAttribution()}`));on('back',()=>{view=detailReturnView;message=openPilot&&!data.city?'openPilotCoverage':'';render()});on('search',()=>{
  if(data?.demo){search();return}
  if(openPilot&&liveUpdates){stopLocationWatch();void startLocationWatch();return}
  void locate(true);
@@ -167,7 +176,7 @@ function toggleSaved(id){
  write('bb-saved',saved);
  app.querySelectorAll('[data-save-id]').forEach(button=>{
   if(button.dataset.saveId!==id)return;
-  const name=button.closest('.card,.detail-title')?.querySelector('h3,h1')?.textContent||'';
+  const name=button.closest('.card,.detail-title')?.querySelector('h3,h1 > span')?.textContent||'';
   button.setAttribute('aria-pressed',String(saved.includes(id)));
   button.setAttribute('aria-label',t(saved.includes(id)?'unsave':'save')+' · '+name);
   button.querySelector('span').textContent=saved.includes(id)?'♥':'♡';
@@ -217,7 +226,7 @@ function computeResults(){
   const minute=Math.floor(now/60000);
   if(rankedData===data&&rankedMinute===minute&&rankedCategory===activeCategory)return;
   rankedData=data;rankedMinute=minute;rankedCategory=activeCategory;
-  const nearby=selectOpenPilotVenues(data,now).filter(venue=>
+  const nearby=selectOpenPilotVenues(data,now,undefined,localVenues).filter(venue=>
    activeCategory==='all'||(activeCategory==='takeaway'?venue.takeaway===true:displayCategory(venue.category)===activeCategory));
   resultGroups=Object.fromEntries(DISCOVERY_GROUPS.map(group=>[group,group==='unclassified'?nearby:[]]));
   resultCount=nearby.length;
@@ -240,6 +249,72 @@ function computeResults(){
 }
 function search(){view='results';message=busy?'loadingNearby':'';render();scrollTo(0,0)}
 function showDialog(html){const d=app.querySelector('#dialog');d.innerHTML=html+`<button class="secondary" id="close-dialog">${t('close')}</button>`;d.querySelector('#close-dialog').onclick=()=>d.close();d.showModal()}
+function osmEditorUrl(venue){
+ return `https://www.openstreetmap.org/edit?editor=id#map=20/${venue.lat.toFixed(6)}/${venue.lng.toFixed(6)}`;
+}
+
+function showAddVenue(){
+ const position={lat:data.lat,lng:data.lng,accuracy:data.locationAccuracy};
+ if(!Number.isFinite(position.accuracy)||position.accuracy<0||position.accuracy>75){
+  showDialog(`<h2>${t('addVenue')}</h2><p>${t('addVenueAccuracy')}</p>`);
+  return;
+ }
+ showDialog(`<h2>${t('addVenue')}</h2><p>${t('addVenuePosition')}</p>
+ <form id="venue-form">
+ <label for="venue-name">${t('venueName')}</label>
+ <input id="venue-name" required maxlength="120">
+ <label for="venue-category">${t('categoryFilters')}</label>
+ <select id="venue-category" required>
+ <option value="">${t('chooseVenueCategory')}</option>
+ ${venueCategories.map(key=>`<option value="${key}">${esc(t('category_'+key))}</option>`).join('')}
+ </select>
+ <p role="status" id="venue-form-status"></p>
+ <button class="primary" type="submit">${t('saveLocalVenue')}</button></form>`);
+ const form=app.querySelector('#venue-form');
+ form.onsubmit=event=>{
+  event.preventDefault();
+  const name=form.querySelector('#venue-name').value.trim();
+  const category=form.querySelector('#venue-category').value;
+  const status=form.querySelector('#venue-form-status');
+  if(!name||name.length>120||!venueCategories.includes(category)){
+   status.textContent=t('venueFormRequired');
+   return;
+  }
+  const normalize=value=>value.trim().normalize('NFKC').toLocaleLowerCase(lang);
+  if([...data.venues,...localVenues].some(v=>normalize(v.name)===normalize(name)&&
+    distanceMeters(position.lat,position.lng,v.lat,v.lng)<=100)){
+   status.textContent=t('venueAlreadyListed');
+   return;
+  }
+  const venue={id:'local:'+crypto.randomUUID(),name,category,takeaway:category==='takeaway',lat:position.lat,lng:position.lng};
+  const next=[...localVenues,venue];
+  try{localStorage.setItem('bb-local-venues',JSON.stringify(next))}
+  catch{status.textContent=t('error');return}
+  localVenues=next;
+  rankedData=null;
+  activeCategory=category;
+  detailReturnView='results';
+  selected={...venue,distance:distanceMeters(data.lat,data.lng,venue.lat,venue.lng)};
+  view='detail';
+  render();
+  scrollTo(0,0);
+ };
+}
+
+function confirmRemoveVenue(){
+ showDialog(`<h2>${t('removeLocalVenue')}</h2><button id="confirm-local-remove" class="primary">${t('removeLocalVenue')}</button><p role="status" id="remove-local-status"></p>`);
+ app.querySelector('#confirm-local-remove').onclick=()=>{
+  const next=localVenues.filter(v=>v.id!==selected.id);
+  try{localStorage.setItem('bb-local-venues',JSON.stringify(next))}
+  catch{app.querySelector('#remove-local-status').textContent=t('error');return}
+  localVenues=next;
+  if(saved.includes(selected.id))toggleSaved(selected.id);
+  rankedData=null;
+  view=detailReturnView;
+  selected=null;
+  render();
+ };
+}
 function chooseLocation(){if(!__BYTEBUDGET_ALLOW_DEMO__||!demoPreview)return;showDialog(`<h2>${t('choose')}</h2><p class="notice">${t('demo')}</p><select id="demo-city" aria-label="${t('choose')}"><option>London</option><option>Bologna</option><option>Tokyo</option></select><button class="primary" id="set-city">${t('done')}</button>`);app.querySelector('#set-city').onclick=()=>{setData(demoCity(app.querySelector('#demo-city').value));render()}}
 async function locate(refresh=false,automatic=false){
  if(liveUpdates&&data&&!data.demo){view='results';render();return}

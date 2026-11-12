@@ -105,5 +105,16 @@
   "category_deli": "Tiendas de comida preparada",
   "category_sushi": "Sushi",
   "category_cocktail": "Coctelerías",
-  "dataLicenses": "Licencias de datos"
+  "dataLicenses": "Licencias de datos",
+  "addVenue": "Añadir un local",
+  "addVenueAccuracy": "Espera una ubicación más precisa y vuelve a intentarlo.",
+  "addVenuePosition": "Abre el formulario frente al local. Se usará la ubicación registrada al abrirlo.",
+  "venueName": "Nombre del local",
+  "chooseVenueCategory": "Elige una categoría",
+  "saveLocalVenue": "Añadir en este dispositivo",
+  "venueFormRequired": "Introduce el nombre y la categoría.",
+  "venueAlreadyListed": "Ya hay un local con ese nombre cerca.",
+  "localVenue": "Añadido en este dispositivo",
+  "addOnOsm": "Abrir el editor de OpenStreetMap",
+  "removeLocalVenue": "Eliminar de este dispositivo"
 }
