@@ -1,5 +1,8 @@
 # ByteBudget
 
+> **Copyright © 2026 Gian Paolo Franceschini — All rights reserved for original proprietary contributions.** See [LICENSE.md](LICENSE.md). Third-party licenses and GitHub's permitted platform uses remain applicable.
+
+
 **Eat well. Your way.** International dining discovery, four city-adjusted price tiers and walking-radius search.
 
 ## Current status
